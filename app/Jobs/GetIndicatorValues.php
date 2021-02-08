@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class GetIndicatorValues implements ShouldQueue
 {
@@ -30,25 +31,45 @@ class GetIndicatorValues implements ShouldQueue
             case 'TX_CURR':
                 $this->getTxCurr();
                 break;
-            case '12M_VL':
-                $this->get12mVl();
+            case 'RETENTION_ON_ART_12_MONTHS':
+                $this->getRetentionOnArt12Months();
                 break;
-            case 'HTS_TST':
-                $this->getHtsTst();
+            case 'RETENTION_ON_ART_VL_1000_12_MONTHS':
+                $this->getRetentionOnArtVl100012Months();
                 break;
-            case 'HTS_POS':
-                $this->getHtsPos();
+            case 'TX_PVLS':
+                $this->getTxPvls();
                 break;
-            case 'HTS_LNK':
-                $this->getHtsLnk();
+            case 'MMD':
+                $this->getMmd();
+                break;
+            case 'HTS_TESTED':
+                $this->getHtsTested();
+                break;
+            case 'HTS_TESTED_POS':
+                $this->getHtsTestedPos();
+                break;
+            case 'HTS_LINKED':
+                $this->getHtsLinked();
+                break;
+            case 'HTS_INDEX':
+                $this->getHtsIndex();
+                break;
+            case 'HTS_INDEX_POS':
+                $this->getHtsIndexPos();
                 break;
             default:
                 $this->getTxNew();
                 $this->getTxCurr();
-                $this->get12mVl();
-                $this->getHtsTst();
-                $this->getHtsPos();
-                $this->getHtsLnk();
+                $this->getRetentionOnArt12Months();
+                $this->getRetentionOnArtVl100012Months();
+                $this->getTxPvls();
+                $this->getMmd();
+                $this->getHtsTested();
+                $this->getHtsTestedPos();
+                $this->getHtsLinked();
+                $this->getHtsIndex();
+                $this->getHtsIndexPos();
         }
     }
 
@@ -64,11 +85,11 @@ class GetIndicatorValues implements ShouldQueue
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'TX_NEW',
-                    'value' => $row->value,
+                    'value' => is_null($row->value) ? 0 : $row->value,
                     'facility_code' => $row->facility_code,
                     'facility_name' => $row->facility_name,
                     'indicator_date' => now(),
-                    'indicator_id' => 'F425DF84-FA3D-49A3-834B-ABD300AE10E8',
+                    'indicator_id' => strtoupper(Str::uuid()),
                     'stage' => 'DWH',
                     'facility_manifest_id' => null,
                     'posted' => false
@@ -85,11 +106,11 @@ class GetIndicatorValues implements ShouldQueue
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'TX_CURR',
-                    'value' => $row->value,
+                    'value' => is_null($row->value) ? 0 : $row->value,
                     'facility_code' => $row->facility_code,
                     'facility_name' => $row->facility_name,
                     'indicator_date' => now(),
-                    'indicator_id' => 'F425DF84-FA3D-49A3-834B-ABD300AE10E8',
+                    'indicator_id' => strtoupper(Str::uuid()),
                     'stage' => 'DWH',
                     'facility_manifest_id' => null,
                     'posted' => false
@@ -97,7 +118,7 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function get12mVl()
+    public function getRetentionOnArt12Months()
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
@@ -105,12 +126,12 @@ class GetIndicatorValues implements ShouldQueue
             ->groupBy('MFLCode')->groupBy('FacilityName')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
-                    'name' => '12M_VL',
-                    'value' => $row->value,
+                    'name' => 'RETENTION_ON_ART_12_MONTHS',
+                    'value' => is_null($row->value) ? 0 : $row->value,
                     'facility_code' => $row->facility_code,
                     'facility_name' => $row->facility_name,
                     'indicator_date' => now(),
-                    'indicator_id' => 'F425DF84-FA3D-49A3-834B-ABD300AE10E8',
+                    'indicator_id' => strtoupper(Str::uuid()),
                     'stage' => 'DWH',
                     'facility_manifest_id' => null,
                     'posted' => false
@@ -118,23 +139,20 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getHtsPos()
+    public function getRetentionOnArtVl100012Months()
     {
-        config(['database.connections.mysql2.database' => 'portaldev']);
-        $period = now()->startOf('month')->sub(1, 'month');
-        DB::connection('mysql2')->table('fact_htsuptake')
-            ->selectRaw('Mflcode as facility_code, FacilityName as facility_name, SUM(Positive) as value')
-            ->where('year', $period->format('Y'))
-            ->where('month', $period->format('n'))
-            ->groupBy('Mflcode')->groupBy('FacilityName')
+        config(['database.connections.sqlsrv.database' => 'PortalDev']);
+        DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
+            ->selectRaw('MFLCode as facility_code, FacilityName as facility_name, SUM(Last12MVLSup) as value')
+            ->groupBy('MFLCode')->groupBy('FacilityName')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
-                    'name' => 'HTS_POS',
-                    'value' => $row->value,
+                    'name' => 'RETENTION_ON_ART_VL_1000_12_MONTHS',
+                    'value' => is_null($row->value) ? 0 : $row->value,
                     'facility_code' => $row->facility_code,
                     'facility_name' => $row->facility_name,
                     'indicator_date' => now(),
-                    'indicator_id' => 'F425DF84-FA3D-49A3-834B-ABD300AE10E8',
+                    'indicator_id' => strtoupper(Str::uuid()),
                     'stage' => 'DWH',
                     'facility_manifest_id' => null,
                     'posted' => false
@@ -142,7 +160,51 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getHtsTst()
+    public function getTxPvls()
+    {
+        config(['database.connections.sqlsrv.database' => 'PortalDev']);
+        DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
+            ->selectRaw('MFLCode as facility_code, FacilityName as facility_name, SUM(Last12MVLSup) as value1, SUM(Last12MonthVL) as value2')
+            ->groupBy('MFLCode')->groupBy('FacilityName')
+            ->cursor()->each(function ($row) {
+                $value = intval((is_null($row->value2) ? 0 : $row->value2)) > 0 ?
+                    (intval((is_null($row->value1) ? 0 : $row->value1))/intval((is_null($row->value2) ? 0 : $row->value2))) * 100 : 0;
+                \App\Models\LiveSyncIndicator::create([
+                    'name' => 'TX_PVLS',
+                    'value' => number_format((float) $value, 0, '.', ''),
+                    'facility_code' => $row->facility_code,
+                    'facility_name' => $row->facility_name,
+                    'indicator_date' => now(),
+                    'indicator_id' => strtoupper(Str::uuid()),
+                    'stage' => 'DWH',
+                    'facility_manifest_id' => null,
+                    'posted' => false
+                ]);
+            });
+    }
+
+    public function getMmd()
+    {
+        config(['database.connections.sqlsrv.database' => 'PortalDev']);
+        DB::connection('sqlsrv')->table('FACT_Trans_DSD_Cascade')
+            ->selectRaw('MFLCode as facility_code, FacilityName as facility_name, SUM(OnMMD) as value')
+            ->groupBy('MFLCode')->groupBy('FacilityName')
+            ->cursor()->each(function ($row) {
+                \App\Models\LiveSyncIndicator::create([
+                    'name' => 'MMD',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'facility_code' => $row->facility_code,
+                    'facility_name' => $row->facility_name,
+                    'indicator_date' => now(),
+                    'indicator_id' => strtoupper(Str::uuid()),
+                    'stage' => 'DWH',
+                    'facility_manifest_id' => null,
+                    'posted' => false
+                ]);
+            });
+    }
+
+    public function getHtsTested()
     {
         config(['database.connections.mysql2.database' => 'portaldev']);
         $period = now()->startOf('month')->sub(1, 'month');
@@ -153,12 +215,12 @@ class GetIndicatorValues implements ShouldQueue
             ->groupBy('Mflcode')->groupBy('FacilityName')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
-                    'name' => 'HTS_TST',
-                    'value' => $row->value,
+                    'name' => 'HTS_TESTED',
+                    'value' => is_null($row->value) ? 0 : $row->value,
                     'facility_code' => $row->facility_code,
                     'facility_name' => $row->facility_name,
                     'indicator_date' => now(),
-                    'indicator_id' => 'F425DF84-FA3D-49A3-834B-ABD300AE10E8',
+                    'indicator_id' => strtoupper(Str::uuid()),
                     'stage' => 'DWH',
                     'facility_manifest_id' => null,
                     'posted' => false
@@ -166,7 +228,31 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getHtsLnk()
+    public function getHtsTestedPos()
+    {
+        config(['database.connections.mysql2.database' => 'portaldev']);
+        $period = now()->startOf('month')->sub(1, 'month');
+        DB::connection('mysql2')->table('fact_htsuptake')
+            ->selectRaw('Mflcode as facility_code, FacilityName as facility_name, SUM(Positive) as value')
+            ->where('year', $period->format('Y'))
+            ->where('month', $period->format('n'))
+            ->groupBy('Mflcode')->groupBy('FacilityName')
+            ->cursor()->each(function ($row) {
+                \App\Models\LiveSyncIndicator::create([
+                    'name' => 'HTS_TESTED_POS',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'facility_code' => $row->facility_code,
+                    'facility_name' => $row->facility_name,
+                    'indicator_date' => now(),
+                    'indicator_id' => strtoupper(Str::uuid()),
+                    'stage' => 'DWH',
+                    'facility_manifest_id' => null,
+                    'posted' => false
+                ]);
+            });
+    }
+
+    public function getHtsLinked()
     {
         config(['database.connections.mysql2.database' => 'portaldev']);
         $period = now()->startOf('month')->sub(1, 'month');
@@ -177,16 +263,58 @@ class GetIndicatorValues implements ShouldQueue
             ->groupBy('Mflcode')->groupBy('FacilityName')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
-                    'name' => 'HTS_LNK',
-                    'value' => $row->value,
+                    'name' => 'HTS_LINKED',
+                    'value' => is_null($row->value) ? 0 : $row->value,
                     'facility_code' => $row->facility_code,
                     'facility_name' => $row->facility_name,
                     'indicator_date' => now(),
-                    'indicator_id' => 'F425DF84-FA3D-49A3-834B-ABD300AE10E8',
+                    'indicator_id' => strtoupper(Str::uuid()),
                     'stage' => 'DWH',
                     'facility_manifest_id' => null,
                     'posted' => false
                 ]);
             });
     }
-}
+
+    public function getHtsIndex()
+    {
+        config(['database.connections.mysql2.database' => 'portaldev']);
+        $period = now()->startOf('month')->sub(1, 'month');
+        DB::connection('mysql2')->table('fact_htsuptake')
+            ->selectRaw('Mflcode as facility_code, FacilityName as facility_name, SUM(Positive) as value')
+            ->where('year', $period->format('Y'))
+            ->where('month', $period->format('n'))
+            ->groupBy('Mflcode')->groupBy('FacilityName')
+            ->cursor()->each(function ($row) {
+                \App\Models\LiveSyncIndicator::create([
+                    'name' => 'HTS_INDEX',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'facility_code' => $row->facility_code,
+                    'facility_name' => $row->facility_name,
+                    'indicator_date' => now(),
+                    'indicator_id' => strtoupper(Str::uuid()),
+                    'stage' => 'DWH',
+                    'facility_manifest_id' => null,
+                    'posted' => false
+                ]);
+            });
+    }
+
+    public function getHtsIndexPos()
+    {
+        config(['database.connections.mysql2.database' => 'portaldev']);
+        $period = now()->startOf('month')->sub(1, 'month');
+        DB::connection('mysql2')->table('fact_pns_knowledgehivstatus')
+            ->selectRaw('Mflcode as facility_code, FacilityName as facility_name, SUM(Positive) as value')
+            ->where('year', $period->format('Y'))
+            ->where('month', $period->format('n'))
+            ->groupBy('Mflcode')->groupBy('FacilityName')
+            ->cursor()->each(function ($row) {
+                \App\Models\LiveSyncIndicator::create([
+                    'name' => 'HTS_INDEX_POS',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'facility_code' => $row->facility_code,
+                    'facility_name' => $row->facility_name,
+                    'indicator_date' => now(),
+                    'indicator_id' => strtoupper(Str::uuid()),
+0AE10E8',
