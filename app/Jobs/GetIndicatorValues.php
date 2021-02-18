@@ -317,4 +317,7 @@ class GetIndicatorValues implements ShouldQueue
                     'facility_name' => $row->facility_name,
                     'indicator_date' => now(),
                     'indicator_id' => strtoupper(Str::uuid()),
-0AE10E8',
+                ]);
+            });
+    }
+}
