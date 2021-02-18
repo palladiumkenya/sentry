@@ -6,23 +6,14 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
     public function register()
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
     public function boot()
     {
-        //
+        \App\Models\GetIndicatorsJob::observe(\App\Observers\GetIndicatorsJobObserver::class);
+        \App\Models\PostLiveSyncIndicatorsJob::observe(\App\Observers\PostLiveSyncIndicatorsJobObserver::class);
     }
 }
