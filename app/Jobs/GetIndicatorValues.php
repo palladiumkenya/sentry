@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,67 +17,70 @@ class GetIndicatorValues implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $indicator;
+    protected $period;
 
-    public function __construct($indicator)
+    public function __construct($indicator, $period = null)
     {
         $this->indicator = $indicator;
+        $this->period = is_null($period) ?
+            now()->startOf('month')->sub(1, 'month') :
+            Carbon::parse($period);
     }
 
     public function handle()
     {
         switch ($this->indicator) {
             case 'TX_NEW':
-                $this->getTxNew();
+                $this->getTxNew($this->period);
                 break;
             case 'TX_CURR':
-                $this->getTxCurr();
+                $this->getTxCurr($this->period);
                 break;
             case 'RETENTION_ON_ART_12_MONTHS':
-                $this->getRetentionOnArt12Months();
+                $this->getRetentionOnArt12Months($this->period);
                 break;
             case 'RETENTION_ON_ART_VL_1000_12_MONTHS':
-                $this->getRetentionOnArtVl100012Months();
+                $this->getRetentionOnArtVl100012Months($this->period);
                 break;
             case 'TX_PVLS':
-                $this->getTxPvls();
+                $this->getTxPvls($this->period);
                 break;
             case 'MMD':
-                $this->getMmd();
+                $this->getMmd($this->period);
                 break;
             case 'HTS_TESTED':
-                $this->getHtsTested();
+                $this->getHtsTested($this->period);
                 break;
             case 'HTS_TESTED_POS':
-                $this->getHtsTestedPos();
+                $this->getHtsTestedPos($this->period);
                 break;
             case 'HTS_LINKED':
-                $this->getHtsLinked();
+                $this->getHtsLinked($this->period);
                 break;
             case 'HTS_INDEX':
-                $this->getHtsIndex();
+                $this->getHtsIndex($this->period);
                 break;
             case 'HTS_INDEX_POS':
-                $this->getHtsIndexPos();
+                $this->getHtsIndexPos($this->period);
                 break;
             default:
-                $this->getTxNew();
-                $this->getTxCurr();
-                $this->getRetentionOnArt12Months();
-                $this->getRetentionOnArtVl100012Months();
-                $this->getTxPvls();
-                $this->getMmd();
-                $this->getHtsTested();
-                $this->getHtsTestedPos();
-                $this->getHtsLinked();
-                $this->getHtsIndex();
-                $this->getHtsIndexPos();
+                $this->getTxNew($this->period);
+                $this->getTxCurr($this->period);
+                $this->getRetentionOnArt12Months($this->period);
+                $this->getRetentionOnArtVl100012Months($this->period);
+                $this->getTxPvls($this->period);
+                $this->getMmd($this->period);
+                $this->getHtsTested($this->period);
+                $this->getHtsTestedPos($this->period);
+                $this->getHtsLinked($this->period);
+                $this->getHtsIndex($this->period);
+                $this->getHtsIndexPos($this->period);
         }
     }
 
-    public function getTxNew()
+    public function getTxNew($period)
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
-        $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('sqlsrv')->table('FACT_Trans_Newly_Started')
             ->selectRaw('MFLCode as facility_code, MAX(FacilityName) as facility_name, SUM(StartedART) as value')
             ->where('Start_Year', $period->format('Y'))
@@ -98,7 +102,7 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getTxCurr()
+    public function getTxCurr($period)
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
@@ -120,7 +124,7 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getRetentionOnArt12Months()
+    public function getRetentionOnArt12Months($period)
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
@@ -142,7 +146,7 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getRetentionOnArtVl100012Months()
+    public function getRetentionOnArtVl100012Months($period)
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
@@ -164,7 +168,7 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getTxPvls()
+    public function getTxPvls($period)
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
@@ -188,7 +192,7 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getMmd()
+    public function getMmd($period)
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('FACT_Trans_DSD_Cascade')
@@ -210,10 +214,9 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getHtsTested()
+    public function getHtsTested($period)
     {
         config(['database.connections.mysql2.database' => 'portaldev']);
-        $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('mysql2')->table('fact_htsuptake')
             ->selectRaw('Mflcode as facility_code, MAX(FacilityName) as facility_name, SUM(Tested) as value')
             ->whereNotNull('Mflcode')
@@ -235,10 +238,9 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getHtsTestedPos()
+    public function getHtsTestedPos($period)
     {
         config(['database.connections.mysql2.database' => 'portaldev']);
-        $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('mysql2')->table('fact_htsuptake')
             ->selectRaw('Mflcode as facility_code, MAX(FacilityName) as facility_name, SUM(Positive) as value')
             ->whereNotNull('Mflcode')
@@ -260,10 +262,9 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getHtsLinked()
+    public function getHtsLinked($period)
     {
         config(['database.connections.mysql2.database' => 'portaldev']);
-        $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('mysql2')->table('fact_htsuptake')
             ->selectRaw('Mflcode as facility_code, MAX(FacilityName) as facility_name, SUM(Linked) as value')
             ->whereNotNull('Mflcode')
@@ -285,10 +286,9 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getHtsIndex()
+    public function getHtsIndex($period)
     {
         config(['database.connections.mysql2.database' => 'portaldev']);
-        $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('mysql2')->table('fact_htsuptake')
             ->selectRaw('Mflcode as facility_code, MAX(FacilityName) as facility_name, SUM(Positive) as value')
             ->whereNotNull('Mflcode')
@@ -310,10 +310,9 @@ class GetIndicatorValues implements ShouldQueue
             });
     }
 
-    public function getHtsIndexPos()
+    public function getHtsIndexPos($period)
     {
         config(['database.connections.mysql2.database' => 'portaldev']);
-        $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('mysql2')->table('fact_pns_knowledgehivstatus')
             ->selectRaw('Mflcode as facility_code, MAX(FacilityName) as facility_name, SUM(Positive) as value')
             ->whereNotNull('Mflcode')
