@@ -78,10 +78,11 @@ class GetIndicatorValues implements ShouldQueue
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('sqlsrv')->table('FACT_Trans_Newly_Started')
-            ->selectRaw('MFLCode as facility_code, FacilityName as facility_name, SUM(StartedART) as value')
+            ->selectRaw('MFLCode as facility_code, MAX(FacilityName) as facility_name, SUM(StartedART) as value')
             ->where('Start_Year', $period->format('Y'))
             ->where('StartART_Month', $period->format('n'))
-            ->groupBy('MFLCode')->groupBy('FacilityName')
+            ->whereNotNull('MFLCode')
+            ->groupBy('MFLCode')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'TX_NEW',
@@ -101,8 +102,9 @@ class GetIndicatorValues implements ShouldQueue
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
-            ->selectRaw('MFLCode as facility_code, FacilityName as facility_name, SUM(TXCURR_Total) as value')
-            ->groupBy('MFLCode')->groupBy('FacilityName')
+            ->selectRaw('MFLCode as facility_code, MAX(FacilityName) as facility_name, SUM(TXCURR_Total) as value')
+            ->whereNotNull('MFLCode')
+            ->groupBy('MFLCode')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'TX_CURR',
@@ -122,8 +124,9 @@ class GetIndicatorValues implements ShouldQueue
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
-            ->selectRaw('MFLCode as facility_code, FacilityName as facility_name, SUM(Last12MonthVL) as value')
-            ->groupBy('MFLCode')->groupBy('FacilityName')
+            ->selectRaw('MFLCode as facility_code, MAX(FacilityName) as facility_name, SUM(Last12MonthVL) as value')
+            ->whereNotNull('MFLCode')
+            ->groupBy('MFLCode')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'RETENTION_ON_ART_12_MONTHS',
@@ -143,8 +146,9 @@ class GetIndicatorValues implements ShouldQueue
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
-            ->selectRaw('MFLCode as facility_code, FacilityName as facility_name, SUM(Last12MVLSup) as value')
-            ->groupBy('MFLCode')->groupBy('FacilityName')
+            ->selectRaw('MFLCode as facility_code, MAX(FacilityName) as facility_name, SUM(Last12MVLSup) as value')
+            ->whereNotNull('MFLCode')
+            ->groupBy('MFLCode')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'RETENTION_ON_ART_VL_1000_12_MONTHS',
@@ -164,8 +168,9 @@ class GetIndicatorValues implements ShouldQueue
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
-            ->selectRaw('MFLCode as facility_code, FacilityName as facility_name, SUM(Last12MVLSup) as value1, SUM(Last12MonthVL) as value2')
-            ->groupBy('MFLCode')->groupBy('FacilityName')
+            ->selectRaw('MFLCode as facility_code, MAX(FacilityName) as facility_name, SUM(Last12MVLSup) as value1, SUM(Last12MonthVL) as value2')
+            ->whereNotNull('MFLCode')
+            ->groupBy('MFLCode')
             ->cursor()->each(function ($row) {
                 $value = intval((is_null($row->value2) ? 0 : $row->value2)) > 0 ?
                     (intval((is_null($row->value1) ? 0 : $row->value1))/intval((is_null($row->value2) ? 0 : $row->value2))) * 100 : 0;
@@ -187,8 +192,9 @@ class GetIndicatorValues implements ShouldQueue
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         DB::connection('sqlsrv')->table('FACT_Trans_DSD_Cascade')
-            ->selectRaw('MFLCode as facility_code, FacilityName as facility_name, SUM(OnMMD) as value')
-            ->groupBy('MFLCode')->groupBy('FacilityName')
+            ->selectRaw('MFLCode as facility_code, MAX(FacilityName) as facility_name, SUM(OnMMD) as value')
+            ->whereNotNull('MFLCode')
+            ->groupBy('MFLCode')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'MMD',
@@ -209,10 +215,11 @@ class GetIndicatorValues implements ShouldQueue
         config(['database.connections.mysql2.database' => 'portaldev']);
         $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('mysql2')->table('fact_htsuptake')
-            ->selectRaw('Mflcode as facility_code, FacilityName as facility_name, SUM(Tested) as value')
+            ->selectRaw('Mflcode as facility_code, MAX(FacilityName) as facility_name, SUM(Tested) as value')
+            ->whereNotNull('Mflcode')
             ->where('year', $period->format('Y'))
             ->where('month', $period->format('n'))
-            ->groupBy('Mflcode')->groupBy('FacilityName')
+            ->groupBy('Mflcode')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'HTS_TESTED',
@@ -233,10 +240,11 @@ class GetIndicatorValues implements ShouldQueue
         config(['database.connections.mysql2.database' => 'portaldev']);
         $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('mysql2')->table('fact_htsuptake')
-            ->selectRaw('Mflcode as facility_code, FacilityName as facility_name, SUM(Positive) as value')
+            ->selectRaw('Mflcode as facility_code, MAX(FacilityName) as facility_name, SUM(Positive) as value')
+            ->whereNotNull('Mflcode')
             ->where('year', $period->format('Y'))
             ->where('month', $period->format('n'))
-            ->groupBy('Mflcode')->groupBy('FacilityName')
+            ->groupBy('Mflcode')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'HTS_TESTED_POS',
@@ -257,10 +265,11 @@ class GetIndicatorValues implements ShouldQueue
         config(['database.connections.mysql2.database' => 'portaldev']);
         $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('mysql2')->table('fact_htsuptake')
-            ->selectRaw('Mflcode as facility_code, FacilityName as facility_name, SUM(Linked) as value')
+            ->selectRaw('Mflcode as facility_code, MAX(FacilityName) as facility_name, SUM(Linked) as value')
+            ->whereNotNull('Mflcode')
             ->where('year', $period->format('Y'))
             ->where('month', $period->format('n'))
-            ->groupBy('Mflcode')->groupBy('FacilityName')
+            ->groupBy('Mflcode')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'HTS_LINKED',
@@ -281,10 +290,11 @@ class GetIndicatorValues implements ShouldQueue
         config(['database.connections.mysql2.database' => 'portaldev']);
         $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('mysql2')->table('fact_htsuptake')
-            ->selectRaw('Mflcode as facility_code, FacilityName as facility_name, SUM(Positive) as value')
+            ->selectRaw('Mflcode as facility_code, MAX(FacilityName) as facility_name, SUM(Positive) as value')
+            ->whereNotNull('Mflcode')
             ->where('year', $period->format('Y'))
             ->where('month', $period->format('n'))
-            ->groupBy('Mflcode')->groupBy('FacilityName')
+            ->groupBy('Mflcode')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'HTS_INDEX',
@@ -305,10 +315,11 @@ class GetIndicatorValues implements ShouldQueue
         config(['database.connections.mysql2.database' => 'portaldev']);
         $period = now()->startOf('month')->sub(1, 'month');
         DB::connection('mysql2')->table('fact_pns_knowledgehivstatus')
-            ->selectRaw('Mflcode as facility_code, FacilityName as facility_name, SUM(Positive) as value')
+            ->selectRaw('Mflcode as facility_code, MAX(FacilityName) as facility_name, SUM(Positive) as value')
+            ->whereNotNull('Mflcode')
             ->where('year', $period->format('Y'))
             ->where('month', $period->format('n'))
-            ->groupBy('Mflcode')->groupBy('FacilityName')
+            ->groupBy('Mflcode')
             ->cursor()->each(function ($row) {
                 \App\Models\LiveSyncIndicator::create([
                     'name' => 'HTS_INDEX_POS',

@@ -26,7 +26,7 @@ class PostLiveSyncIndicator implements ShouldQueue
     {
         $client = new Client();
         $response = $client->request('POST', 'stages/indicator', [
-            'base_uri' => env('LIVE_SYNC_URL', 'http://localhost:4777'),
+            'base_uri' => env('LIVE_SYNC_URL'),
             'timeout'  => 10.0,
             'json' => [[
                 'id' => $this->liveSyncIndicator->indicator_id,
