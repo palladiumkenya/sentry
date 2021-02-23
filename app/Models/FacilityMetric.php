@@ -24,7 +24,9 @@ class FacilityMetric extends Model
     ];
 
     protected $casts = [
-        'updated' => 'datetime',
+        'create_date' => 'datetime',
+        'metric_date' => 'datetime',
+        'dwh_metric_date' => 'datetime',
     ];
 
     public function facility()
