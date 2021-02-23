@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\Facility;
+use App\Models\FacilityMetric;
+use Carbon\Carbon;
+use GuzzleHttp\Client;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
+class GetSpotFacilityMetrics implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public function __construct()
+    {
+        //
+    }
+
+    public function handle()
+    {
+        Facility::whereNotNull('uid')->cursor()->each(function($facility) {
+            $client = new Client();
+            $response = $client->request('GET', 'api/v1/metrics/facmetrics/getIndicatorsByFacilityId/'.$facility->uid, [
+                'base_uri' => env('SPOT_API_URL'),
+                'verify' => false,
+                'timeout'  => 60,
+            ]);
+            if ($response->getStatusCode() == 200) {
+                $response = json_decode($response->getBody(), true);
+                foreach ($response as $metric) {
+                    $facilityMetric = FacilityMetric::where('uid', $metric['_id'])->first();
+                    if (!$facilityMetric) {
+                        $facilityMetric = FacilityMetric::create([
+                            'facility_id' => $facility->id,
+                            'create_date' => $metric['createDate'] ? Carbon::parse($metric['createDate'])->format('Y-m-d H:i:s') : null,
+                            'name' => $metric['name'],
+                            'value' => $metric['value'],
+                            'metric_date' => Carbon::parse($metric['indicatorDate'])->format('Y-m-d H:i:s'),
+                            'dwh_value' => $metric['dwhValue'],
+                            'dwh_metric_date' => $metric['dwhIndicatorDate'] ? Carbon::parse($metric['dwhIndicatorDate'])->format('Y-m-d H:i:s') : null,
+                            'manifest_id' => $metric['facilityManifestId'],
+                            'posted' => false,
+                        ]);
+                    } else {
+                        // update ? --for now no
+                        if (!is_null($metric['dwhValue']) && is_null($facilityMetric->dwh_value)) {
+                            $facilityMetric->update([
+                                'dwh_value' => $metric['dwhValue'],
+                                'dwh_metric_date' => $metric['dwhIndicatorDate'] ? Carbon::parse($metric['dwhIndicatorDate'])->format('Y-m-d H:i:s') : null,
+                                'posted' => false
+                            ]);
+                        }
+                    }
+                }
+            }
+        });
+    }
+}

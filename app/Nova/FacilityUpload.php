@@ -19,7 +19,7 @@ class FacilityUpload extends Resource
 
     public static $search = ['id', 'uid', 'partner', 'docket'];
 
-    public static $displayInNavigation = true;
+    public static $displayInNavigation = false;
 
     public static $perPageViaRelationship = 30;
 

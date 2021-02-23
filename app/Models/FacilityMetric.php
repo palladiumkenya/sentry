@@ -4,12 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FacilityMetric extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    protected $fillable = ['*'];
+    protected $fillable = [
+        'facility_id',
+        'uid',
+        'create_date',
+        'name',
+        'value',
+        'metric_date',
+        'manifest_id',
+        'dwh_value',
+        'dwh_metric_date',
+        'posted',
+    ];
 
     protected $casts = [
         'updated' => 'datetime',
