@@ -16,13 +16,14 @@ class CreateFacilitiesTable extends Migration
         Schema::create('facilities', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code');
-            $table->string('uid')->nullable();
-            $table->string('county')->nullable();
-            $table->string('partner')->nullable();
-            $table->string('source')->nullable();
-            $table->boolean('posted')->default(false);
+            $table->string('code')->index();
+            $table->string('uid')->nullable()->index();
+            $table->string('county')->nullable()->index();
+            $table->string('partner')->nullable()->index();
+            $table->string('source')->nullable()->index();
+            $table->boolean('posted')->default(false)->index();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
