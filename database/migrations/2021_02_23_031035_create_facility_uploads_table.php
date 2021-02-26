@@ -23,6 +23,7 @@ class CreateFacilityUploadsTable extends Migration
             $table->bigInteger('received')->nullable();
             $table->string('status')->nullable()->index();
             $table->dateTime('updated')->nullable();
+            $table->boolean('processed')->default(false)->index();
             $table->boolean('posted')->default(false)->index();
             $table->timestamps();
             $table->softDeletes();

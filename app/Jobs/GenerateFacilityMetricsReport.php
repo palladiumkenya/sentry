@@ -3,32 +3,29 @@
 namespace App\Jobs;
 
 use App\Models\Facility;
-use Illuminate\Bus\Queueable;
 use App\Models\FacilityMetric;
-use Spatie\Browsershot\Browsershot;
 use Barryvdh\Snappy\Facades\SnappyPdf;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class GenerateFacilityMetricsReport implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct()
+    protected $facility;
+
+    public function __construct(Facility $facility)
     {
-        //
+        $this->facility = $facility;
     }
 
     public function handle()
     {
-        $facility = Facility::whereIn('code', ['13548'])->first();
-        if (!$facility) {
-            return;
-        }
-        $metrics = FacilityMetric::where('facility_id', $facility->id)
+        $metrics = FacilityMetric::where('facility_id', $this->facility->id)
             ->whereNotNull('name')
             ->whereNotNull('value')
             ->whereNotNull('dwh_value')
@@ -50,10 +47,9 @@ class GenerateFacilityMetricsReport implements ShouldQueue
             "HTS_INDEX" => "Individuals who were identified and tested using Index testing services and received their results",
             "TX_PVLS" => "Individuals of ART patients with a suppressed viral load within the past 12 months",
             "HTS_INDEX_POS" => "Individuals who tested positive using Index testing services and received their results",
-            "TX_RTT" => "Patients who experienced interruption in treatment previously and restarted ARVs in this month"
+            "TX_RTT" => "Patients who experienced interruption in treatment previously and restarted ARVs in this month",
+            "TX_ML" => "Individuals who were on ART previously then had no clinical contact since their last expected contact",
         ];
-        SnappyPdf::loadView('reports.facilities.metrics', compact('facility', 'metrics', 'descriptions'))->save($path);
-        // Browsershot::html($view)->landscape(true)->showBackground()->save($path);
+        SnappyPdf::loadView('reports.facilities.metrics', compact('facility', 'metrics', 'descriptions'))->setOrientation('landscape')->save($path);
     }
 }
-

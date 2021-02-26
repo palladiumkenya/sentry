@@ -11,8 +11,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
+use stdClass;
 
-class SendETLCompletedEmail implements ShouldQueue
+class SendEtlCompletedEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -23,8 +24,10 @@ class SendETLCompletedEmail implements ShouldQueue
 
     public function handle()
     {
-        $user = User::find(1);
-        $contact = new User;
+        $user = new stdClass();
+        $user->email = 'eric.ejimba@thepalladiumgroup.com';
+        $user->name = 'Eric Ejimba';
+        $contact = new stdClass();
         $contact->email = 'Koske.Kimutai@thepalladiumgroup.com';
         $contact->name = 'Koske Kimutai';
         $partner = 'Palladium';
@@ -32,7 +35,7 @@ class SendETLCompletedEmail implements ShouldQueue
         $unsubscribe_url = "https://auth.kenyahmis.org/dwhidentity/api/EmailService/Unsubscribe/".$user->email;
         $file = storage_path('app/reports/palladium_ndwh_dqa.pdf');
 
-        Mail::to('eric.ejimba@thepalladiumgroup.com')->send(new ETLCompleted(
+        Mail::to($user->email)->send(new ETLCompleted(
             $user,
             $contact,
             $partner,

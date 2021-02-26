@@ -1,7 +1,7 @@
 @component('mail::message')
 Dear {{ $user->name }}
 
-Your data upload to the National Data Warehouse has been successfully refreshed as at {{ $refresh_date }}.<br>
+Your data upload to the National Data Warehouse has been successfully refreshed as at {{ $refresh_date->format('d M Y') }}.<br>
 
 Find attached a summary Data Quality Assurance report.
 

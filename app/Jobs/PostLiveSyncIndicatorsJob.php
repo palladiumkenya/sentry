@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Jobs\PostLiveSyncIndicator;
+use App\Models\Facility;
 use App\Models\LiveSyncIndicator;
 use App\Models\PostLiveSyncIndicatorsJob as PostLiveSyncIndicatorsJobModel;
 use Illuminate\Bus\Queueable;
@@ -27,7 +28,8 @@ class PostLiveSyncIndicatorsJob implements ShouldQueue
         $this->postLiveSyncIndicatorsJob->started_at = now();
         $this->postLiveSyncIndicatorsJob->save();
 
-        LiveSyncIndicator::where('posted', false)
+        LiveSyncIndicator::whereIn('facility_code', Facility::where('etl', true)->pluck('code')->toArray())
+            ->where('posted', false)
             ->where('created_at', '<=', now()->subtract('minutes', 5))
             ->cursor()->each(function ($liveSyncIndicator) {
                 PostLiveSyncIndicator::dispatch($liveSyncIndicator);
@@ -35,8 +37,5 @@ class PostLiveSyncIndicatorsJob implements ShouldQueue
 
         $this->postLiveSyncIndicatorsJob->completed_at = now();
         $this->postLiveSyncIndicatorsJob->save();
-
-        // $retainIds = PostLiveSyncIndicatorsJobModel::whereNotNull('completed_at')->orderBy('id', 'DESC')->take(10)->pluck('id')->toArray();
-        // PostLiveSyncIndicatorsJobModel::whereNotNull('completed_at')->whereNotIn('id', $retainIds)->delete();
     }
 }

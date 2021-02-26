@@ -21,6 +21,8 @@ class CreateFacilitiesTable extends Migration
             $table->string('county')->nullable()->index();
             $table->string('partner')->nullable()->index();
             $table->string('source')->nullable()->index();
+            $table->boolean('etl')->default(false)->index();
+            $table->boolean('processed')->default(false)->index();
             $table->boolean('posted')->default(false)->index();
             $table->timestamps();
             $table->softDeletes();

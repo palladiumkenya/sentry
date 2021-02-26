@@ -29,7 +29,7 @@
             <tbody>
                 @foreach($metrics as $metric)
                     <tr>
-                        <td>{{ $metric->name }}</td>
+                        <td width="20%">{{ $metric->name }}</td>
                         <td width="40%">{{ $descriptions[$metric->name] }}</td>
                         <td align="right">{{ $metric->value }}</td>
                         <td align="right">{{ $metric->metric_date->format('d M Y') }}</td>
@@ -40,6 +40,11 @@
             </tbody>
         </table>
         <!-- <h2 class="pt-4 pb-4 text-2xl font-semibold">Upload History</h2> -->
+        <br>
+        <p class="tracking-tighter text-2xl">This report can also be accessed from:</p>
+        <a class="tracking-tighter text-2xl" href="https://spot.kenyahmis.org/#/stats/showcase/{{ $facility->uid }}">
+            https://spot.kenyahmis.org/#/stats/showcase/{{ $facility->uid }}
+        </a>
     </div>
 </div>
 </body>

@@ -4,6 +4,7 @@ namespace App\Nova;
 
 use Laravel\Nova\Fields\ID;
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Text;
 
 class Facility extends Resource
@@ -34,6 +35,7 @@ class Facility extends Resource
             Text::make('GUID',  'uid')->sortable()->onlyOnDetail(),
             Text::make('County',  'county')->sortable(),
             Text::make('Partner',  'partner')->sortable(),
+            Boolean::make('ETL',  'etl')->sortable(),
         ];
     }
 
@@ -54,6 +56,8 @@ class Facility extends Resource
 
     public function actions(Request $request)
     {
-        return [];
+        return [
+            new Actions\ToggleEtlStatus,
+        ];
     }
 }

@@ -21,9 +21,10 @@ class CreateFacilityMetricsTable extends Migration
             $table->string('name')->nullable()->index();
             $table->string('value')->nullable();
             $table->dateTime('metric_date')->nullable();
-            $table->dateTime('manifest_id')->nullable()->index();
+            $table->string('manifest_id')->nullable()->index();
             $table->string('dwh_value')->nullable();
             $table->dateTime('dwh_metric_date')->nullable();
+            $table->boolean('processed')->default(false)->index();
             $table->boolean('posted')->default(false)->index();
             $table->timestamps();
             $table->softDeletes();

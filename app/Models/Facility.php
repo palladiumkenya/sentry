@@ -17,6 +17,18 @@ class Facility extends Model
         'county',
         'partner',
         'source',
+        'etl',
+        'processed',
         'posted'
     ];
+
+    public function etlJobs()
+    {
+        return $this->belongsToMany(EtlJob::class)
+            ->using(EtlJobFacility::class)
+            ->withPivot([
+                'created_at',
+                'updated_at',
+            ]);
+    }
 }

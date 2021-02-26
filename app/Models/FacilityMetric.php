@@ -20,6 +20,7 @@ class FacilityMetric extends Model
         'manifest_id',
         'dwh_value',
         'dwh_metric_date',
+        'processed',
         'posted',
     ];
 

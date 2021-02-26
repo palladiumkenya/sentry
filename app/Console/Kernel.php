@@ -16,7 +16,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->job(new GetSpotFacilities())->everyTenMinutes()->withoutOverlapping();
-        $schedule->job(new GetSpotFacilityMetrics())->everyThirtyMinutes()->withoutOverlapping();
         $schedule->command('sentry:get-indicators')->mondays()->at('7:00');
         $schedule->command('sentry:post-live-sync-indicators')->everyThirtyMinutes()->withoutOverlapping();
     }

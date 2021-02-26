@@ -13,6 +13,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        \App\Models\EtlJob::observe(\App\Observers\EtlJobObserver::class);
         \App\Models\GetIndicatorsJob::observe(\App\Observers\GetIndicatorsJobObserver::class);
         \App\Models\PostLiveSyncIndicatorsJob::observe(\App\Observers\PostLiveSyncIndicatorsJobObserver::class);
     }
