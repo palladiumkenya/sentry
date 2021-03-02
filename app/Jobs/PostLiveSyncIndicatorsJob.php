@@ -2,9 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Jobs\PostLiveSyncIndicator;
-use App\Models\Facility;
-use App\Models\LiveSyncIndicator;
+use App\Jobs\PostLiveSyncIndicators;
 use App\Models\PostLiveSyncIndicatorsJob as PostLiveSyncIndicatorsJobModel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,14 +25,7 @@ class PostLiveSyncIndicatorsJob implements ShouldQueue
     {
         $this->postLiveSyncIndicatorsJob->started_at = now();
         $this->postLiveSyncIndicatorsJob->save();
-
-        LiveSyncIndicator::whereIn('facility_code', Facility::where('etl', true)->pluck('code')->toArray())
-            ->where('posted', false)
-            ->where('created_at', '<=', now()->subtract('minutes', 5))
-            ->cursor()->each(function ($liveSyncIndicator) {
-                PostLiveSyncIndicator::dispatch($liveSyncIndicator);
-            });
-
+        PostLiveSyncIndicators::dispatch();
         $this->postLiveSyncIndicatorsJob->completed_at = now();
         $this->postLiveSyncIndicatorsJob->save();
     }

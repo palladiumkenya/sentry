@@ -4,7 +4,9 @@ namespace App\Nova;
 
 use Laravel\Nova\Fields\ID;
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\Text;
 
 class Facility extends Resource
@@ -34,8 +36,14 @@ class Facility extends Resource
             Text::make('Code',  'code')->sortable(),
             Text::make('GUID',  'uid')->sortable()->onlyOnDetail(),
             Text::make('County',  'county')->sortable(),
-            Text::make('Partner',  'partner')->sortable(),
+            Text::make('Sub-County',  'sub_county')->sortable(),
+            Text::make('Ward',  'ward')->sortable(),
+            Text::make('Constituency',  'constitutency')->sortable(),
             Boolean::make('ETL',  'etl')->sortable(),
+            HasMany::make('Metrics', 'facilityMetrics', FacilityMetric::class),
+            HasMany::make('Uploads', 'facilityUploads', FacilityUpload::class),
+            HasMany::make('Indicators', 'liveSyncIndicators', LiveSyncIndicator::class),
+            BelongsToMany::make('ETL Jobs', 'etlJobs', EtlJob::class),
         ];
     }
 

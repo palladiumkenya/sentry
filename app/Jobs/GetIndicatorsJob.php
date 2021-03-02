@@ -25,11 +25,8 @@ class GetIndicatorsJob implements ShouldQueue
     {
         $this->getIndicatorsJob->started_at = now();
         $this->getIndicatorsJob->save();
-        GetIndicatorValues::dispatchNow('');
+        GetIndicatorValues::dispatchNow();
         $this->getIndicatorsJob->completed_at = now();
         $this->getIndicatorsJob->save();
-
-        // $retainIds = GetIndicatorsJobModel::whereNotNull('completed_at')->orderBy('id', 'DESC')->take(10)->pluck('id')->toArray();
-        // GetIndicatorsJobModel::whereNotNull('completed_at')->whereNotIn('id', $retainIds)->delete();
     }
 }

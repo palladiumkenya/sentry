@@ -6,14 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class EtlJobFacility extends Pivot
+class FacilityPartner extends Pivot
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'etl_job_facility';
+    protected $table = 'facility_partner';
 
     protected $fillable = [
-        'etl_job_id',
-        'facility_id'
+        'facility_id',
+        'partner_id',
+        'docket',
+        'created_by',
     ];
 }

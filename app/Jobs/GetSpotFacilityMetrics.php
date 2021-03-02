@@ -17,10 +17,12 @@ class GetSpotFacilityMetrics implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $etlJob;
     protected $facility;
 
-    public function __construct(Facility $facility)
+    public function __construct(EtlJob $etlJob, Facility $facility)
     {
+        $this->etlJob = $etlJob;
         $this->facility = $facility;
     }
 
@@ -35,6 +37,7 @@ class GetSpotFacilityMetrics implements ShouldQueue
             'base_uri' => env('SPOT_API_URL'),
             'verify' => false,
             'timeout'  => 60,
+            'http_errors' => false,
         ]);
         if ($response->getStatusCode() == 200) {
             $response = json_decode($response->getBody(), true);
@@ -42,6 +45,7 @@ class GetSpotFacilityMetrics implements ShouldQueue
                 $facilityMetric = FacilityMetric::where('uid', $metric['_id'])->first();
                 if (!$facilityMetric) {
                     $facilityMetric = FacilityMetric::create([
+                        'uid' => $metric['_id'],
                         'facility_id' => $facility->id,
                         'create_date' => $metric['createDate'] ? Carbon::parse($metric['createDate'])->format('Y-m-d H:i:s') : null,
                         'name' => $metric['name'],
@@ -50,7 +54,9 @@ class GetSpotFacilityMetrics implements ShouldQueue
                         'dwh_value' => $metric['dwhValue'],
                         'dwh_metric_date' => $metric['dwhIndicatorDate'] ? Carbon::parse($metric['dwhIndicatorDate'])->format('Y-m-d H:i:s') : null,
                         'manifest_id' => $metric['facilityManifestId'],
+                        'processed' => false,
                         'posted' => false,
+                        'etl_job_id' => $this->etlJob->id,
                     ]);
                 } else {
                     // update ? --for now no
@@ -58,7 +64,9 @@ class GetSpotFacilityMetrics implements ShouldQueue
                         $facilityMetric->update([
                             'dwh_value' => $metric['dwhValue'],
                             'dwh_metric_date' => $metric['dwhIndicatorDate'] ? Carbon::parse($metric['dwhIndicatorDate'])->format('Y-m-d H:i:s') : null,
-                            'posted' => false
+                            'processed' => false,
+                            'posted' => false,
+                            'etl_job_id' => $this->etlJob->id,
                         ]);
                     }
                 }

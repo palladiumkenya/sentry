@@ -22,6 +22,21 @@ class Facility extends Model
         'posted'
     ];
 
+    public function facilityMetrics()
+    {
+        return $this->hasMany(FacilityMetric::class);
+    }
+
+    public function facilityUploads()
+    {
+        return $this->hasMany(FacilityUpload::class);
+    }
+
+    public function liveSyncIndicators()
+    {
+        return $this->hasMany(LiveSyncIndicator::class);
+    }
+
     public function etlJobs()
     {
         return $this->belongsToMany(EtlJob::class)

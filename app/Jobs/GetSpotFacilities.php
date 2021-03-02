@@ -27,6 +27,7 @@ class GetSpotFacilities implements ShouldQueue
             'base_uri' => env('SPOT_API_URL'),
             'verify' => false,
             'timeout'  => 60,
+            'http_errors' => false,
         ]);
         if ($response->getStatusCode() == 200) {
             $response = json_decode($response->getBody(), true);
@@ -38,8 +39,8 @@ class GetSpotFacilities implements ShouldQueue
                         'code' => $transfer['code'],
                         'uid' => isset($transfer['facility']['_id']) ? $transfer['facility']['_id'] : '',
                         'county' => isset($transfer['facility']['masterFacility']['county']['name']) ? $transfer['facility']['masterFacility']['county']['name'] : '',
-                        'partner' => isset($transfer['facility']['masterFacility']['mechanism']['name']) ? $transfer['facility']['masterFacility']['mechanism']['name'] : '',
                         'source' => 'SPOT',
+                        'processed' => false,
                         'posted' => false,
                     ]);
                 } else {

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\EtlJob;
 use App\Models\Facility;
 use App\Models\FacilityMetric;
 use Barryvdh\Snappy\Facades\SnappyPdf;
@@ -16,22 +17,30 @@ class GenerateFacilityMetricsReport implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $etlJob;
     protected $facility;
 
-    public function __construct(Facility $facility)
+    public function __construct(EtlJob $etlJob, Facility $facility)
     {
+        $this->etlJob = $etlJob;
         $this->facility = $facility;
     }
 
     public function handle()
     {
-        $metrics = FacilityMetric::where('facility_id', $this->facility->id)
+        $etlJob = $this->etlJob;
+        $facility = $this->facility;
+        $metrics = FacilityMetric::where('facility_id', $facility->id)
+            ->where('etl_job_id', $etlJob->id)
             ->whereNotNull('name')
             ->whereNotNull('value')
             ->whereNotNull('dwh_value')
             ->get();
+        if (count($metrics) === 0) {
+            return;
+        }
         $view = view('reports.facilities.metrics', compact('facility', 'metrics'));
-        $path = storage_path('app/reports/palladium_ndwh_dqa.pdf');
+        $path = storage_path('app/reports/etls/'.$etlJob->id.'/'.$facility->id.'.pdf');
         if (file_exists($path)) {
             unlink($path);
         }

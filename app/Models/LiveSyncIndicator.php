@@ -12,16 +12,21 @@ class LiveSyncIndicator extends Model
     protected $fillable = [
         'name',
         'value',
-        'facility_code',
-        'facility_name',
+        'facility_id',
         'indicator_date',
         'indicator_id',
         'stage',
         'facility_manifest_id',
+        'processed',
         'posted'
     ];
 
     protected $casts = [
         'indicator_date' => 'datetime',
     ];
+
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class, 'facility_id');
+    }
 }

@@ -24,11 +24,11 @@ class CreateEtlJobsTable extends Migration
         });
 
         Schema::table('facility_uploads', function (Blueprint $table) {
-            $table->bigInteger('etl_jobs_id')->unsigned()->nullable()->index();
+            $table->bigInteger('etl_job_id')->unsigned()->nullable()->index();
         });
 
         Schema::table('facility_metrics', function (Blueprint $table) {
-            $table->bigInteger('etl_jobs_id')->unsigned()->nullable()->index();
+            $table->bigInteger('etl_job_id')->unsigned()->nullable()->index();
         });
     }
 
@@ -40,13 +40,13 @@ class CreateEtlJobsTable extends Migration
     public function down()
     {
         Schema::table('facility_uploads', function (Blueprint $table) {
-            $table->dropIndex(['etl_jobs_id']);
-            $table->dropColumn('etl_jobs_id');
+            $table->dropIndex(['etl_job_id']);
+            $table->dropColumn('etl_job_id');
         });
 
         Schema::table('facility_metrics', function (Blueprint $table) {
-            $table->dropIndex(['etl_jobs_id']);
-            $table->dropColumn('etl_jobs_id');
+            $table->dropIndex(['etl_job_id']);
+            $table->dropColumn('etl_job_id');
         });
 
         Schema::dropIfExists('etl_jobs');
