@@ -1,18 +1,19 @@
 <?php
 
+use App\Models\FacilityMetric;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-Route::get('/', function () {
-    return 'Sentry is Live';
+Route::get('/testing', function () {
+    $etlJob = $this->etlJob;
+    $facility = $this->facility;
+    $metrics = FacilityMetric::where('facility_id', $facility->id)
+        ->where('etl_job_id', $etlJob->id)
+        ->whereNotNull('name')
+        ->whereNotNull('value')
+        ->whereNotNull('dwh_value')
+        ->get();
+    if (count($metrics) === 0) {
+        return;
+    }
+    return view('reports.facilities.metrics', compact('facility', 'metrics'));
 });
