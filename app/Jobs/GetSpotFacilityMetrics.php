@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\EtlJob;
 use App\Models\Facility;
 use App\Models\FacilityMetric;
 use Carbon\Carbon;
@@ -34,7 +35,7 @@ class GetSpotFacilityMetrics implements ShouldQueue
         }
         $client = new Client();
         $response = $client->request('GET', 'api/v1/metrics/facmetrics/getIndicatorsByFacilityId/'.$facility->uid, [
-            'base_uri' => env('SPOT_API_URL'),
+            'base_uri' => nova_get_setting('spot_api_url'),
             'verify' => false,
             'timeout'  => 60,
             'http_errors' => false,
@@ -59,16 +60,19 @@ class GetSpotFacilityMetrics implements ShouldQueue
                         'etl_job_id' => $this->etlJob->id,
                     ]);
                 } else {
-                    // update ? --for now no
-                    if (!is_null($metric['dwhValue']) && is_null($facilityMetric->dwh_value)) {
-                        $facilityMetric->update([
-                            'dwh_value' => $metric['dwhValue'],
-                            'dwh_metric_date' => $metric['dwhIndicatorDate'] ? Carbon::parse($metric['dwhIndicatorDate'])->format('Y-m-d H:i:s') : null,
-                            'processed' => false,
-                            'posted' => false,
-                            'etl_job_id' => $this->etlJob->id,
-                        ]);
-                    }
+                    $facilityMetric->update([
+                        'facility_id' => $facility->id,
+                        'create_date' => $metric['createDate'] ? Carbon::parse($metric['createDate'])->format('Y-m-d H:i:s') : null,
+                        'name' => $metric['name'],
+                        'value' => $metric['value'],
+                        'metric_date' => Carbon::parse($metric['indicatorDate'])->format('Y-m-d H:i:s'),
+                        'dwh_value' => $metric['dwhValue'],
+                        'dwh_metric_date' => $metric['dwhIndicatorDate'] ? Carbon::parse($metric['dwhIndicatorDate'])->format('Y-m-d H:i:s') : null,
+                        'manifest_id' => $metric['facilityManifestId'],
+                        'processed' => false,
+                        'posted' => false,
+                        'etl_job_id' => $this->etlJob->id,
+                    ]);
                 }
             }
         }

@@ -40,7 +40,7 @@ class GenerateFacilityMetricsReport implements ShouldQueue
             return;
         }
         $view = view('reports.facilities.metrics', compact('facility', 'metrics'));
-        $path = storage_path('app/reports/etls/'.$etlJob->id.'/'.$facility->id.'.pdf');
+        $path = storage_path('app/reports/etls/'.$etlJob->id.'_'.$facility->id.'.pdf');
         if (file_exists($path)) {
             unlink($path);
         }

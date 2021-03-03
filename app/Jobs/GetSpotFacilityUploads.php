@@ -34,7 +34,7 @@ class GetSpotFacilityUploads implements ShouldQueue
         }
         $client = new Client();
         $response = $client->request('GET', 'api/v1/transfers/facilities/'.$facility->uid, [
-            'base_uri' => env('SPOT_API_URL'),
+            'base_uri' => nova_get_setting('spot_api_url'),
             'verify' => false,
             'timeout'  => 60,
             'http_errors' => false,

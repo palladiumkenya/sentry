@@ -29,5 +29,10 @@ class MergePartnerFacilityMetricsReports implements ShouldQueue
     {
         $path = storage_path('app/reports/etls');
         $files = Storage::files($path);
+        $path = storage_path(
+            'app/reports/etls/'.
+            $this->partner->clean_name.'_'.
+            $this->etlJob->job_date->format('YmdHis').'_dqa.pdf'
+        );
     }
 }

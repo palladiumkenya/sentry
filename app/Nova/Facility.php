@@ -39,6 +39,7 @@ class Facility extends Resource
             Text::make('Sub-County',  'sub_county')->sortable(),
             Text::make('Ward',  'ward')->sortable(),
             Text::make('Constituency',  'constitutency')->sortable(),
+            Text::make('Source',  'Source')->onlyOnDetail(),
             Boolean::make('ETL',  'etl')->sortable(),
             HasMany::make('Metrics', 'facilityMetrics', FacilityMetric::class),
             HasMany::make('Uploads', 'facilityUploads', FacilityUpload::class),

@@ -24,7 +24,7 @@ class GetSpotFacilities implements ShouldQueue
     {
         $client = new Client();
         $response = $client->request('GET', 'api/v1/transfers/manifests/all', [
-            'base_uri' => env('SPOT_API_URL'),
+            'base_uri' => nova_get_setting('spot_api_url'),
             'verify' => false,
             'timeout'  => 60,
             'http_errors' => false,
@@ -44,7 +44,13 @@ class GetSpotFacilities implements ShouldQueue
                         'posted' => false,
                     ]);
                 } else {
-                    // update ? --for now no
+                    if (!$facility->uid) {
+                        $facility->update([
+                            'uid' => isset($transfer['facility']['_id']) ? $transfer['facility']['_id'] : '',
+                            'processed' => false,
+                            'posted' => false,
+                        ]);
+                    }
                 }
             }
         }

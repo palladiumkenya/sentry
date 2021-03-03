@@ -32,20 +32,19 @@ class EtlJob implements ShouldQueue
         $etlJob->started_at = now();
         $etlJob->save();
 
-        $directory = storage_path('app/reports/etls/'.$etlJob->id);
-        Storage::makeDirectory($directory);
-
         // ReclaimSpace::dispatch($databaseName, $fileName);
         // TruncateTables::dispatch($databaseName);
         // DisableConstraints::dispatch($databaseName);
 
-        GetSpotFacilities::dispatchNow();
-        GetIndicatorValues::dispatchNow();
-        PostLiveSyncIndicators::dispatchNow();
-        Facility::where('etl', true)->cursor()->each(function($facility) use ($etlJob) {
-            GetSpotFacilityMetrics::dispatch($etlJob, $facility);
-            GenerateFacilityMetricsReport::dispatch($etlJob, $facility);
-        });
+        // GetSpotFacilities::dispatchNow();
+        // GetIndicatorValues::dispatchNow();
+        // PostLiveSyncIndicators::dispatchNow();
+
+        // Facility::where('etl', true)->cursor()->each(function($facility) use ($etlJob) {
+        //     GetSpotFacilityMetrics::dispatchNow($etlJob, $facility);
+        //     GenerateFacilityMetricsReport::dispatchNow($etlJob, $facility);
+        // });
+
         $etlJob->completed_at = now();
         $etlJob->save();
     }

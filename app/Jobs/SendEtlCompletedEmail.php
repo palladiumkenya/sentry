@@ -3,7 +3,8 @@
 namespace App\Jobs;
 
 use App\Mail\ETLCompleted;
-use App\Models\User;
+use App\Models\EtlJob;
+use App\Models\Partner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,23 +18,31 @@ class SendEtlCompletedEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct()
+    protected $partner;
+    protected $etlJob;
+
+    public function __construct(Partner $partner, EtlJob $etlJob)
     {
-        //
+        $this->partner = $partner;
+        $this->etlJob = $etlJob;
     }
 
     public function handle()
     {
         $user = new stdClass();
-        $user->email = 'eric.ejimba@thepalladiumgroup.com';
-        $user->name = 'Eric Ejimba';
+        $user->email = nova_get_setting('test_person_email');
+        $user->name = nova_get_setting('test_person_name');
         $contact = new stdClass();
-        $contact->email = 'Koske.Kimutai@thepalladiumgroup.com';
-        $contact->name = 'Koske Kimutai';
-        $partner = 'Palladium';
+        $contact->email = nova_get_setting('contact_person_email');
+        $contact->name = nova_get_setting('contact_person_name');
+        $partner = $this->partner->name;
         $refresh_date = now();
-        $unsubscribe_url = "https://auth.kenyahmis.org/dwhidentity/api/EmailService/Unsubscribe/".$user->email;
-        $file = storage_path('app/reports/palladium_ndwh_dqa.pdf');
+        $unsubscribe_url = str_replace('{{email}}', $user->email, nova_get_setting('email_unsubscribe_url'));
+        $file = storage_path(
+            'app/reports/etls/'.
+            $this->partner->clean_name.'_'.
+            $this->etlJob->job_date->format('YmdHis').'_dqa.pdf'
+        );
 
         Mail::to($user->email)->send(new ETLCompleted(
             $user,

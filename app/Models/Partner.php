@@ -19,6 +19,12 @@ class Partner extends Model
         'created_by'
     ];
 
+    public function getCleanNameAttribute()
+    {
+        $name = str_replace(' ', '_', $this->attributes['name']);
+        return preg_replace('/[^A-Za-z0-9\-]/', '_', $name);
+    }
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');

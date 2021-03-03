@@ -11,6 +11,7 @@
         "php": "^7.3|^8.0",
         "barryvdh/laravel-snappy": "^0.4.8",
         "daltcore/lara-pdf-merger": "^2.0",
+        "eminiarts/nova-tabs": "^1.4",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
@@ -18,6 +19,7 @@
         "laravel/horizon": "^5.6",
         "laravel/nova": "*",
         "laravel/tinker": "^2.5",
+        "optimistdigital/nova-settings": "^3.1",
         "spatie/once": "^2.0",
         "vladimir-yuldashev/laravel-queue-rabbitmq": "^11.1"
     },
