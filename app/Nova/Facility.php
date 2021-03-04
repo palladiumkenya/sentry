@@ -17,7 +17,7 @@ class Facility extends Resource
 
     public static $title = 'name';
 
-    public static $search = ['id', 'name', 'code', 'uid', 'county', 'partner', 'source'];
+    public static $search = ['id', 'name', 'code', 'uid', 'county', 'source'];
 
     public static $displayInNavigation = true;
 
@@ -41,6 +41,7 @@ class Facility extends Resource
             Text::make('Constituency',  'constitutency')->sortable(),
             Text::make('Source',  'Source')->onlyOnDetail(),
             Boolean::make('ETL',  'etl')->sortable(),
+            BelongsToMany::make('Partners', 'partners', Partner::class),
             HasMany::make('Metrics', 'facilityMetrics', FacilityMetric::class),
             HasMany::make('Uploads', 'facilityUploads', FacilityUpload::class),
             HasMany::make('Indicators', 'liveSyncIndicators', LiveSyncIndicator::class),

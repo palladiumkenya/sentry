@@ -16,6 +16,7 @@ class Partner extends Model
         'project',
         'code',
         'uid',
+        'source',
         'created_by'
     ];
 

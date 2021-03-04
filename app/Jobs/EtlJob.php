@@ -10,7 +10,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Storage;
 
 class EtlJob implements ShouldQueue
 {
@@ -25,25 +24,20 @@ class EtlJob implements ShouldQueue
 
     public function handle()
     {
-        $databaseName = 'PortalDev';
-        $fileName = 'Portal Dev_log';
-
         $etlJob = $this->etlJob;
         $etlJob->started_at = now();
         $etlJob->save();
 
-        // ReclaimSpace::dispatch($databaseName, $fileName);
+        // ReclaimSpace::dispatch('PortalDev', 'Portal Dev_log');
         // TruncateTables::dispatch($databaseName);
         // DisableConstraints::dispatch($databaseName);
 
-        // GetSpotFacilities::dispatchNow();
-        // GetIndicatorValues::dispatchNow();
-        // PostLiveSyncIndicators::dispatchNow();
-
-        // Facility::where('etl', true)->cursor()->each(function($facility) use ($etlJob) {
-        //     GetSpotFacilityMetrics::dispatchNow($etlJob, $facility);
-        //     GenerateFacilityMetricsReport::dispatchNow($etlJob, $facility);
-        // });
+        GetIndicatorValues::dispatchNow();
+        PostLiveSyncIndicators::dispatchNow();
+        Facility::where('etl', true)->cursor()->each(function($facility) use ($etlJob) {
+            GetSpotFacilityMetrics::dispatchNow($etlJob, $facility);
+            GenerateFacilityMetricsReport::dispatchNow($etlJob, $facility);
+        });
 
         $etlJob->completed_at = now();
         $etlJob->save();

@@ -17,5 +17,7 @@ class FacilityPartner extends Pivot
         'partner_id',
         'docket',
         'created_by',
+        'created_at',
+        'updated_at',
     ];
 }

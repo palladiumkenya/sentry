@@ -15,7 +15,6 @@ class Facility extends Model
         'code',
         'uid',
         'county',
-        'partner',
         'source',
         'etl',
         'processed',
@@ -42,6 +41,18 @@ class Facility extends Model
         return $this->belongsToMany(EtlJob::class)
             ->using(EtlJobFacility::class)
             ->withPivot([
+                'created_at',
+                'updated_at',
+            ]);
+    }
+
+    public function partners()
+    {
+        return $this->belongsToMany(Partner::class)
+            ->using(FacilityPartner::class)
+            ->withPivot([
+                'docket',
+                'created_by',
                 'created_at',
                 'updated_at',
             ]);

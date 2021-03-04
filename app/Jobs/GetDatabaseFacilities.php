@@ -22,20 +22,42 @@ class GetDatabaseFacilities implements ShouldQueue
 
     public function handle()
     {
-        config(['database.connections.sqlsrv.database' => 'PortalDev']);
-        DB::connection('sqlsrv')->table('lkp_USGPartnerMenchanism')
-            ->selectRaw('MFL_Code as code, FacilityName as name, County as county, Mechanism as partner')
+        config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
+        DB::connection('sqlsrv')->table('lkp_usgPartnerMenchanism')
+            ->selectRaw('MFL_Code as code, FacilityName as name, County as county, Agency as agency, MechanismID as mechanism_id, Mechanism as partner')
             ->whereNotNull('MFL_Code')
             ->cursor()->each(function ($row) {
-                $facility = Facility::where('code', $row['code'])->first();
+                $facility = Facility::where('code', $row->code)->first();
                 if (!$facility) {
                     $facility = Facility::create([
-                        'name' => $row['name'],
-                        'code' => $row['code'],
+                        'name' => $row->name,
+                        'code' => $row->code,
                         'uid' => null,
-                        'county' => $row['county'],
-                        'partner' => $row['partner'],
+                        'county' => $row->county,
                         'source' => 'DWH',
+                        'etl' => false,
+                        'processed' => false,
+                        'posted' => false,
+                    ]);
+                } else {
+                    // update ? --for now no
+                }
+            });
+
+        DB::connection('sqlsrv')->table('lkp_usgPartnerMenchanism_HTS')
+            ->selectRaw('MFL_Code as code, FacilityName as name, County as county, Agency as agency, MechanismID as mechanism_id, Mechanism as partner')
+            ->whereNotNull('MFL_Code')
+            ->cursor()->each(function ($row) {
+                $facility = Facility::where('code', $row->code)->first();
+                if (!$facility) {
+                    $facility = Facility::create([
+                        'name' => $row->name,
+                        'code' => $row->code,
+                        'uid' => null,
+                        'county' => $row->county,
+                        'source' => 'DWH',
+                        'etl' => false,
+                        'processed' => false,
                         'posted' => false,
                     ]);
                 } else {

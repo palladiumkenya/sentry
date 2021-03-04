@@ -14,6 +14,8 @@ class EtlJobFacility extends Pivot
 
     protected $fillable = [
         'etl_job_id',
-        'facility_id'
+        'facility_id',
+        'created_at',
+        'updated_at',
     ];
 }
