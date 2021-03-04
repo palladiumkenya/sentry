@@ -39,11 +39,11 @@ class GenerateFacilityMetricsReport implements ShouldQueue
         if (count($metrics) === 0) {
             return;
         }
-        $view = view('reports.facilities.metrics', compact('facility', 'metrics'));
         $path = storage_path('app/reports/etls/'.$etlJob->id.'_'.$facility->id.'.pdf');
         if (file_exists($path)) {
             unlink($path);
         }
+        $url = nova_get_setting(nova_get_setting('production') ? 'spot_url' : 'spot_url_staging');
         $descriptions = [
             "TX_CURR" => "Individuals currently receiving antiretroviral therapy (ART)",
             "TX_NEW" => "Individuals newly enrolled on antiretroviral therapy (ART)",
@@ -59,6 +59,6 @@ class GenerateFacilityMetricsReport implements ShouldQueue
             "TX_RTT" => "Patients who experienced interruption in treatment previously and restarted ARVs in this month",
             "TX_ML" => "Individuals who were on ART previously then had no clinical contact since their last expected contact",
         ];
-        SnappyPdf::loadView('reports.facilities.metrics', compact('facility', 'metrics', 'descriptions'))->setOrientation('landscape')->save($path);
+        SnappyPdf::loadView('reports.facilities.metrics', compact('facility', 'metrics', 'descriptions', 'url'))->setOrientation('landscape')->save($path);
     }
 }

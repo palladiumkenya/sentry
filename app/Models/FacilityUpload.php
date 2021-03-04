@@ -10,7 +10,19 @@ class FacilityUpload extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['*'];
+    protected $fillable = [
+        'facility_id',
+        'uid',
+        'docket',
+        'expected',
+        'received',
+        'status',
+        'updated',
+        'processed',
+        'posted',
+        'etl_job_id',
+        'partner_id',
+    ];
 
     protected $casts = [
         'updated' => 'datetime',
@@ -19,5 +31,10 @@ class FacilityUpload extends Model
     public function facility()
     {
         return $this->belongsTo(Facility::class, 'facility_id');
+    }
+
+    public function etlJob()
+    {
+        return $this->belongsTo(EtlJob::class, 'etl_job_id');
     }
 }

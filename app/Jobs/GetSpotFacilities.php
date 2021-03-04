@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class GetSpotFacilities implements ShouldQueue
 {
@@ -24,7 +25,7 @@ class GetSpotFacilities implements ShouldQueue
     {
         $client = new Client();
         $response = $client->request('GET', 'api/v1/transfers/manifests/all', [
-            'base_uri' => nova_get_setting('spot_api_url'),
+            'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
             'verify' => false,
             'timeout'  => 60,
             'http_errors' => false,
@@ -53,6 +54,8 @@ class GetSpotFacilities implements ShouldQueue
                     }
                 }
             }
+        } else {
+            Log::error('GetSpotFacilities: failed to fetch facilities');
         }
     }
 }

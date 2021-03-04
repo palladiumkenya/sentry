@@ -19,9 +19,9 @@ class FacilityUpload extends Resource
 
     public static $search = ['id', 'uid', 'partner', 'docket'];
 
-    public static $displayInNavigation = false;
+    public static $displayInNavigation = true;
 
-    public static $perPageViaRelationship = 30;
+    public static $perPageViaRelationship = 10;
 
     public static function label()
     {
@@ -33,12 +33,12 @@ class FacilityUpload extends Resource
         return [
             ID::make('ID',  'id')->sortable(),
             BelongsTo::make('Facility', 'facility', Facility::class)->sortable(),
-            Text::make('Partner',  'partner')->sortable(),
             Text::make('Docket',  'docket')->sortable(),
             Number::make('Expected',  'expected')->sortable(),
             Number::make('Received',  'received')->sortable(),
-            Text::make('Status',  'status')->sortable(),
+            // Text::make('Status',  'status')->sortable(),
             DateTime::make('Updated',  'updated')->sortable(),
+            BelongsTo::make('ETL Job', 'etlJob', EtlJob::class)->sortable(),
         ];
     }
 

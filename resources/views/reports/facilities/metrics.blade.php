@@ -45,6 +45,7 @@
                     <th>EMR Date</th>
                     <th>NDWH Value</th>
                     <th>NDWH Date</th>
+                    <th>Difference</th>
                 </thead>
                 <tbody>
                     @foreach($metrics as $metric)
@@ -55,6 +56,7 @@
                         <td align="right">{{ $metric->metric_date->format('d M Y') }}</td>
                         <td align="right">{{ $metric->dwh_value }}</td>
                         <td align="right">{{ $metric->dwh_metric_date->format('d M Y') }}</td>
+                        <td align="right">{{ $metric->dwh_value - $metric->value }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -63,9 +65,7 @@
             <div id="upload-history-chart"></div>
             <br>
             <p class="tracking-tighter text-2xl">This report can also be accessed from:</p>
-            <a class="tracking-tighter text-2xl" href="https://spot.kenyahmis.org/#/stats/showcase/{{ $facility->uid }}">
-                https://spot.kenyahmis.org/#/stats/showcase/{{ $facility->uid }}
-            </a>
+            <a class="tracking-tighter text-2xl" href="{{ $url }}/#/stats/showcase/{{ $facility->uid }}">{{ $url }}/#/stats/showcase/{{ $facility->uid }}</a>
         </div>
     </div>
 </body>

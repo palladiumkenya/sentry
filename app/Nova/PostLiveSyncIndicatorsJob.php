@@ -19,7 +19,7 @@ class PostLiveSyncIndicatorsJob extends Resource
 
     public static $displayInNavigation = true;
 
-    public static $perPageViaRelationship = 30;
+    public static $perPageViaRelationship = 10;
 
     public static function label()
     {

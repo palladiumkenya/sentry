@@ -22,7 +22,7 @@ class User extends Resource
 
     public static $displayInNavigation = true;
 
-    public static $perPageViaRelationship = 30;
+    public static $perPageViaRelationship = 10;
 
     public function fields(Request $request)
     {

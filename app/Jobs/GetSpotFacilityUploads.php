@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\EtlJob;
 use App\Models\Facility;
 use App\Models\FacilityUpload;
 use Carbon\Carbon;
@@ -12,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class GetSpotFacilityUploads implements ShouldQueue
 {
@@ -28,13 +30,14 @@ class GetSpotFacilityUploads implements ShouldQueue
 
     public function handle()
     {
+        $etlJob = $this->etlJob;
         $facility = $this->facility;
         if (!$facility->uid) {
             return;
         }
         $client = new Client();
         $response = $client->request('GET', 'api/v1/transfers/facilities/'.$facility->uid, [
-            'base_uri' => nova_get_setting('spot_api_url'),
+            'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
             'verify' => false,
             'timeout'  => 60,
             'http_errors' => false,
@@ -52,21 +55,23 @@ class GetSpotFacilityUploads implements ShouldQueue
                         'docket' => $upload['docket'],
                         'expected' => $upload['patientCount'],
                         'received' => $upload['recievedCount'],
-                        'status' => $upload['handshakeStatus'],
+                        'status' => isset($upload['handshakeStatus']) ? $upload['handshakeStatus'] : null,
                         'processed' => false,
                         'posted' => false,
+                        'etl_job_id' => $etlJob->id,
                     ]);
                 } else {
-                    if (($facilityUpload->status !== $upload['handshakeStatus']) || ($facilityUpload->received !== $upload['received'])) {
-                        $facilityUpload->update([
-                            'status' => $upload['handshakeStatus'],
-                            'received' => $upload['received'],
-                            'processed' => false,
-                            'posted' => false,
-                        ]);
-                    }
+                    $facilityUpload->update([
+                        'status' => isset($upload['handshakeStatus']) ? $upload['handshakeStatus'] : null,
+                        'received' => $upload['received'],
+                        'processed' => false,
+                        'posted' => false,
+                        'etl_job_id' => $etlJob->id,
+                    ]);
                 }
             }
+        } else {
+            Log::error('GetSpotFacilityUploads: failed to fetch uploads for facility '.$facility->uid);
         }
     }
 }

@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class GetSpotFacilityMetrics implements ShouldQueue
 {
@@ -29,13 +30,14 @@ class GetSpotFacilityMetrics implements ShouldQueue
 
     public function handle()
     {
+        $etlJob = $this->etlJob;
         $facility = $this->facility;
         if (!$facility->uid) {
             return;
         }
         $client = new Client();
         $response = $client->request('GET', 'api/v1/metrics/facmetrics/getIndicatorsByFacilityId/'.$facility->uid, [
-            'base_uri' => nova_get_setting('spot_api_url'),
+            'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
             'verify' => false,
             'timeout'  => 60,
             'http_errors' => false,
@@ -57,7 +59,7 @@ class GetSpotFacilityMetrics implements ShouldQueue
                         'manifest_id' => $metric['facilityManifestId'],
                         'processed' => false,
                         'posted' => false,
-                        'etl_job_id' => $this->etlJob->id,
+                        'etl_job_id' => $etlJob->id,
                     ]);
                 } else {
                     $facilityMetric->update([
@@ -71,10 +73,12 @@ class GetSpotFacilityMetrics implements ShouldQueue
                         'manifest_id' => $metric['facilityManifestId'],
                         'processed' => false,
                         'posted' => false,
-                        'etl_job_id' => $this->etlJob->id,
+                        'etl_job_id' => $etlJob->id,
                     ]);
                 }
             }
+        } else {
+            Log::error('GetSpotFacilityMetrics: failed to fetch metrics for facility '.$facility->uid);
         }
     }
 }

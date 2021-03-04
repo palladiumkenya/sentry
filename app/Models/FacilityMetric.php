@@ -22,6 +22,7 @@ class FacilityMetric extends Model
         'dwh_metric_date',
         'processed',
         'posted',
+        'etl_job_id',
     ];
 
     protected $casts = [
@@ -33,5 +34,10 @@ class FacilityMetric extends Model
     public function facility()
     {
         return $this->belongsTo(Facility::class, 'facility_id');
+    }
+
+    public function etlJob()
+    {
+        return $this->belongsTo(EtlJob::class, 'etl_job_id');
     }
 }

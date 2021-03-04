@@ -37,7 +37,10 @@ class SendEtlCompletedEmail implements ShouldQueue
         $contact->name = nova_get_setting('contact_person_name');
         $partner = $this->partner->name;
         $refresh_date = now();
-        $unsubscribe_url = str_replace('{{email}}', $user->email, nova_get_setting('email_unsubscribe_url'));
+        $unsubscribe_url = str_replace(
+            '{{email}}', $user->email,
+            nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+        );
         $file = storage_path(
             'app/reports/etls/'.
             $this->partner->clean_name.'_'.

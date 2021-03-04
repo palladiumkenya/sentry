@@ -2,6 +2,9 @@
 
 namespace App\Nova;
 
+use App\Nova\Actions\Repost;
+use App\Nova\Filters\LiveSyncIndicatorsByFacility;
+use App\Nova\Filters\LiveSyncIndicatorsByName;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Boolean;
@@ -23,7 +26,7 @@ class LiveSyncIndicator extends Resource
 
     public static $displayInNavigation = true;
 
-    public static $perPageViaRelationship = 30;
+    public static $perPageViaRelationship = 10;
 
     public static function label() {
         return 'Indicators';
@@ -49,7 +52,10 @@ class LiveSyncIndicator extends Resource
 
     public function filters(Request $request)
     {
-        return [];
+        return [
+            new LiveSyncIndicatorsByName(),
+            new LiveSyncIndicatorsByFacility(),
+        ];
     }
 
     public function lenses(Request $request)
@@ -59,6 +65,8 @@ class LiveSyncIndicator extends Resource
 
     public function actions(Request $request)
     {
-        return [];
+        return [
+            new Repost(),
+        ];
     }
 }

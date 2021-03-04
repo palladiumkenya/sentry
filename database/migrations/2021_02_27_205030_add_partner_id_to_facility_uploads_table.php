@@ -14,7 +14,7 @@ class AddPartnerIdToFacilityUploadsTable extends Migration
     public function up()
     {
         Schema::table('facility_uploads', function (Blueprint $table) {
-            $table->bigInteger('partner_id')->unsigned()->index();
+            $table->bigInteger('partner_id')->unsigned()->nullable()->index();
             $table->dropIndex(['partner']);
             $table->dropColumn('partner');
         });

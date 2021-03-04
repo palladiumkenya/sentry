@@ -36,4 +36,14 @@ class EtlJob extends Model
                 'updated_at',
             ]);
     }
+
+    public function facilityMetrics()
+    {
+        return $this->hasMany(FacilityMetric::class);
+    }
+
+    public function facilityUploads()
+    {
+        return $this->hasMany(FacilityUpload::class);
+    }
 }

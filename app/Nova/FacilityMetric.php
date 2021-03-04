@@ -20,7 +20,7 @@ class FacilityMetric extends Resource
 
     public static $displayInNavigation = true;
 
-    public static $perPageViaRelationship = 30;
+    public static $perPageViaRelationship = 10;
 
     public static function label()
     {
@@ -37,6 +37,7 @@ class FacilityMetric extends Resource
             DateTime::make('EMR Date',  'metric_date')->sortable(),
             Text::make('DWH Value',  'dwh_value')->sortable(),
             DateTime::make('DWH Date',  'dwh_metric_date')->sortable(),
+            BelongsTo::make('ETL Job', 'etlJob', EtlJob::class)->sortable(),
         ];
     }
 

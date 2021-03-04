@@ -19,7 +19,7 @@ class LiveSyncIndicatorObserver
 
     public function created(LiveSyncIndicator $liveSyncIndicator)
     {
-        LiveSyncIndicator::dispatch($liveSyncIndicator);
+        //
     }
 
     public function updating(LiveSyncIndicator $liveSyncIndicator)

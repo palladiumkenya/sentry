@@ -25,7 +25,7 @@ class PostLiveSyncIndicators implements ShouldQueue
     {
         LiveSyncIndicator::whereIn('facility_id', Facility::where('etl', true)->pluck('id')->toArray())
             ->where('posted', false)
-            ->where('created_at', '<=', now()->subtract('minutes', 0.5))
+            ->where('created_at', '<=', now()->subtract('minutes', 1))
             ->cursor()->each(function ($liveSyncIndicator) {
                 PostLiveSyncIndicator::dispatchNow($liveSyncIndicator);
             });

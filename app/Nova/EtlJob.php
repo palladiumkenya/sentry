@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 
 class EtlJob extends Resource
@@ -20,7 +21,7 @@ class EtlJob extends Resource
 
     public static $displayInNavigation = true;
 
-    public static $perPageViaRelationship = 30;
+    public static $perPageViaRelationship = 10;
 
     public static function label()
     {
@@ -37,6 +38,8 @@ class EtlJob extends Resource
             // BelongsTo::make('Initiated By', 'createdBy', User::class)->searchable()->sortable()->exceptOnForms(),
             DateTime::make('Created At',  'created_at')->sortable()->exceptOnForms(),
             BelongsToMany::make('Facilities', 'facilities', Facility::class),
+            HasMany::make('Uploads', 'facilityUploads', FacilityUpload::class),
+            HasMany::make('Metrics', 'facilityMetrics', FacilityMetric::class),
         ];
     }
 

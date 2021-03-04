@@ -2,6 +2,7 @@
 
 namespace App\Nova;
 
+use App\Nova\Filters\FacilitiesByEtlStatus;
 use Laravel\Nova\Fields\ID;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsToMany;
@@ -21,7 +22,7 @@ class Facility extends Resource
 
     public static $displayInNavigation = true;
 
-    public static $perPageViaRelationship = 30;
+    public static $perPageViaRelationship = 10;
 
     public static function label()
     {
@@ -38,7 +39,7 @@ class Facility extends Resource
             Text::make('County',  'county')->sortable(),
             Text::make('Sub-County',  'sub_county')->sortable(),
             Text::make('Ward',  'ward')->sortable(),
-            Text::make('Constituency',  'constitutency')->sortable(),
+            Text::make('Constituency',  'constituency')->sortable(),
             Text::make('Source',  'Source')->onlyOnDetail(),
             Boolean::make('ETL',  'etl')->sortable(),
             BelongsToMany::make('Partners', 'partners', Partner::class),
@@ -56,7 +57,9 @@ class Facility extends Resource
 
     public function filters(Request $request)
     {
-        return [];
+        return [
+            new FacilitiesByEtlStatus()
+        ];
     }
 
     public function lenses(Request $request)

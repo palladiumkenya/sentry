@@ -36,6 +36,7 @@ class EtlJob implements ShouldQueue
         PostLiveSyncIndicators::dispatchNow();
         Facility::where('etl', true)->cursor()->each(function($facility) use ($etlJob) {
             GetSpotFacilityMetrics::dispatchNow($etlJob, $facility);
+            GetSpotFacilityUploads::dispatchNow($etlJob, $facility);
             GenerateFacilityMetricsReport::dispatchNow($etlJob, $facility);
         });
 
