@@ -20,6 +20,10 @@ class User extends Resource
         'id', 'name', 'email',
     ];
 
+    public static $displayInNavigation = true;
+
+    public static $perPageViaRelationship = 10;
+
     public function fields(Request $request)
     {
         return [
