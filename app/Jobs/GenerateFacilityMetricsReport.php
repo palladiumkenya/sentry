@@ -6,13 +6,13 @@ use App\Models\EtlJob;
 use App\Models\Facility;
 use App\Models\FacilityMetric;
 use App\Models\FacilityUpload;
-use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Spatie\Browsershot\Browsershot;
 
 class GenerateFacilityMetricsReport implements ShouldQueue
 {
@@ -98,8 +98,9 @@ class GenerateFacilityMetricsReport implements ShouldQueue
             "TX_RTT" => "Patients who experienced interruption in treatment previously and restarted ARVs in this month",
             "TX_ML" => "Individuals who were on ART previously then had no clinical contact since their last expected contact",
         ];
-        SnappyPdf::loadView('reports.facilities.metrics', compact(
+        $view = view('reports.facilities.metrics', compact(
             'facility', 'metrics', 'descriptions', 'url', 'data', 'months', 'docket'
-        ))->setOrientation('landscape')->save($path);
+        ));
+        Browsershot::html($view)->save($path);
     }
 }
