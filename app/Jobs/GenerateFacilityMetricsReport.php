@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\EtlJob;
 use App\Models\Facility;
 use App\Models\FacilityMetric;
+use App\Models\FacilityUpload;
 use Barryvdh\Snappy\Facades\SnappyPdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -36,14 +37,52 @@ class GenerateFacilityMetricsReport implements ShouldQueue
             ->whereNotNull('value')
             ->whereNotNull('dwh_value')
             ->get();
-        if (count($metrics) === 0) {
-            return;
+        $uploads = FacilityUpload::where('facility_id', $facility->id)
+            ->whereNotNull('docket')
+            ->whereNotNull('received')
+            ->whereNotNull('updated')
+            ->orderBy('updated')
+            ->get();
+        $minDate = now();
+        $maxDate = now();
+        $dockets = ['NDWH', 'HTS', 'MPI'];
+        $months = [];
+        foreach ($uploads as $upload)
+        {
+            if ($upload->updated->lessThan($minDate)) {
+                $minDate = $upload->updated;
+            }
+        }
+        $runningDate = $minDate;
+        while ($runningDate < $maxDate)
+        {
+            if (!in_array($runningDate->format('M Y'), $months)) {
+                $months[] = $runningDate->format('M Y');
+            }
+            $runningDate = $runningDate->addMonths(1);
+        }
+        $data = [];
+        foreach ($dockets as $docket) {
+            $data[$docket] = [];
+            foreach ($months as $month) {
+                $data[$docket][$month] = 0;
+            }
+        }
+        foreach ($uploads as $upload)
+        {
+            $month = $upload->updated->format('M Y');
+            $docket = $upload->docket;
+            $data[$docket][$month] = intval($upload->received);
+        }
+        foreach ($dockets as $docket)
+        {
+            $data[$docket] = array_values($data[$docket]);
         }
         $path = storage_path('app/reports/etls/'.$etlJob->id.'_'.$facility->id.'.pdf');
         if (file_exists($path)) {
             unlink($path);
         }
-        $url = nova_get_setting(nova_get_setting('production') ? 'spot_url' : 'spot_url_staging');
+        $url = nova_get_setting(nova_get_setting('production') ? 'spot_url' : 'spot_url_staging').'/#/stats/showcase/'.$facility->uid;
         $descriptions = [
             "TX_CURR" => "Individuals currently receiving antiretroviral therapy (ART)",
             "TX_NEW" => "Individuals newly enrolled on antiretroviral therapy (ART)",
@@ -59,6 +98,8 @@ class GenerateFacilityMetricsReport implements ShouldQueue
             "TX_RTT" => "Patients who experienced interruption in treatment previously and restarted ARVs in this month",
             "TX_ML" => "Individuals who were on ART previously then had no clinical contact since their last expected contact",
         ];
-        SnappyPdf::loadView('reports.facilities.metrics', compact('facility', 'metrics', 'descriptions', 'url'))->setOrientation('landscape')->save($path);
+        SnappyPdf::loadView('reports.facilities.metrics', compact(
+            'facility', 'metrics', 'descriptions', 'url', 'data', 'months', 'docket'
+        ))->setOrientation('landscape')->save($path);
     }
 }
