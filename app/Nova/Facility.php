@@ -7,6 +7,7 @@ use Laravel\Nova\Fields\ID;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\Text;
 
@@ -47,6 +48,8 @@ class Facility extends Resource
             HasMany::make('Uploads', 'facilityUploads', FacilityUpload::class),
             HasMany::make('Indicators', 'liveSyncIndicators', LiveSyncIndicator::class),
             BelongsToMany::make('ETL Jobs', 'etlJobs', EtlJob::class),
+            DateTime::make('Created',  'created_at')->onlyOnDetail(),
+            DateTime::make('Updated',  'updated_at')->onlyOnDetail(),
         ];
     }
 

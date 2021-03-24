@@ -39,6 +39,7 @@ class Partner extends Resource
             Text::make('Code',  'code')->sortable(),
             Text::make('UID',  'uid')->sortable(),
             DateTime::make('Created At',  'created_at')->sortable()->exceptOnForms(),
+            DateTime::make('Updated At',  'updated_at')->sortable()->exceptOnForms(),
             BelongsToMany::make('Facilities', 'facilities', Facility::class),
         ];
     }

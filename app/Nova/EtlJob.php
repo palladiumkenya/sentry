@@ -40,6 +40,8 @@ class EtlJob extends Resource
             BelongsToMany::make('Facilities', 'facilities', Facility::class),
             HasMany::make('Uploads', 'facilityUploads', FacilityUpload::class),
             HasMany::make('Metrics', 'facilityMetrics', FacilityMetric::class),
+            DateTime::make('Created',  'created_at')->onlyOnDetail(),
+            DateTime::make('Updated',  'updated_at')->onlyOnDetail(),
         ];
     }
 

@@ -42,6 +42,8 @@ class LiveSyncIndicator extends Resource
             DateTime::make('Indicator Date')->sortable()->rules('required'),
             Text::make('Stage')->sortable()->rules('required', 'max:255'),
             Boolean::make('Processed', 'posted')->sortable()->rules('required'),
+            DateTime::make('Created',  'created_at')->onlyOnDetail(),
+            DateTime::make('Updated',  'updated_at')->onlyOnDetail(),
         ];
     }
 

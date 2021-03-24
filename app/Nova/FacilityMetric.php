@@ -38,6 +38,8 @@ class FacilityMetric extends Resource
             Text::make('DWH Value',  'dwh_value')->sortable(),
             DateTime::make('DWH Date',  'dwh_metric_date')->sortable(),
             BelongsTo::make('ETL Job', 'etlJob', EtlJob::class)->sortable(),
+            DateTime::make('Created',  'created_at')->onlyOnDetail(),
+            DateTime::make('Updated',  'updated_at')->onlyOnDetail(),
         ];
     }
 

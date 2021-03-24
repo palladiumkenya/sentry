@@ -39,6 +39,8 @@ class FacilityUpload extends Resource
             // Text::make('Status',  'status')->sortable(),
             DateTime::make('Updated',  'updated')->sortable(),
             BelongsTo::make('ETL Job', 'etlJob', EtlJob::class)->sortable(),
+            DateTime::make('Created',  'created_at')->onlyOnDetail(),
+            DateTime::make('Updated',  'updated_at')->onlyOnDetail(),
         ];
     }
 
