@@ -39,7 +39,7 @@ class GetSpotFacilityMetrics implements ShouldQueue
         $response = $client->request('GET', 'api/v1/metrics/facmetrics/getIndicatorsByFacilityId/'.$facility->uid, [
             'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
             'verify' => false,
-            'timeout'  => 60,
+            'timeout'  => 30,
             'http_errors' => false,
         ]);
         if ($response->getStatusCode() == 200) {

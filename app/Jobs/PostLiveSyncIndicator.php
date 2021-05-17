@@ -28,7 +28,8 @@ class PostLiveSyncIndicator implements ShouldQueue
         $client = new Client();
         $response = $client->request('POST', 'stages/indicator', [
             'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
-            'timeout'  => 10.0,
+            'verify' => false,
+            'timeout'  => 30,
             'http_errors' => false,
             'json' => [[
                 'id' => $this->liveSyncIndicator->indicator_id,
