@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\EtlJob as EtlJobModel;
 use App\Models\Facility;
+use App\Models\Partner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,6 +15,8 @@ use Illuminate\Queue\SerializesModels;
 class EtlJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public $tries = 1;
 
     protected $etlJob;
 
@@ -32,13 +35,25 @@ class EtlJob implements ShouldQueue
         // TruncateTables::dispatch($databaseName);
         // DisableConstraints::dispatch($databaseName);
 
-        GetIndicatorValues::dispatchNow();
-        PostLiveSyncIndicators::dispatchNow();
-        Facility::where('etl', true)->cursor()->each(function($facility) use ($etlJob) {
-            GetSpotFacilityMetrics::dispatchNow($etlJob, $facility);
-            GetSpotFacilityUploads::dispatchNow($etlJob, $facility);
-            GenerateFacilityMetricsReport::dispatchNow($etlJob, $facility);
+        Facility::where('etl', true)->chunk(100, function ($facilities) use ($etlJob) {
+            $f = [];
+            $facilities->each(function ($facility) use (&$f) {
+                $f[$facility->code] = $facility->id;
+            });
+            GetIndicatorValues::dispatchNow(null, null, $f);
+            PostLiveSyncIndicators::dispatchNow(array_values($f));
+            $facilities->each(function ($facility) use ($etlJob) {
+                GetSpotFacilityMetrics::dispatchNow($etlJob, $facility);
+                GetSpotFacilityUploads::dispatchNow($etlJob, $facility);
+                GenerateFacilityMetricsReport::dispatchNow($etlJob, $facility);
+            });
         });
+
+        $partner = Partner::find(1);
+
+        if ($partner) {
+            SendEtlCompletedEmail::dispatchNow($partner, $etlJob, Facility::where('etl', true)->pluck('id'));
+        }
 
         $etlJob->completed_at = now();
         $etlJob->save();

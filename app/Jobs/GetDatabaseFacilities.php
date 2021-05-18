@@ -15,6 +15,8 @@ class GetDatabaseFacilities implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 1;
+
     public function __construct()
     {
         //

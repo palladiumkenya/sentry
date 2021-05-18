@@ -18,8 +18,8 @@
                     <thead>
                         <th>Name</th>
                         <th>Description</th>
-                        <th>EMR Value</th>
                         <th>EMR Date</th>
+                        <th>EMR Value</th>
                         <th>DWH Value</th>
                         <th>DWH Date</th>
                         <th>Diff</th>
@@ -27,13 +27,13 @@
                     <tbody>
                         @foreach($metrics as $metric)
                         <tr>
-                            <td width="20%">{{ $metric->name }}</td>
+                            <td width="20%">{{ str_replace('_', ' ', $metric->name) }}</td>
                             <td width="30%">{{ $descriptions[$metric->name] }}</td>
-                            <td align="right">{{ $metric->value }}</td>
                             <td align="right">{{ $metric->metric_date->format('d M Y') }}</td>
+                            <td align="right">{{ $metric->value }}</td>
                             <td align="right">{{ $metric->dwh_value }}</td>
                             <td align="right">{{ $metric->dwh_metric_date->format('d M Y') }}</td>
-                            <td align="right">{{ $metric->dwh_value - $metric->value }}</td>
+                            <td align="right">{{ abs($metric->dwh_value - $metric->value) }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -49,11 +49,11 @@
         const data = @json($data);
         Highcharts.chart('upload-history-chart', {
             title: { text: '' },
-            yAxis: [{ type: 'logarithmic', minorTickInterval: 0.1, title: { text: 'Patient Count' }}],
+            yAxis: [{ type: 'logarithmic', title: { text: 'Patient Count' }}],
             xAxis: [{ categories: months, title: { text: 'Months' }, crosshair: true }],
             legend: { layout: 'horizontal', align: 'center', verticalAlign: 'bottom'},
             series: [
-                { name: 'NDWH', data: data['NDWH'] },
+                { name: 'C&T', data: data['NDWH'] },
                 { name: 'HTS', data: data['HTS'] },
                 { name: 'PKV', data: data['MPI'] }
             ]

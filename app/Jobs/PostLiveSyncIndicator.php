@@ -16,6 +16,8 @@ class PostLiveSyncIndicator implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 1;
+
     protected $liveSyncIndicator;
 
     public function __construct(LiveSyncIndicator $liveSyncIndicator)

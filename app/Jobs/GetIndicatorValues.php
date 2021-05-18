@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\Facility;
 use App\Models\LiveSyncIndicator;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -18,82 +17,81 @@ class GetIndicatorValues implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 1;
+
     protected $indicator;
     protected $period;
     protected $facilities;
 
-    public function __construct($indicator = null, $period = null)
+    public function __construct($indicator = null, $period = null, $facilities = [])
     {
         $this->indicator = $indicator;
         $this->period = is_null($period) ?
             now()->startOf('month')->sub(1, 'month')->endOf('month')->endOfDay() :
             Carbon::parse($period)->endOf('month')->endOfDay();
+        $this->facilities = $facilities;
     }
 
     public function handle()
     {
-        $facilities = [];
-        Facility::where('etl', true)->cursor()->each(function($facility) use (&$facilities) {
-            $facilities[$facility->code] = $facility->id;
-        });
-        if (!count($facilities)) {
+        if (!count($this->facilities)) {
             return;
         }
-        $this->facilities = $facilities;
+
         switch ($this->indicator) {
             case 'HTS_TESTED':
-                $this->getHtsTested($this->period, $facilities);
+                $this->getHtsTested($this->period, $this->facilities);
                 break;
             case 'HTS_TESTED_POS':
-                $this->getHtsTestedPos($this->period, $facilities);
+                $this->getHtsTestedPos($this->period, $this->facilities);
                 break;
             case 'HTS_LINKED':
-                $this->getHtsLinked($this->period, $facilities);
+                $this->getHtsLinked($this->period, $this->facilities);
                 break;
             case 'HTS_INDEX':
-                $this->getHtsIndex($this->period, $facilities);
+                $this->getHtsIndex($this->period, $this->facilities);
                 break;
             case 'HTS_INDEX_POS':
-                $this->getHtsIndexPos($this->period, $facilities);
+                $this->getHtsIndexPos($this->period, $this->facilities);
                 break;
             case 'TX_NEW':
-                $this->getTxNew($this->period, $facilities);
+                $this->getTxNew($this->period, $this->facilities);
                 break;
             case 'TX_CURR':
-                $this->getTxCurr($this->period, $facilities);
+                $this->getTxCurr($this->period, $this->facilities);
                 break;
             case 'TX_RTT':
-                // $this->getTxRtt($this->period, $facilities);
+                // $this->getTxRtt($this->period, $this->facilities);
                 break;
             case 'TX_ML':
-                // $this->getTxMl($this->period, $facilities);
+                // $this->getTxMl($this->period, $this->facilities);
                 break;
             case 'TX_PVLS':
-                $this->getTxPvls($this->period, $facilities);
+                $this->getTxPvls($this->period, $this->facilities);
                 break;
             case 'MMD':
-                $this->getMmd($this->period, $facilities);
+                $this->getMmd($this->period, $this->facilities);
                 break;
             case 'RETENTION_ON_ART_12_MONTHS':
-                $this->getRetentionOnArt12Months($this->period, $facilities);
+                $this->getRetentionOnArt12Months($this->period, $this->facilities);
                 break;
             case 'RETENTION_ON_ART_VL_1000_12_MONTHS':
-                $this->getRetentionOnArtVl100012Months($this->period, $facilities);
+                $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
                 break;
             default:
-                $this->getHtsTested($this->period, $facilities);
-                $this->getHtsTestedPos($this->period, $facilities);
-                $this->getHtsLinked($this->period, $facilities);
-                $this->getHtsIndex($this->period, $facilities);
-                $this->getHtsIndexPos($this->period, $facilities);
-                $this->getTxNew($this->period, $facilities);
-                $this->getTxCurr($this->period, $facilities);
-                // $this->getTxRtt($this->period, $facilities);
-                // $this->getTxMl($this->period, $facilities);
-                $this->getTxPvls($this->period, $facilities);
-                $this->getMmd($this->period, $facilities);
-                $this->getRetentionOnArt12Months($this->period, $facilities);
-                $this->getRetentionOnArtVl100012Months($this->period, $facilities);
+                $this->getHtsTested($this->period, $this->facilities);
+                $this->getHtsTestedPos($this->period, $this->facilities);
+                $this->getHtsLinked($this->period, $this->facilities);
+                $this->getHtsIndex($this->period, $this->facilities);
+                $this->getHtsIndexPos($this->period, $this->facilities);
+                $this->getTxNew($this->period, $this->facilities);
+                $this->getTxCurr($this->period, $this->facilities);
+                // $this->getTxRtt($this->period, $this->facilities);
+                // $this->getTxMl($this->period, $this->facilities);
+                $this->getTxPvls($this->period, $this->facilities);
+                $this->getMmd($this->period, $this->facilities);
+                $this->getRetentionOnArt12Months($this->period, $this->facilities);
+                $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
         }
     }
 

@@ -3,11 +3,11 @@
 namespace App\Jobs;
 
 use App\Jobs\PostLiveSyncIndicator;
-use App\Models\Facility;
 use App\Models\LiveSyncIndicator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -16,17 +16,27 @@ class PostLiveSyncIndicators implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct()
+    public $tries = 1;
+
+    protected $facilityIds;
+
+    public function __construct($facilityIds = [])
     {
-        //
+        $this->facilityIds = $facilityIds;
     }
 
     public function handle()
     {
-        LiveSyncIndicator::whereIn('facility_id', Facility::where('etl', true)->pluck('id')->toArray())
+        $facilityIds = $this->facilityIds;
+        if (!count($facilityIds)) {
+            return;
+        }
+        LiveSyncIndicator::whereIn('facility_id', $facilityIds)
             ->where('posted', false)
-            ->where('created_at', '<=', now()->subtract('minutes', 1))
-            ->cursor()->each(function ($liveSyncIndicator) {
+            ->where(function (Builder $query) {
+                $query->orWhere('created_at', '<=', now()->subtract('seconds', 30))
+                    ->orWhere('updated_at', '<=', now()->subtract('seconds', 30));
+            })->cursor()->each(function ($liveSyncIndicator) {
                 PostLiveSyncIndicator::dispatchNow($liveSyncIndicator);
             });
     }

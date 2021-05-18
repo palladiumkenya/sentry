@@ -19,6 +19,8 @@ class GetSpotFacilityUploads implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 1;
+
     protected $etlJob;
     protected $facility;
 
@@ -53,8 +55,8 @@ class GetSpotFacilityUploads implements ShouldQueue
                         'facility_id' => $facility->id,
                         'updated' => $upload['logDate'] ? Carbon::parse($upload['logDate'])->format('Y-m-d H:i:s') : null,
                         'docket' => $upload['docket'],
-                        'expected' => $upload['patientCount'],
-                        'received' => $upload['recievedCount'],
+                        'expected' => isset($upload['patientCount']) ? $upload['patientCount'] : null,
+                        'received' => isset($upload['recievedCount']) ? $upload['recievedCount'] : null,
                         'status' => isset($upload['handshakeStatus']) ? $upload['handshakeStatus'] : null,
                         'processed' => false,
                         'posted' => false,
@@ -63,7 +65,7 @@ class GetSpotFacilityUploads implements ShouldQueue
                 } else {
                     $facilityUpload->update([
                         'status' => isset($upload['handshakeStatus']) ? $upload['handshakeStatus'] : null,
-                        'received' => $upload['received'],
+                        'received' => isset($upload['recievedCount']) ? $upload['recievedCount'] : null,
                         'processed' => false,
                         'posted' => false,
                         'etl_job_id' => $etlJob->id,

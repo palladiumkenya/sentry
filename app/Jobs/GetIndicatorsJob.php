@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Jobs\GetIndicatorValues;
+use App\Models\Facility;
 use App\Models\GetIndicatorsJob as GetIndicatorsJobModel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,6 +14,8 @@ use Illuminate\Queue\SerializesModels;
 class GetIndicatorsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public $tries = 1;
 
     protected $getIndicatorsJob;
 
@@ -25,7 +28,13 @@ class GetIndicatorsJob implements ShouldQueue
     {
         $this->getIndicatorsJob->started_at = now();
         $this->getIndicatorsJob->save();
-        GetIndicatorValues::dispatchNow();
+        Facility::where('etl', true)->chunk(100, function ($facilities) {
+            $f = [];
+            $facilities->each(function ($facility) use (&$f) {
+                $f[$facility->code] = $facility->id;
+            });
+            GetIndicatorValues::dispatchNow(null, null, $f);
+        });
         $this->getIndicatorsJob->completed_at = now();
         $this->getIndicatorsJob->save();
     }

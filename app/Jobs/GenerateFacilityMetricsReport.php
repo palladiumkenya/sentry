@@ -18,6 +18,8 @@ class GenerateFacilityMetricsReport implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 1;
+
     protected $etlJob;
     protected $facility;
 
@@ -31,12 +33,40 @@ class GenerateFacilityMetricsReport implements ShouldQueue
     {
         $etlJob = $this->etlJob;
         $facility = $this->facility;
-        $metrics = FacilityMetric::where('facility_id', $facility->id)
+        $indicators = [
+            'HTS_TESTED' => 0,
+            'HTS_TESTED_POS' => 0,
+            'HTS_INDEX_POS' => 0,
+            'TX_NEW' => 0,
+            'TX_CURR' => 0,
+            'RETENTION_ON_ART_12_MONTHS' => 0,
+            'RETENTION_ON_ART_VL_1000_12_MONTHS' => 0
+        ];
+        $metrics = (new FacilityMetric)->newCollection();
+        $m = FacilityMetric::where('facility_id', $facility->id)
             ->where('etl_job_id', $etlJob->id)
             ->whereNotNull('name')
             ->whereNotNull('value')
             ->whereNotNull('dwh_value')
+            ->whereIn('name', array_keys($indicators))
+            ->orderByRaw("FIELD(name,
+                'HTS_TESTED',
+                'HTS_TESTED_POS',
+                'HTS_INDEX_POS',
+                'TX_NEW',
+                'TX_CURR',
+                'RETENTION_ON_ART_12_MONTHS',
+                'RETENTION_ON_ART_VL_1000_12_MONTHS'
+            ) ASC, metric_date DESC")
             ->get();
+
+        $m->each(function ($metric) use (&$indicators, &$metrics) {
+            $indicators[$metric->name] = $indicators[$metric->name] + 1;
+            if ($indicators[$metric->name] == 1) {
+                $metrics->push($metric);
+            }
+        });
+
         $uploads = FacilityUpload::where('facility_id', $facility->id)
             ->whereNotNull('docket')
             ->whereNotNull('received')
@@ -84,17 +114,17 @@ class GenerateFacilityMetricsReport implements ShouldQueue
         }
         $url = nova_get_setting(nova_get_setting('production') ? 'spot_url' : 'spot_url_staging').'/#/stats/showcase/'.$facility->uid;
         $descriptions = [
-            "TX_CURR" => "Individuals currently receiving antiretroviral therapy (ART)",
-            "TX_NEW" => "Individuals newly enrolled on antiretroviral therapy (ART)",
             "HTS_TESTED" => "Individuals who received a HIV test",
             "HTS_TESTED_POS" => "Individuals who tested positive during a HIV test",
             "HTS_LINKED" => "Individuals who tested positive and have been enrolled to care",
+            "HTS_INDEX" => "Individuals who were identified and tested using Index testing services and received their results",
+            "HTS_INDEX_POS" => "Individuals who tested positive using Index testing services and received their results",
+            "TX_NEW" => "Individuals newly enrolled on antiretroviral therapy (ART)",
+            "TX_CURR" => "Individuals currently receiving antiretroviral therapy (ART)",
             "RETENTION_ON_ART_12_MONTHS" => "Individuals who are still alive and on ART 12 months after initiating treatment",
             "RETENTION_ON_ART_VL_1000_12_MONTHS" => "Individuals who are suppressed 12 months after initiating treatment",
             "MMD" => "Individuals dispensed drugs for  Multi month dispense (>= 90 days)",
-            "HTS_INDEX" => "Individuals who were identified and tested using Index testing services and received their results",
             "TX_PVLS" => "Individuals of ART patients with a suppressed viral load within the past 12 months",
-            "HTS_INDEX_POS" => "Individuals who tested positive using Index testing services and received their results",
             "TX_RTT" => "Patients who experienced interruption in treatment previously and restarted ARVs in this month",
             "TX_ML" => "Individuals who were on ART previously then had no clinical contact since their last expected contact",
         ];

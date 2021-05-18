@@ -11,6 +11,8 @@ class ETLCompleted extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    public $tries = 1;
+
     public $user;
     public $contact;
     public $partner;

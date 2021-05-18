@@ -19,6 +19,8 @@ class GetSpotFacilityMetrics implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 1;
+
     protected $etlJob;
     protected $facility;
 

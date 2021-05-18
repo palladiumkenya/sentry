@@ -14,6 +14,8 @@ class TruncateTables implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 1;
+
     protected $databaseName;
 
     public function __construct($databaseName)

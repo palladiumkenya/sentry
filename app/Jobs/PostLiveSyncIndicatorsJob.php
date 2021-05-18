@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Jobs\PostLiveSyncIndicators;
+use App\Models\Facility;
 use App\Models\PostLiveSyncIndicatorsJob as PostLiveSyncIndicatorsJobModel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,6 +14,8 @@ use Illuminate\Queue\SerializesModels;
 class PostLiveSyncIndicatorsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public $tries = 1;
 
     protected $postLiveSyncIndicatorsJob;
 
@@ -25,7 +28,13 @@ class PostLiveSyncIndicatorsJob implements ShouldQueue
     {
         $this->postLiveSyncIndicatorsJob->started_at = now();
         $this->postLiveSyncIndicatorsJob->save();
-        PostLiveSyncIndicators::dispatch();
+        Facility::where('etl', true)->chunk(100, function ($facilities) {
+            $f = [];
+            $facilities->each(function ($facility) use (&$f) {
+                $f[$facility->code] = $facility->id;
+            });
+            PostLiveSyncIndicators::dispatchNow($f);
+        });
         $this->postLiveSyncIndicatorsJob->completed_at = now();
         $this->postLiveSyncIndicatorsJob->save();
     }
