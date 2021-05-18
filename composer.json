@@ -21,6 +21,7 @@
         "laravel/tinker": "^2.5",
         "optimistdigital/nova-settings": "^3.1",
         "spatie/browsershot": "^3.44",
+        "spatie/laravel-rate-limited-job-middleware": "^1.5",
         "spatie/once": "^2.0",
         "vladimir-yuldashev/laravel-queue-rabbitmq": "^11.1"
     },

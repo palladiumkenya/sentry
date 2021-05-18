@@ -16,7 +16,7 @@ class GetIndicatorsJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
-    public $timeout = 600;
+    public $timeout = 1800;
 
     protected $getIndicatorsJob;
 

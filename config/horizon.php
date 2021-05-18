@@ -174,21 +174,12 @@ return [
             'tries' => 1,
             'nice' => 0,
         ],
-        'supervisor-2' => [
-            'connection' => 'redis',
-            'queue' => ['post_live_sync_indicator'],
-            'balance' => 'auto',
-            'maxProcesses' => 5,
-            'memory' => 2048,
-            'tries' => 1,
-            'nice' => 0,
-        ],
     ],
 
     'environments' => [
         'production' => [
             'supervisor-1' => [
-                'maxProcesses' => 10,
+                'maxProcesses' => 20,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],

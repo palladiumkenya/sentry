@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Spatie\RateLimitedMiddleware\RateLimited;
 
 class PostLiveSyncIndicator implements ShouldQueue
 {
@@ -19,11 +20,22 @@ class PostLiveSyncIndicator implements ShouldQueue
     public $tries = 1;
     public $timeout = 600;
 
+
     protected $liveSyncIndicator;
 
     public function __construct(LiveSyncIndicator $liveSyncIndicator)
     {
         $this->liveSyncIndicator = $liveSyncIndicator;
+    }
+
+    public function middleware()
+    {
+        $rateLimitedMiddleware = (new RateLimited())
+            ->allow(5)
+            ->everySeconds(10)
+            ->releaseAfterSeconds(5);
+
+        return [$rateLimitedMiddleware];
     }
 
     public function handle()
