@@ -19,6 +19,7 @@ class GenerateFacilityMetricsReport implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
+    public $timeout = 600;
 
     protected $etlJob;
     protected $facility;

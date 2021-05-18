@@ -151,7 +151,7 @@ return [
     |
     */
 
-    'memory_limit' => 64,
+    'memory_limit' => 2048,
 
     /*
     |--------------------------------------------------------------------------
@@ -170,7 +170,16 @@ return [
             'queue' => ['default'],
             'balance' => 'auto',
             'maxProcesses' => 1,
-            'memory' => 128,
+            'memory' => 2048,
+            'tries' => 1,
+            'nice' => 0,
+        ],
+        'supervisor-2' => [
+            'connection' => 'redis',
+            'queue' => ['post_live_sync_indicator'],
+            'balance' => 'auto',
+            'maxProcesses' => 5,
+            'memory' => 2048,
             'tries' => 1,
             'nice' => 0,
         ],

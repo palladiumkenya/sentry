@@ -17,6 +17,7 @@ class GetSpotFacilities implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
+    public $timeout = 600;
 
     public function __construct()
     {

@@ -17,6 +17,7 @@ class PostLiveSyncIndicators implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
+    public $timeout = 1800;
 
     protected $facilityIds;
 
@@ -37,7 +38,7 @@ class PostLiveSyncIndicators implements ShouldQueue
                 $query->orWhere('created_at', '<=', now()->subtract('seconds', 30))
                     ->orWhere('updated_at', '<=', now()->subtract('seconds', 30));
             })->cursor()->each(function ($liveSyncIndicator) {
-                PostLiveSyncIndicator::dispatchNow($liveSyncIndicator);
+                PostLiveSyncIndicator::dispatchNow($liveSyncIndicator)->onQueue('post_live_sync_indicator');
             });
     }
 }

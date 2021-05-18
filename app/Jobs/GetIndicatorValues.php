@@ -18,6 +18,7 @@ class GetIndicatorValues implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
+    public $timeout = 1800;
 
     protected $indicator;
     protected $period;

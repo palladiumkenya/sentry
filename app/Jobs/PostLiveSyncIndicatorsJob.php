@@ -16,6 +16,7 @@ class PostLiveSyncIndicatorsJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
+    public $timeout = 1800;
 
     protected $postLiveSyncIndicatorsJob;
 
