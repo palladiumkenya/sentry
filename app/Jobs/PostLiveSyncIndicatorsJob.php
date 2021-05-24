@@ -34,7 +34,7 @@ class PostLiveSyncIndicatorsJob implements ShouldQueue
             $facilities->each(function ($facility) use (&$f) {
                 $f[$facility->code] = $facility->id;
             });
-            PostLiveSyncIndicators::dispatchNow($f);
+            PostLiveSyncIndicators::dispatch($f);
         });
         $this->postLiveSyncIndicatorsJob->completed_at = now();
         $this->postLiveSyncIndicatorsJob->save();

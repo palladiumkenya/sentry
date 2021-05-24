@@ -38,7 +38,7 @@ class PostLiveSyncIndicators implements ShouldQueue
                 $query->orWhere('created_at', '<=', now()->subtract('seconds', 30))
                     ->orWhere('updated_at', '<=', now()->subtract('seconds', 30));
             })->cursor()->each(function ($liveSyncIndicator) {
-                PostLiveSyncIndicator::dispatchNow($liveSyncIndicator);
+                PostLiveSyncIndicator::dispatch($liveSyncIndicator);
             });
     }
 }
