@@ -17,15 +17,16 @@ class PostLiveSyncIndicator implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $tries = 1;
-    public $timeout = 600;
-
-
     protected $liveSyncIndicator;
 
     public function __construct(LiveSyncIndicator $liveSyncIndicator)
     {
         $this->liveSyncIndicator = $liveSyncIndicator;
+    }
+
+    public function retryUntil()
+    {
+        return now()->addHours(2);
     }
 
     public function middleware()
