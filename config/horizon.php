@@ -165,7 +165,7 @@ return [
     */
 
     'defaults' => [
-        'supervisor-1' => [
+        'default' => [
             'connection' => 'redis',
             'queue' => ['default'],
             'balance' => 'auto',
@@ -174,11 +174,20 @@ return [
             'tries' => 1,
             'nice' => 0,
         ],
+        'live-sync' => [
+            'connection' => 'redis',
+            'queue' => ['PostLiveSyncIndicator'],
+            'balance' => 'auto',
+            'maxProcesses' => 5,
+            'memory' => 2048,
+            'tries' => 3,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [
         'production' => [
-            'supervisor-1' => [
+            'default' => [
                 'maxProcesses' => 20,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
@@ -186,7 +195,7 @@ return [
         ],
 
         'local' => [
-            'supervisor-1' => [
+            'default' => [
                 'maxProcesses' => 3,
             ],
         ],
