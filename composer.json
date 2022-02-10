@@ -23,7 +23,8 @@
         "spatie/browsershot": "^3.44",
         "spatie/laravel-rate-limited-job-middleware": "^1.5",
         "spatie/once": "^2.0",
-        "vladimir-yuldashev/laravel-queue-rabbitmq": "^11.1"
+        "vladimir-yuldashev/laravel-queue-rabbitmq": "^11.1",
+        "ext-curl": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

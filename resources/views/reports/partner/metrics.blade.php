@@ -39,6 +39,7 @@
 
         .table1 td:first-child {
             font-weight: bold;
+            color: blue;
         }
 
         td {
@@ -64,13 +65,12 @@
     </div>
     <div class="row">
         <div class="col pt-5 p-20 justify-content-center">
-            {{--                <h3 class="mt-4">{{ $facility->name }}</h3>--}}
-            <h5>Greetings HJF Kisumu West ,</h5>
+            <h5>Greetings {{ $partner->name }} ,</h5>
             <p>The Kenya HMIS project is working with NASCOP to improve the availability and quality of data in the
                 National Data Warehouse (NDW). This requires every facility to upload complete and up-to-date databases
                 on a monthly basis to the NDW.</p>
             <p>The purpose of this email is to share the reporting rates and selected data quality and alignment metrics
-                for the facilities that you support. Please see below a summary of the metrics for January 2022:</p>
+                for the facilities that you support. Please see below a summary of the metrics for {{date('F Y',strtotime('last month'))}}:</p>
 
             <table class="table1">
                 <thead>
@@ -80,28 +80,28 @@
                 </thead>
                 <tr>
                     <td>Number of EMR Facilities</td>
-                    <td>3 Facilities</td>
-                    <td><a href="#">View</a></td>
+                    <td>{{count($facility_partner)}} Facilities</td>
+                    <td><a href="{{$spoturl}}">View</a></td>
                 </tr>
                 <tr>
                     <td>Care and Treatment Reporting Rates</td>
-                    <td>60%</td>
-                    <td><a href="#">View</a></td>
+                    <td>{{$ct_rr}}%</td>
+                    <td><a href="{{$dwhurl}}">View</a></td>
                 </tr>
                 <tr>
                     <td>HTS Reporting Rates</td>
-                    <td>50%</td>
-                    <td><a href="#">View</a></td>
+                    <td>{{$hts_rr}}%</td>
+                    <td><a href="{{$dwhurl}}">View</a></td>
                 </tr>
                 <tr>
                     <td>Difference (EMR value- NDW value)</td>
-                    <td>55%</td>
+                    <td></td>
                     <td><a href="#">View</a></td>
                 </tr>
                 <tr>
                     <td>% Variance*</td>
-                    <td>55%</td>
-                    <td><a href="#">View</a></td>
+                    <td></td>
+                    <td><a href="{{$spoturl}}">View</a></td>
                 </tr>
             </table>
 
@@ -121,97 +121,25 @@
                 <td>Difference</td>
                 <td>Percentage</td>
                 </thead>
-                <tr>
-                    <td>HTS Tested POS</td>
-                    <td>29/06/2021</td>
-                    <td>10,454</td>
-                    <td>10,000</td>
-                    <td>30/06/2021</td>
-                    <td>454</td>
-                    <td>44%</td>
-                </tr>
-                <tr>
-                    <td>HTS Tested POS</td>
-                    <td>29/06/2021</td>
-                    <td>10,454</td>
-                    <td>10,000</td>
-                    <td>30/06/2021</td>
-                    <td>454</td>
-                    <td>44%</td>
-                </tr>
-                <tr>
-                    <td>HTS Tested POS</td>
-                    <td>29/06/2021</td>
-                    <td>10,454</td>
-                    <td>10,000</td>
-                    <td>30/06/2021</td>
-                    <td>454</td>
-                    <td>44%</td>
-                </tr>
-                <tr>
-                    <td>HTS Tested POS</td>
-                    <td>29/06/2021</td>
-                    <td>10,454</td>
-                    <td>10,000</td>
-                    <td>30/06/2021</td>
-                    <td>454</td>
-                    <td>44%</td>
-                </tr>
-                <tr>
-                    <td>HTS Tested POS</td>
-                    <td>29/06/2021</td>
-                    <td>10,454</td>
-                    <td>10,000</td>
-                    <td>30/06/2021</td>
-                    <td>454</td>
-                    <td>44%</td>
-                </tr>
-                <tr>
-                    <td>HTS Tested POS</td>
-                    <td>29/06/2021</td>
-                    <td>10,454</td>
-                    <td>10,000</td>
-                    <td>30/06/2021</td>
-                    <td>454</td>
-                    <td>44%</td>
-                </tr>
+                @foreach($metrics as $metric)
+                    <tr>
+                        <td width="20%">{{ str_replace('_', ' ', $metric->name) }}</td>
+                        <td align="right">{{ $metric->metric_date->format('d M Y') }}</td>
+                        <td align="right">{{ $metric->value }}</td>
+                        <td align="right">{{ $metric->dwh_value }}</td>
+                        <td align="right">{{ $metric->dwh_metric_date->format('d M Y') }}</td>
+                        <td align="right">{{ abs($metric->dwh_value - $metric->value) }}</td>
+                    </tr>
+                @endforeach
             </table>
             <br>
-            <button class="btn btn-dark btn-block">National Data Warehouse</button>
+            <a class="btn btn-dark btn-block" href="{{$dwhurl}}">National Data Warehouse</a>
             <br>
 
             <p>Kindly work with supported facilities to address any challenges they may have in uploading high quality
                 data to the NDW. Please reach out to Palladium Kenya if you have any questions.</p>
             <p>Kind Regards,</p>
             <p>The Kenya HMIS Team</p>
-            {{--            <h4 class="mt-4 mb-3">Indicator Metrics</h4>--}}
-            {{--            <table class="table table-bordered table-sm">--}}
-            {{--                <thead>--}}
-            {{--                <th>Name</th>--}}
-            {{--                <th>Description</th>--}}
-            {{--                <th>EMR Date</th>--}}
-            {{--                <th>EMR Value</th>--}}
-            {{--                <th>DWH Value</th>--}}
-            {{--                <th>DWH Date</th>--}}
-            {{--                <th>Diff</th>--}}
-            {{--                </thead>--}}
-            {{--                <tbody>--}}
-            {{--                --}}{{--                        @foreach($metrics as $metric)--}}
-            {{--                --}}{{--                        <tr>--}}
-            {{--                --}}{{--                            <td width="20%">{{ str_replace('_', ' ', $metric->name) }}</td>--}}
-            {{--                --}}{{--                            <td width="30%">{{ $descriptions[$metric->name] }}</td>--}}
-            {{--                --}}{{--                            <td align="right">{{ $metric->metric_date->format('d M Y') }}</td>--}}
-            {{--                --}}{{--                            <td align="right">{{ $metric->value }}</td>--}}
-            {{--                --}}{{--                            <td align="right">{{ $metric->dwh_value }}</td>--}}
-            {{--                --}}{{--                            <td align="right">{{ $metric->dwh_metric_date->format('d M Y') }}</td>--}}
-            {{--                --}}{{--                            <td align="right">{{ abs($metric->dwh_value - $metric->value) }}</td>--}}
-            {{--                --}}{{--                        </tr>--}}
-            {{--                --}}{{--                        @endforeach--}}
-            {{--                </tbody>--}}
-            {{--            </table>--}}
-            {{--            <h4 class="mt-4 mb-3">Upload History</h4>--}}
-            {{--            <div id="upload-history-chart"></div>--}}
-            {{--                <a href="{{ $url }}" style="color: #0000ee;" class="mt-4">{{ $url }}</a>--}}
         </div>
     </div>
     <div class="row" style="background-color: #000059">
