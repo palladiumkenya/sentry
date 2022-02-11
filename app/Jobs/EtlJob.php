@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\EtlJob as EtlJobModel;
 use App\Models\Facility;
 use App\Models\Partner;
+use App\Models\PartnerMetric;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -46,15 +47,19 @@ class EtlJob implements ShouldQueue
             $facilities->each(function ($facility) use ($etlJob) {
                 GetSpotFacilityMetrics::dispatchNow($etlJob, $facility);
                 GetSpotFacilityUploads::dispatchNow($etlJob, $facility);
-                GenerateFacilityMetricsReport::dispatchNow($etlJob, $facility);
             });
         });
 
-        $partner = Partner::find(1);
+        $partners = Partner::get();
+        PartnerMetric::truncate();
 
-        if ($partner) {
-            SendEtlCompletedEmail::dispatchNow($partner, $etlJob, Facility::where('etl', true)->pluck('id'));
+        foreach ($partners as $partner) {
+            GenerateFacilityMetricsReport::dispatchNow($etlJob, $partner);
         }
+
+//        if ($partner) {
+//            SendEtlCompletedEmail::dispatchNow($partner, $etlJob, Facility::where('etl', true)->pluck('id'));
+//        }
 
         $etlJob->completed_at = now();
         $etlJob->save();
