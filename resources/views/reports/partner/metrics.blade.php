@@ -119,15 +119,15 @@
                 <td>NDW Calculation</td>
                 <td>NDW Date</td>
                 <td>Difference</td>
-                <td>Percentage</td>
+{{--                <td>Percentage</td>--}}
                 </thead>
                 @foreach($metrics as $metric)
                     <tr>
                         <td width="20%">{{ str_replace('_', ' ', $metric->name) }}</td>
-                        <td align="right">{{ $metric->metric_date->format('d M Y') }}</td>
+                        <td align="right">{{ date('d-m-Y', strtotime($metric->metric_date)) }}</td>
                         <td align="right">{{ $metric->value }}</td>
                         <td align="right">{{ $metric->dwh_value }}</td>
-                        <td align="right">{{ $metric->dwh_metric_date->format('d M Y') }}</td>
+                        <td align="right">{{ date('d-m-Y', strtotime($metric->dwh_metric_date)) }}</td>
                         <td align="right">{{ abs($metric->dwh_value - $metric->value) }}</td>
                     </tr>
                 @endforeach
