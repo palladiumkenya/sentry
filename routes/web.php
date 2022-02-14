@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/ten', function () {
+Route::get('/test', function () {
 
     $partners = Partner::get();
     $partnersNames = [];
