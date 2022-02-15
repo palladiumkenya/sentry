@@ -188,8 +188,16 @@ Route::get('/test', function () {
             ->where('partner_id', $partner->id)
             ->first();
 
-        return view('reports.partner.metrics', compact(
-             'metrics', 'spoturl', 'dwhurl', 'facility_partner', 'ct_rr', 'hts_rr', 'partner', 'difference'
-        ));
+        return new App\Mail\ETLCompleted($partner,
+            $partner,
+            $partner,
+            $metrics,
+            $spoturl,
+            $dwhurl,
+            $facility_partner,
+            $ct_rr,
+            $hts_rr,
+            $partner,
+            $difference);
     }
 });
