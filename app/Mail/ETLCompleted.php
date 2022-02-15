@@ -2,10 +2,13 @@
 
 namespace App\Mail;
 
+use App\Models\FacilityPartner;
+use App\Models\Partner;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class ETLCompleted extends Mailable implements ShouldQueue
 {
@@ -16,30 +19,28 @@ class ETLCompleted extends Mailable implements ShouldQueue
     public $user;
     public $contact;
     public $partner;
-    public $refresh_date;
     public $unsubscribe_url;
     public $file;
+    protected $metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr, $difference;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(
-        $user,
-        $contact,
-        $partner,
-        $refresh_date,
-        $unsubscribe_url,
-        $file
-    )
+    public function __construct($user, $contact, $unsubscribe_url, $metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr, Partner $partner, $difference)
     {
         $this->user = $user;
         $this->contact = $contact;
-        $this->partner = $partner;
-        $this->refresh_date = $refresh_date;
         $this->unsubscribe_url = $unsubscribe_url;
-        $this->file = $file;
+        $this->metrics = $metrics;
+        $this->spoturl = $spoturl;
+        $this->dwhurl = $dwhurl;
+        $this->facility_partner = $facility_partner;
+        $this->ct_rr = $ct_rr;
+        $this->hts_rr = $hts_rr;
+        $this->partner = $partner;
+        $this->difference = $difference;
     }
 
     /**
@@ -49,12 +50,20 @@ class ETLCompleted extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        return $this->markdown('emails.etl.completed', [
+        Log::info($this->user);
+        Log::info($this->metrics);
+        return $this->markdown('reports.partner.metrics', [
+            'metrics' => $this->metrics,
+            'spoturl' => $this->spoturl,
+            'dwhurl' => $this->dwhurl,
+            'facility_partner' => $this->facility_partner,
+            'ct_rr' => $this->ct_rr,
+            'hts_rr' => $this->hts_rr,
             'user' => $this->user,
             'contact' => $this->contact,
             'partner' => $this->partner,
-            'refresh_date' => $this->refresh_date,
             'unsubscribe_url' => $this->unsubscribe_url,
-        ])->subject('NDWH DQA Report')->attach($this->file);
+            'difference' => $this->difference
+        ])->subject('NDWH DQA Report');
     }
 }
