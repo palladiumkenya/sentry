@@ -95,8 +95,8 @@
                 </tr>
                 <tr>
                     <td>Difference (EMR value- NDW value)</td>
-                    <td> </td>
-                    <td><a href="https://palladiumgroup-my.sharepoint.com/:x:/r/personal/mary_gikura_thepalladiumgroup_com/_layouts/15/guestaccess.aspx?email=lousa.yogo%40thepalladiumgroup.com&e=4%3AP6Qi2d&at=9&CID=13149ec0-f5b1-3e05-8d39-e9f3fdf7de9c&share=EQU85MfsI1JFlw5HJHu9DkQB-iStEspiQ5aA5i4zPbU--A">View</a></td>
+                    <td></td>
+                    <td><a href="https://palladiumgroup-my.sharepoint.com/:x:/g/personal/mary_gikura_thepalladiumgroup_com/EQU85MfsI1JFlw5HJHu9DkQB-iStEspiQ5aA5i4zPbU--A">View</a></td>
                 </tr>
                 <tr>
                     <td>% Variance*</td>
