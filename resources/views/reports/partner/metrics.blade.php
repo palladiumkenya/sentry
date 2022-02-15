@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {{--    <title>{{ $facility->name }}</title>--}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
           integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -44,9 +43,6 @@
 
         td {
             padding: 15px;
-            /*border-bottom:1px dotted #aaa;*/
-            /*background: radial-gradient(circle at bottom, black 1px, transparent 1.5px) repeat-x bottom;
-            background-size: 5px 4px;*/
         }
 
         .cmjx-highlight {
@@ -60,7 +56,7 @@
 <div class="container-fluid">
     <div class="row" style="background-color: #000059">
         <div class="col p-5 align-content-center">
-            <img class="center" src="img.png">
+            <img class="center" src="data:image/png;base64,{{base64_encode(file_get_contents('./public/img.png'))}}" alt="logo">
         </div>
     </div>
     <div class="row">
@@ -79,7 +75,7 @@
                 <td></td>
                 </thead>
                 <tr>
-                    <td>Number of EMR Facilities</td>
+                    <td style=" padding: 15px;">Number of EMR Facilities</td>
                     <td>{{count($facility_partner)}} Facilities</td>
                     <td><a href="{{$spoturl}}">View</a></td>
                 </tr>
@@ -106,9 +102,10 @@
             </table>
 
             <small>*% Variance was computed as =</small>
-            <small style="text-align:center">
-                \[ \Biggl( {Reported value - Verified value \over Verified value}\Biggr) * 100\]
-            </small>
+            <img class="center" height="50px" src="data:image/png;base64,{{base64_encode(file_get_contents('./public/formular.png'))}}" alt="formular">
+{{--            <small style="text-align:center">--}}
+{{--                \[ \Biggl( {Reported value - Verified value \over Verified value}\Biggr) * 100\]--}}
+{{--            </small>--}}
             <br>
             <p>Data Alignment : - A comparison between National Data warehouse and EMR data</p>
             <table>
@@ -144,13 +141,13 @@
         </div>
     </div>
     <div class="row" style="background-color: #000059">
-        <div class="col p-5 text-center text-white">
-            <p>If you have any questions, feel free message us at
+        <div class="col p-5  text-white" style="text-align: center">
+            <p style="text-align: center">If you have any questions, feel free message us at
                 help@palladiumgroup.on.spiceworks.com.</p>
-            <p>All right reserved. Update email preferences or unsubscribe.</p>
-            <p>+254 717 969471</p>
-            <p>Nairobi, Kenya</p>
-            <p>Terms of use | Privacy Policy</p>
+            <p style="text-align: center">All right reserved. Update email preferences or unsubscribe.</p>
+            <p style="text-align: center">+254 717 969471</p>
+            <p style="text-align: center">Nairobi, Kenya</p>
+            <p style="text-align: center">Terms of use | Privacy Policy</p>
         </div>
     </div>
 </div>
