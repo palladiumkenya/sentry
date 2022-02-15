@@ -52,7 +52,7 @@ class ETLCompleted extends Mailable implements ShouldQueue
     {
         Log::info($this->user);
         Log::info($this->metrics);
-        return $this->markdown('reports.partner.metrics', [
+        return $this->markdown('emails.etl.completed', [
             'metrics' => $this->metrics,
             'spoturl' => $this->spoturl,
             'dwhurl' => $this->dwhurl,

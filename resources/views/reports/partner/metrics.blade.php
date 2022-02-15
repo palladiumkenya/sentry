@@ -8,7 +8,7 @@
           integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <style>
+    <style type="text/css">
         .center {
             display: block;
             margin-left: auto;
@@ -120,7 +120,7 @@
                 </thead>
                 @foreach($metrics as $metric)
                     <tr>
-                        <td width="20%">{{ str_replace('_', ' ', $metric->name) }}</td>
+                        <td style="width:20%">{{ str_replace('_', ' ', $metric->name) }}</td>
                         <td align="right">{{ date('d-m-Y', strtotime($metric->metric_date)) }}</td>
                         <td align="right">{{ $metric->value }}</td>
                         <td align="right">{{ $metric->dwh_value }}</td>
@@ -151,9 +151,5 @@
         </div>
     </div>
 </div>
-<script>
-    const months = {};
-    const data = {}
-</script>
 </body>
 </html>
