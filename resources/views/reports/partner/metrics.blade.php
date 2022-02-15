@@ -95,7 +95,7 @@
                 </tr>
                 <tr>
                     <td>Difference (EMR value- NDW value)</td>
-                    <td></td>
+                    <td>{{$difference->value - $difference->dwh_value}}</td>
                     <td><a href="#">View</a></td>
                 </tr>
                 <tr>
@@ -119,7 +119,7 @@
                 <td>NDW Calculation</td>
                 <td>NDW Date</td>
                 <td>Difference</td>
-{{--                <td>Percentage</td>--}}
+                <td>Percentage</td>
                 </thead>
                 @foreach($metrics as $metric)
                     <tr>
@@ -129,6 +129,7 @@
                         <td align="right">{{ $metric->dwh_value }}</td>
                         <td align="right">{{ date('d-m-Y', strtotime($metric->dwh_metric_date)) }}</td>
                         <td align="right">{{ abs($metric->dwh_value - $metric->value) }}</td>
+                        <td align="right">{{ round($metric->value == 0? 0 : abs($metric->dwh_value - $metric->value) * 100 / $metric->value , 2) }} %</td>
                     </tr>
                 @endforeach
             </table>

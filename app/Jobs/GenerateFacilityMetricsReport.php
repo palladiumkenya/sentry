@@ -202,6 +202,10 @@ class GenerateFacilityMetricsReport implements ShouldQueue
         else
             $hts_rr = 0;
         if (!empty($metrics)) {
+            $difference = DB::table('partner_metrics')
+                ->selectRaw('sum(`value`) as `value`, SUM(dwh_value) as dwh_value')
+                ->where('partner_id', $this->partner->id)
+                ->get();
             $metrics = DB::table('partner_metrics')
                 ->selectRaw('sum(`value`) as `value`, SUM(dwh_value) as dwh_value, `name`, metric_date, dwh_metric_date')
                 ->where('partner_id', $this->partner->id)
@@ -211,7 +215,7 @@ class GenerateFacilityMetricsReport implements ShouldQueue
             Log::info($metrics);
 
             EmailJob::dispatchNow(
-                $metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr, $this->partner
+                $metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr, $this->partner, $difference
             );
         }
 

@@ -30,7 +30,7 @@ Route::get('/test', function () {
 
     foreach ($partners as $partner) {
 
-        $etlJob = EtlJob::where('id', 37)->first();
+        $etlJob = EtlJob::max('id');
         $partner = Partner::where('id', 17)->first();
         $indicators = [
             'HTS_TESTED' => 0,
@@ -44,7 +44,7 @@ Route::get('/test', function () {
         $metrics = (new FacilityMetric)->newCollection();
 
         $m = FacilityMetric::whereIn('facility_id', FacilityPartner::where('partner_id', 17)->pluck('facility_id'))
-            ->where('etl_job_id', $etlJob->id)
+            ->where('etl_job_id', $etlJob)
             ->whereNotNull('name')
             ->whereNotNull('value')
             ->whereNotNull('dwh_value')
@@ -183,9 +183,13 @@ Route::get('/test', function () {
         else
             $hts_rr = 0;
 
+        $difference = DB::table('partner_metrics')
+            ->selectRaw('sum(`value`) as `value`, SUM(dwh_value) as dwh_value')
+            ->where('partner_id', $partner->id)
+            ->first();
 
         return view('reports.partner.metrics', compact(
-             'metrics', 'spoturl', 'dwhurl', 'facility_partner', 'ct_rr', 'hts_rr', 'partner'
+             'metrics', 'spoturl', 'dwhurl', 'facility_partner', 'ct_rr', 'hts_rr', 'partner', 'difference'
         ));
     }
 });

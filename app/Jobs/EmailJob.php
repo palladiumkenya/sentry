@@ -21,20 +21,21 @@ use Illuminate\Support\Str;
 use stdClass;
 use App\Models\EtlJob as EtlJobModel;
 use Swift_IoException;
+use \Mailjet\Resources;
 
 
 class EmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr, $partner;
+    protected $metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr, $partner, $difference;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr, Partner $partner)
+    public function __construct($metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr, Partner $partner, $difference)
     {
         $this->metrics = $metrics;
         $this->spoturl = $spoturl;
@@ -43,6 +44,7 @@ class EmailJob implements ShouldQueue
         $this->ct_rr = $ct_rr;
         $this->hts_rr = $hts_rr;
         $this->partner = $partner;
+        $this->difference = $difference;
     }
 
     /**
@@ -94,7 +96,8 @@ class EmailJob implements ShouldQueue
                         $this->facility_partner,
                         $this->ct_rr,
                         $this->hts_rr,
-                        $this->partner
+                        $this->partner,
+                        $this->difference
                     ));
                 } catch (Swift_IoException $e) {
                     Log::error($e);

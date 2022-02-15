@@ -21,19 +21,14 @@ class ETLCompleted extends Mailable implements ShouldQueue
     public $partner;
     public $unsubscribe_url;
     public $file;
-    protected $metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr;
+    protected $metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr, $difference;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(
-        $user,
-        $contact,
-        $unsubscribe_url, $metrics, $spoturl, $dwhurl,
-        $facility_partner, $ct_rr, $hts_rr, Partner $partner
-    )
+    public function __construct($user, $contact, $unsubscribe_url, $metrics, $spoturl, $dwhurl, $facility_partner, $ct_rr, $hts_rr, Partner $partner, $difference)
     {
         $this->user = $user;
         $this->contact = $contact;
@@ -45,6 +40,7 @@ class ETLCompleted extends Mailable implements ShouldQueue
         $this->ct_rr = $ct_rr;
         $this->hts_rr = $hts_rr;
         $this->partner = $partner;
+        $this->difference = $difference;
     }
 
     /**
@@ -67,6 +63,7 @@ class ETLCompleted extends Mailable implements ShouldQueue
             'contact' => $this->contact,
             'partner' => $this->partner,
             'unsubscribe_url' => $this->unsubscribe_url,
+            'difference' => $this->difference
         ])->subject('NDWH DQA Report');
     }
 }
