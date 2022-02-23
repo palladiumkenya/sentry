@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row" style="background-color: #000059">
             <div class="col p-5 align-content-center">
-                <img class="center" src="data:image/png;base64,{{base64_encode(file_get_contents('./public/img.png'))}}" alt="logo">
+                <img class="center" src="https://eastus1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat=png&cs=fFNQTw&docid=https%3A%2F%2Fpalladiumgroup-my.sharepoint.com%3A443%2F_api%2Fv2.0%2Fdrives%2Fb!q3-0g_Fvb0KC1It5z_Zd9qzEBNbltp9CuQONZGRmZuaw7GWXWnW-QKxJJ-0ZXhnJ%2Fitems%2F01GNNNYSAVF24YL4DHC5HJNBKRT3R66OXO%3Fversion%3DPublished&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvcGFsbGFkaXVtZ3JvdXAtbXkuc2hhcmVwb2ludC5jb21AZTc5NDI5NzQtOTczOC00YTRhLWI2NDYtMmFiOTBmNzlkYjBmIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTY0NTU5NjAwMCIsImV4cCI6IjE2NDU2MTc2MDAiLCJlbmRwb2ludHVybCI6IkhBR2ZDVGdpQ2treHBKU3dMMmJ3R0xXaDRDcGVuUWtBR2svRVZtUDFuWHM9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMjQiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJPRE5pTkRkbVlXSXRObVptTVMwME1qWm1MVGd5WkRRdE9HSTNPV05tWmpZMVpHWTIiLCJzaWduaW5fc3RhdGUiOiJbXCJrbXNpXCJdIiwibmFtZWlkIjoiMCMuZnxtZW1iZXJzaGlwfGNoYXJsZXMuYmV0dEB0aGVwYWxsYWRpdW1ncm91cC5jb20iLCJuaWkiOiJtaWNyb3NvZnQuc2hhcmVwb2ludCIsImlzdXNlciI6InRydWUiLCJjYWNoZWtleSI6IjBoLmZ8bWVtYmVyc2hpcHwxMDAzMjAwMWM3Mzk5OWVkQGxpdmUuY29tIiwic2Vzc2lvbmlkIjoiNDI3MGIzOGUtZGJjYy00NjBhLWJmMzItZWEyNjdhZTJjYzI5IiwidHQiOiIwIiwidXNlUGVyc2lzdGVudENvb2tpZSI6IjMiLCJpcGFkZHIiOiIxNjUuOTAuMTguMTA1In0.UTNzNXNTeWU1RlhPN3NyRC95STA1bERNeHBjMmtlV3FJSk8wWnFldXhiTT0&cTag=%22c%3A%7B85B92E15-67F0-4E17-9685-519EE3EF3AEE%7D%2C1%22&encodeFailures=1&width=600&height=180&srcWidth=600&srcHeight=180" alt="logo">
             </div>
         </div>
         <div class="row">
@@ -51,8 +51,8 @@
                 </table>
                 @endcomponent
                 @component('mail::message')
-                <small role="presentation" >*% Variance was computed as =</small>
-                <img class="center" height="50px" src="data:image/png;base64,{{base64_encode(file_get_contents('./public/formular.png'))}}" alt="formular">
+                <small role="presentation" >*% Variance was computed as:</small>
+                <img class="center" src="https://eastus1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat=png&cs=fFNQTw&docid=https%3A%2F%2Fpalladiumgroup-my.sharepoint.com%3A443%2F_api%2Fv2.0%2Fdrives%2Fb!q3-0g_Fvb0KC1It5z_Zd9qzEBNbltp9CuQONZGRmZuaw7GWXWnW-QKxJJ-0ZXhnJ%2Fitems%2F01GNNNYSC74KBN2T6CSBHLAZ5DP4LBPH7Z%3Fversion%3DPublished&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvcGFsbGFkaXVtZ3JvdXAtbXkuc2hhcmVwb2ludC5jb21AZTc5NDI5NzQtOTczOC00YTRhLWI2NDYtMmFiOTBmNzlkYjBmIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTY0NTU5NjAwMCIsImV4cCI6IjE2NDU2MTc2MDAiLCJlbmRwb2ludHVybCI6IkhBR2ZDVGdpQ2treHBKU3dMMmJ3R0xXaDRDcGVuUWtBR2svRVZtUDFuWHM9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMjQiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJPRE5pTkRkbVlXSXRObVptTVMwME1qWm1MVGd5WkRRdE9HSTNPV05tWmpZMVpHWTIiLCJzaWduaW5fc3RhdGUiOiJbXCJrbXNpXCJdIiwibmFtZWlkIjoiMCMuZnxtZW1iZXJzaGlwfGNoYXJsZXMuYmV0dEB0aGVwYWxsYWRpdW1ncm91cC5jb20iLCJuaWkiOiJtaWNyb3NvZnQuc2hhcmVwb2ludCIsImlzdXNlciI6InRydWUiLCJjYWNoZWtleSI6IjBoLmZ8bWVtYmVyc2hpcHwxMDAzMjAwMWM3Mzk5OWVkQGxpdmUuY29tIiwic2Vzc2lvbmlkIjoiNDI3MGIzOGUtZGJjYy00NjBhLWJmMzItZWEyNjdhZTJjYzI5IiwidHQiOiIwIiwidXNlUGVyc2lzdGVudENvb2tpZSI6IjMiLCJpcGFkZHIiOiIxNjUuOTAuMTguMTA1In0.UTNzNXNTeWU1RlhPN3NyRC95STA1bERNeHBjMmtlV3FJSk8wWnFldXhiTT0&cTag=%22c%3A%7BDD82E25F-C24F-4E90-B067-A37F16179FF9%7D%2C1%22&encodeFailures=1&width=842&height=156&srcWidth=842&srcHeight=156" alt="formular">
 
                 @endcomponent
                 @component('mail::message')
