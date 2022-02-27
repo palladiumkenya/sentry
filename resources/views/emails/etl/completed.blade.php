@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row" style="background-color: #000059">
             <div class="col p-5 align-content-center">
-                <img class="center" src="https://eastus1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat=png&cs=fFNQTw&docid=https%3A%2F%2Fpalladiumgroup-my.sharepoint.com%3A443%2F_api%2Fv2.0%2Fdrives%2Fb!q3-0g_Fvb0KC1It5z_Zd9qzEBNbltp9CuQONZGRmZuaw7GWXWnW-QKxJJ-0ZXhnJ%2Fitems%2F01GNNNYSAVF24YL4DHC5HJNBKRT3R66OXO%3Fversion%3DPublished&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvcGFsbGFkaXVtZ3JvdXAtbXkuc2hhcmVwb2ludC5jb21AZTc5NDI5NzQtOTczOC00YTRhLWI2NDYtMmFiOTBmNzlkYjBmIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTY0NTU5NjAwMCIsImV4cCI6IjE2NDU2MTc2MDAiLCJlbmRwb2ludHVybCI6IkhBR2ZDVGdpQ2treHBKU3dMMmJ3R0xXaDRDcGVuUWtBR2svRVZtUDFuWHM9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMjQiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJPRE5pTkRkbVlXSXRObVptTVMwME1qWm1MVGd5WkRRdE9HSTNPV05tWmpZMVpHWTIiLCJzaWduaW5fc3RhdGUiOiJbXCJrbXNpXCJdIiwibmFtZWlkIjoiMCMuZnxtZW1iZXJzaGlwfGNoYXJsZXMuYmV0dEB0aGVwYWxsYWRpdW1ncm91cC5jb20iLCJuaWkiOiJtaWNyb3NvZnQuc2hhcmVwb2ludCIsImlzdXNlciI6InRydWUiLCJjYWNoZWtleSI6IjBoLmZ8bWVtYmVyc2hpcHwxMDAzMjAwMWM3Mzk5OWVkQGxpdmUuY29tIiwic2Vzc2lvbmlkIjoiNDI3MGIzOGUtZGJjYy00NjBhLWJmMzItZWEyNjdhZTJjYzI5IiwidHQiOiIwIiwidXNlUGVyc2lzdGVudENvb2tpZSI6IjMiLCJpcGFkZHIiOiIxNjUuOTAuMTguMTA1In0.UTNzNXNTeWU1RlhPN3NyRC95STA1bERNeHBjMmtlV3FJSk8wWnFldXhiTT0&cTag=%22c%3A%7B85B92E15-67F0-4E17-9685-519EE3EF3AEE%7D%2C1%22&encodeFailures=1&width=600&height=180&srcWidth=600&srcHeight=180" alt="logo">
+                <img class="center" src="https://lh3.googleusercontent.com/hLsj2td6VF7ijpRkfDpudfIJYbpTdX5_L9MhuyFn7_Dfh1TuCandHp9ySCGpskjZiu_fOQt4IORXYErtofzaYgbETaoxHogQVwFUTIym0uahfVFFpfl6giAqS3Idv0tx6ZuJ3_z73_vntuGBTUmKtV-18ah0CVWR4iFJAzGMqpH3PLpBp-6rFwecq9MM2kFzxuUbZ7pYxDSXN9WOI_qgGKVKL0iWa5-c04q8FlleAmIFleEcomIQ65rAskfBwkDjTegW_l7Gb2egCigkl-PLyxpgyVwiJnvfbPm_UKSonjBRBwqcTOHwd58Bxgt2l4bTCJwvo68YbaRbaE93Wydt1N2K4Tl1CPhbauxEaKFlFrs6HQxoqP62pM0xRKcyT5EtJYAyy-kw_RR5DPsbCNuARdOafMQHZyUmGC2iNaPukiu6zorD7nvJqhHRqxeLuShMU-GxSmaQpyJsY-diYxwdD3tuM9QYe7xjHGuAqWZ4GJXlCSYV9TQ2L9ffP4HYK8D5rvx9TyszqgQO-X5335DdUIohtx36qXl2pPvURC93isBLmMCjEsoO02izAtmEgiWQVmQgQEhkNQ5xfe6ph4NNVQPJjBdP7kzyg7-WT9S0jCno70zRyT9YiUSvWQFgGtxYpEO-Hz9b6V3NPa3qPpwYsIUUg8nDy5bB1HSf59y7hPps_shaCLnd2VmNNU_bGt6AuVNeDqIbRkXZ0Bg0N9MXrRN_=w600-h180-no?authuser=0" alt="logo">
             </div>
         </div>
         <div class="row">
@@ -39,12 +39,12 @@
                         <td style=" padding: 15px;"><a href="{{$dwhurl}}">View</a></td>
                     </tr>
                     <tr style="background: radial-gradient(circle at bottom, black 1px, transparent 1.5px) repeat-x bottom;background-size: 5px 4px;">
-                        <td style=" padding: 15px;">Difference (EMR value- NDW value)</td>
+                        <td style=" padding: 15px;">Stale Databases</td>
                         <td style=" padding: 15px;"> </td>
                         <td style=" padding: 15px;"><a href="https://palladiumgroup-my.sharepoint.com/:x:/r/personal/mary_gikura_thepalladiumgroup_com/_layouts/15/guestaccess.aspx?email=lousa.yogo%40thepalladiumgroup.com&e=4%3AP6Qi2d&at=9&CID=13149ec0-f5b1-3e05-8d39-e9f3fdf7de9c&share=EQU85MfsI1JFlw5HJHu9DkQB-iStEspiQ5aA5i4zPbU--A">View</a></td>
                     </tr>
                     <tr style="background: radial-gradient(circle at bottom, black 1px, transparent 1.5px) repeat-x bottom;background-size: 5px 4px;">
-                        <td style=" padding: 15px;">% Variance*</td>
+                        <td style=" padding: 15px;">Number of facilities with incomplete uploads</td>
                         <td style=" padding: 15px;"></td>
                         <td style=" padding: 15px;"><a href="{{$spoturl}}">View</a></td>
                     </tr>
@@ -52,7 +52,7 @@
                 @endcomponent
                 @component('mail::message')
                 <small role="presentation" >*% Variance was computed as:</small>
-                <img class="center" src="https://eastus1-mediap.svc.ms/transform/thumbnail?provider=spo&inputFormat=png&cs=fFNQTw&docid=https%3A%2F%2Fpalladiumgroup-my.sharepoint.com%3A443%2F_api%2Fv2.0%2Fdrives%2Fb!q3-0g_Fvb0KC1It5z_Zd9qzEBNbltp9CuQONZGRmZuaw7GWXWnW-QKxJJ-0ZXhnJ%2Fitems%2F01GNNNYSC74KBN2T6CSBHLAZ5DP4LBPH7Z%3Fversion%3DPublished&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvcGFsbGFkaXVtZ3JvdXAtbXkuc2hhcmVwb2ludC5jb21AZTc5NDI5NzQtOTczOC00YTRhLWI2NDYtMmFiOTBmNzlkYjBmIiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTY0NTU5NjAwMCIsImV4cCI6IjE2NDU2MTc2MDAiLCJlbmRwb2ludHVybCI6IkhBR2ZDVGdpQ2treHBKU3dMMmJ3R0xXaDRDcGVuUWtBR2svRVZtUDFuWHM9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxMjQiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJPRE5pTkRkbVlXSXRObVptTVMwME1qWm1MVGd5WkRRdE9HSTNPV05tWmpZMVpHWTIiLCJzaWduaW5fc3RhdGUiOiJbXCJrbXNpXCJdIiwibmFtZWlkIjoiMCMuZnxtZW1iZXJzaGlwfGNoYXJsZXMuYmV0dEB0aGVwYWxsYWRpdW1ncm91cC5jb20iLCJuaWkiOiJtaWNyb3NvZnQuc2hhcmVwb2ludCIsImlzdXNlciI6InRydWUiLCJjYWNoZWtleSI6IjBoLmZ8bWVtYmVyc2hpcHwxMDAzMjAwMWM3Mzk5OWVkQGxpdmUuY29tIiwic2Vzc2lvbmlkIjoiNDI3MGIzOGUtZGJjYy00NjBhLWJmMzItZWEyNjdhZTJjYzI5IiwidHQiOiIwIiwidXNlUGVyc2lzdGVudENvb2tpZSI6IjMiLCJpcGFkZHIiOiIxNjUuOTAuMTguMTA1In0.UTNzNXNTeWU1RlhPN3NyRC95STA1bERNeHBjMmtlV3FJSk8wWnFldXhiTT0&cTag=%22c%3A%7BDD82E25F-C24F-4E90-B067-A37F16179FF9%7D%2C1%22&encodeFailures=1&width=842&height=156&srcWidth=842&srcHeight=156" alt="formular">
+                <img class="center" src="https://lh3.googleusercontent.com/q-wFxwrbH9rYRLY_55HjL_ANrue4IFXPH2gj03kRkDqZp0eYNhfAlvjPseqdnAiFvVYdE9U4g7nKVt8yx9F57f-T72tBLJ9h7TTj30Fm_DlKfnyQijIC9y2ju0tgBsRrtY3QEziEiAS_R3Hm4rFTFv-ayMJ8GZg700UHmnjIEUbzzTcqizdB8ZoxfoILpgVjAILvwr--fsGjsIVXAaoS2HoIVDu4qeOCX5kXYkxCMFcjUNuvFRGYV1i19JSqxvhLFHMWe-TKqcAAhtmK-Diza9UIpT0FTHkFxeCab_iWNPM583L1MIFOfDx1bNkDoD1IDMLlBuZiZJC1SEvPAwsAx-4kPolnnLhOk7JZiJw6cfCCzgX-xZRzjeizCCbkRbIlkcn9i5q2-5Kmbn65b7aQdqY6Gv-cC5vfPUMWu3ioA52w_8L8PsgtSgTKxqUz5fi_Vf2XrPYvFlnBQHTqvGRVf7osb9cOZKta1X3ZWW6ba-XX27ROCW98r0q83GXgM405ym-eefd1ZPGsUPhck3h4ariFrXDIyKei3efkN2B01ToZw8E9_iJkMohDcfLeYDZjt4X90HLnZuv9SxF9Scbu8EZRi0A5t1IMD-kZ6ZEli4TZRhs_1qmLXM_N46nATZefEiLhgQN2hOGThJ54_yeci3T5wbkthhvgL7QurCxxQBGk1e_32fftgTj8Xz4zLVD-p0643DBX_xYZ9VOCYfET38hp=w842-h156-no?authuser=0" alt="formular">
 
                 @endcomponent
                 @component('mail::message')
@@ -66,8 +66,8 @@
                     <td style=" padding: 15px;">EMR Value</td>
                     <td style=" padding: 15px;">NDW Calculation</td>
                     <td style=" padding: 15px;">NDW Date</td>
-                    <td style=" padding: 15px;">Difference</td>
-                    <td style=" padding: 15px;">Percentage</td>
+                    <td style=" padding: 15px;">Difference (EMR value- NDW value)</td>
+                    <td style=" padding: 15px;">% Variance*</td>
                     </thead>
                     @foreach($metrics as $metric)
                         <tr style="background: radial-gradient(circle at bottom, black 1px, transparent 1.5px) repeat-x bottom;background-size: 5px 4px;">
