@@ -19,7 +19,6 @@
         .p-20 {
             padding-left: 20%;
             padding-right: 20%;
-            font-size: 18px;
         }
 
         table {
@@ -45,6 +44,23 @@
             padding: 15px;
         }
 
+        .button {
+            -webkit-text-size-adjust: none;
+            border-radius: 4px;
+            color: #ffffff !important;
+            display: inline-block;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .button-primary {
+            background-color: #000059;
+            border-bottom: 8px solid #000059;
+            border-left: 18px solid #000059;
+            border-right: 18px solid #000059;
+            border-top: 8px solid #000059;
+        }
+
         .cmjx-highlight {
             border: 2px solid #DD4A68;
             padding: 8px;
@@ -56,7 +72,7 @@
 <div class="container-fluid">
     <div class="row" style="background-color: #000059">
         <div class="col p-5 align-content-center">
-            <img class="center" src="data:image/png;base64,{{base64_encode(file_get_contents('./public/img.png'))}}" alt="logo">
+            <img class="center" src="{{$message->embed('img.png')}}" alt="logo">
         </div>
     </div>
     <div class="row">
@@ -66,7 +82,8 @@
                 National Data Warehouse (NDW). This requires every facility to upload complete and up-to-date databases
                 on a monthly basis to the NDW.</p>
             <p>The purpose of this email is to share the reporting rates and selected data quality and alignment metrics
-                for the facilities that you support. Please see below a summary of the metrics for {{date('F Y',strtotime('last month'))}}:</p>
+                for the facilities that you support. Please see below a summary of the metrics
+                for {{date('F Y',strtotime('last month'))}}:</p>
 
             <table class="table1">
                 <thead>
@@ -81,42 +98,39 @@
                 </tr>
                 <tr>
                     <td>Care and Treatment Reporting Rates</td>
-                    <td>{{$ct_rr}}%</td>
+                    <td>{{round($ct_rr, 2)}}%</td>
                     <td><a href="{{$dwhurl}}">View</a></td>
                 </tr>
                 <tr>
                     <td>HTS Reporting Rates</td>
-                    <td>{{$hts_rr}}%</td>
+                    <td>{{round($hts_rr, 2)}}%</td>
                     <td><a href="{{$dwhurl}}">View</a></td>
                 </tr>
                 <tr>
-                    <td>Difference (EMR value- NDW value)</td>
-                    <td> </td>
-                    <td><a href="https://palladiumgroup-my.sharepoint.com/:x:/r/personal/mary_gikura_thepalladiumgroup_com/_layouts/15/guestaccess.aspx?email=lousa.yogo%40thepalladiumgroup.com&e=4%3AP6Qi2d&at=9&CID=13149ec0-f5b1-3e05-8d39-e9f3fdf7de9c&share=EQU85MfsI1JFlw5HJHu9DkQB-iStEspiQ5aA5i4zPbU--A">View</a></td>
+                    <td>Stale Databases</td>
+                    <td></td>
+                    <td>
+                        <a href="https://palladiumgroup-my.sharepoint.com/:x:/r/personal/mary_gikura_thepalladiumgroup_com/_layouts/15/guestaccess.aspx?email=lousa.yogo%40thepalladiumgroup.com&e=4%3AP6Qi2d&at=9&CID=13149ec0-f5b1-3e05-8d39-e9f3fdf7de9c&share=EQU85MfsI1JFlw5HJHu9DkQB-iStEspiQ5aA5i4zPbU--A">View</a>
+                    </td>
                 </tr>
                 <tr>
-                    <td>% Variance*</td>
+                    <td>Number of facilities with incomplete uploads</td>
                     <td></td>
                     <td><a href="{{$spoturl}}">View</a></td>
                 </tr>
             </table>
 
-            <small>*% Variance was computed as =</small>
-            <img class="center" height="50px" src="data:image/png;base64,{{base64_encode(file_get_contents('./public/formular.png'))}}" alt="formular">
-{{--            <small style="text-align:center">--}}
-{{--                \[ \Biggl( {Reported value - Verified value \over Verified value}\Biggr) * 100\]--}}
-{{--            </small>--}}
             <br>
             <p>Data Alignment : - A comparison between National Data warehouse and EMR data</p>
             <table>
                 <thead>
                 <td>Indicator Name</td>
-                <td>EMR Indicator Date</td>
+                <td style=" width:20%">EMR Indicator Date</td>
                 <td>EMR Value</td>
                 <td>NDW Calculation</td>
-                <td>NDW Date</td>
-                <td>Difference</td>
-                <td>Percentage</td>
+                <td style="width:20%">NDW Date</td>
+                <td>Difference (EMR value- NDW value)</td>
+                <td>% Variance*</td>
                 </thead>
                 @foreach($metrics as $metric)
                     <tr>
@@ -126,12 +140,19 @@
                         <td align="right">{{ $metric->dwh_value }}</td>
                         <td align="right">{{ date('d-m-Y', strtotime($metric->dwh_metric_date)) }}</td>
                         <td align="right">{{ abs($metric->dwh_value - $metric->value) }}</td>
-                        <td align="right">{{ round($metric->value == 0? 0 : abs($metric->dwh_value - $metric->value) * 100 / $metric->value , 2) }} %</td>
+                        <td align="right">{{ round($metric->value == 0? 0 : abs($metric->dwh_value - $metric->value) * 100 / $metric->value , 2) }}
+                            %
+                        </td>
                     </tr>
                 @endforeach
             </table>
+
+            <small>*% Variance was computed as =</small>
+            <img class="center" src="{{$message->embed('formular.png')}}" alt="formular">
             <br>
-            <a class="btn btn-dark btn-block" href="{{$dwhurl}}">National Data Warehouse</a>
+            <div style="text-align: center">
+                <a class="button button-primary" href="{{$dwhurl . 'reporting-rates'}}" target="_blank" rel="noopener">National Data Warehouse</a>
+            </div>
             <br>
 
             <p>Kindly work with supported facilities to address any challenges they may have in uploading high quality
@@ -142,12 +163,12 @@
     </div>
     <div class="row" style="background-color: #000059">
         <div class="col p-5  text-white" style="text-align: center">
-            <p style="text-align: center">If you have any questions, feel free message us at
+            <p style="text-align: center; color: white">If you have any questions, feel free message us at
                 help@palladiumgroup.on.spiceworks.com.</p>
-            <p style="text-align: center">All right reserved. Update email preferences or unsubscribe.</p>
-            <p style="text-align: center">+254 717 969471</p>
-            <p style="text-align: center">Nairobi, Kenya</p>
-            <p style="text-align: center">Terms of use | Privacy Policy</p>
+            <p style="text-align: center; color: white">All right reserved. Update email preferences or unsubscribe.</p>
+            <p style="text-align: center; color: white">+254 717 969471</p>
+            <p style="text-align: center; color: white">Nairobi, Kenya</p>
+            <p style="text-align: center; color: white">Terms of use | Privacy Policy</p>
         </div>
     </div>
 </div>

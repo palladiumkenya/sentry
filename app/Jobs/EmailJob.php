@@ -86,19 +86,24 @@ class EmailJob implements ShouldQueue
                 );
 
                 try {
-                    Mail::to($email)->send(new ETLCompleted(
-                        $name,
-                        $contactPerson,
-                        $unsubscribe_url,
-                        $this->metrics,
-                        $this->spoturl,
-                        $this->dwhurl,
-                        $this->facility_partner,
-                        $this->ct_rr,
-                        $this->hts_rr,
-                        $this->partner,
-                        $this->difference
-                    ));
+                    Mail::send('emails.etl.completed',
+                        [
+                            'name' => $name,
+                            'contactPerson' => $contactPerson,
+                            'unsubscribe_url' => $unsubscribe_url,
+                            'metrics' => $this->metrics,
+                            'spoturl' => $this->spoturl,
+                            'dwhurl' => $this->dwhurl,
+                            'facility_partner' => $this->facility_partner,
+                            'ct_rr' => $this->ct_rr,
+                            'hts_rr' => $this->hts_rr,
+                            'partner' => $this->partner,
+                            'difference' => $this->difference
+                        ],
+                        function ($message) use ($email) {
+                            $message->to($email)->subject('NDWH DQA Report');
+                        }
+                    );
                 } catch (Swift_IoException $e) {
                     Log::error($e);
                 }

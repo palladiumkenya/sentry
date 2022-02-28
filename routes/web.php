@@ -8,6 +8,7 @@ use App\Models\FacilityUpload;
 use App\Models\Partner;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/test', function () {
@@ -188,16 +189,23 @@ Route::get('/test', function () {
             ->where('partner_id', $partner->id)
             ->first();
 
-        return new App\Mail\ETLCompleted($partner,
-            $partner,
-            $partner,
-            $metrics,
-            $spoturl,
-            $dwhurl,
-            $facility_partner,
-            $ct_rr,
-            $hts_rr,
-            $partner,
-            $difference);
+        Mail::send('reports.partner.metrics',
+            [
+                'name' => '',
+                'contactPerson' => '',
+                'unsubscribe_url' => '',
+                'metrics' => $metrics,
+                'spoturl' => $spoturl,
+                'dwhurl' => $dwhurl,
+                'facility_partner' => $facility_partner,
+                'ct_rr' => $ct_rr,
+                'hts_rr' => $hts_rr,
+                'partner' => $partner,
+                'difference' => $difference
+            ],
+            function ($message) {
+                $message->to('cbrianbet@gmail.com')->subject('NDWH DQA Report');
+            });
+        return;
     }
 });

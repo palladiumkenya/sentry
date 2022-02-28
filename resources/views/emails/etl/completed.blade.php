@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row" style="background-color: #000059">
             <div class="col p-5 align-content-center">
-                <img class="center" src="https://lh3.googleusercontent.com/hLsj2td6VF7ijpRkfDpudfIJYbpTdX5_L9MhuyFn7_Dfh1TuCandHp9ySCGpskjZiu_fOQt4IORXYErtofzaYgbETaoxHogQVwFUTIym0uahfVFFpfl6giAqS3Idv0tx6ZuJ3_z73_vntuGBTUmKtV-18ah0CVWR4iFJAzGMqpH3PLpBp-6rFwecq9MM2kFzxuUbZ7pYxDSXN9WOI_qgGKVKL0iWa5-c04q8FlleAmIFleEcomIQ65rAskfBwkDjTegW_l7Gb2egCigkl-PLyxpgyVwiJnvfbPm_UKSonjBRBwqcTOHwd58Bxgt2l4bTCJwvo68YbaRbaE93Wydt1N2K4Tl1CPhbauxEaKFlFrs6HQxoqP62pM0xRKcyT5EtJYAyy-kw_RR5DPsbCNuARdOafMQHZyUmGC2iNaPukiu6zorD7nvJqhHRqxeLuShMU-GxSmaQpyJsY-diYxwdD3tuM9QYe7xjHGuAqWZ4GJXlCSYV9TQ2L9ffP4HYK8D5rvx9TyszqgQO-X5335DdUIohtx36qXl2pPvURC93isBLmMCjEsoO02izAtmEgiWQVmQgQEhkNQ5xfe6ph4NNVQPJjBdP7kzyg7-WT9S0jCno70zRyT9YiUSvWQFgGtxYpEO-Hz9b6V3NPa3qPpwYsIUUg8nDy5bB1HSf59y7hPps_shaCLnd2VmNNU_bGt6AuVNeDqIbRkXZ0Bg0N9MXrRN_=w600-h180-no?authuser=0" alt="logo">
+                <img class="center" src="https://lh3.googleusercontent.com/xD9DmUfg8qDGM23dqRHWSycg0ivi8zDmNN2BsW-Ee2Ig28z6gO2ZjdMC_yRGubm80QbDcXSNbNRis9BTemopVecvlbF4ixvr7DlvFWpj7LJh7rS8_BAwR1QV_WeJd4AnJyGV6AIMBw=w2400" alt="logo">
             </div>
         </div>
         <div class="row">
@@ -54,7 +54,7 @@
                 <small role="presentation" >*% Variance was computed as:</small>
                 <img class="center" src="https://lh3.googleusercontent.com/q-wFxwrbH9rYRLY_55HjL_ANrue4IFXPH2gj03kRkDqZp0eYNhfAlvjPseqdnAiFvVYdE9U4g7nKVt8yx9F57f-T72tBLJ9h7TTj30Fm_DlKfnyQijIC9y2ju0tgBsRrtY3QEziEiAS_R3Hm4rFTFv-ayMJ8GZg700UHmnjIEUbzzTcqizdB8ZoxfoILpgVjAILvwr--fsGjsIVXAaoS2HoIVDu4qeOCX5kXYkxCMFcjUNuvFRGYV1i19JSqxvhLFHMWe-TKqcAAhtmK-Diza9UIpT0FTHkFxeCab_iWNPM583L1MIFOfDx1bNkDoD1IDMLlBuZiZJC1SEvPAwsAx-4kPolnnLhOk7JZiJw6cfCCzgX-xZRzjeizCCbkRbIlkcn9i5q2-5Kmbn65b7aQdqY6Gv-cC5vfPUMWu3ioA52w_8L8PsgtSgTKxqUz5fi_Vf2XrPYvFlnBQHTqvGRVf7osb9cOZKta1X3ZWW6ba-XX27ROCW98r0q83GXgM405ym-eefd1ZPGsUPhck3h4ariFrXDIyKei3efkN2B01ToZw8E9_iJkMohDcfLeYDZjt4X90HLnZuv9SxF9Scbu8EZRi0A5t1IMD-kZ6ZEli4TZRhs_1qmLXM_N46nATZefEiLhgQN2hOGThJ54_yeci3T5wbkthhvgL7QurCxxQBGk1e_32fftgTj8Xz4zLVD-p0643DBX_xYZ9VOCYfET38hp=w842-h156-no?authuser=0" alt="formular">
 
-                @endcomponent
+                    @endcomponent
                 @component('mail::message')
                 <p>Data Alignment : - A comparison between National Data warehouse and EMR data</p>
                 @endcomponent
@@ -83,7 +83,7 @@
                 </table>
                 @endcomponent
                 @component('mail::button', ['url' => $dwhurl])
-                    National Data Warehouse</a>
+                    National Data Warehouse
                 @endcomponent
 <p>
                 <p>Kindly work with supported facilities to address any challenges they may have in uploading high quality
