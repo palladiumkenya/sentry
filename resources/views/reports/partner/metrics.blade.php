@@ -72,7 +72,7 @@
 <div class="container-fluid">
     <div class="row" style="background-color: #000059">
         <div class="col p-5 align-content-center">
-            <img class="center" src="{{$message->embed('img.png')}}" alt="logo">
+            <img class="center" style="margin-top: 3px; margin-bottom: 3px" src="{{$message->embed('img.png')}}" alt="logo">
         </div>
     </div>
     <div class="row">
@@ -161,7 +161,7 @@
             <p>The Kenya HMIS Team</p>
         </div>
     </div>
-    <div class="row" style="background-color: #000059">
+    <div class="row" style="background-color: #000059; padding-top: 3px; padding-bottom: 3px">
         <div class="col p-5  text-white" style="text-align: center">
             <p style="text-align: center; color: white">If you have any questions, feel free message us at
                 help@palladiumgroup.on.spiceworks.com.</p>
