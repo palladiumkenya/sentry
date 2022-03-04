@@ -94,23 +94,23 @@
                 <tr>
                     <td style=" padding: 15px;">Number of EMR Facilities</td>
                     <td>{{count($facility_partner)}} Facilities</td>
-                    <td><a href="{{$spoturl}}">View</a></td>
+                    <td><a href="http://197.248.44.226:7001/home">View</a></td>
                 </tr>
                 <tr>
                     <td>Care and Treatment Reporting Rates</td>
                     <td>{{round($ct_rr, 2)}}%</td>
-                    <td><a href="{{$dwhurl}}">View</a></td>
+                    <td><a href="{{$dwhurl . 'reporting-rates'}}">View</a></td>
                 </tr>
                 <tr>
                     <td>HTS Reporting Rates</td>
                     <td>{{round($hts_rr, 2)}}%</td>
-                    <td><a href="{{$dwhurl}}">View</a></td>
+                    <td><a href="{{$dwhurl . 'reporting-rates'}}">View</a></td>
                 </tr>
                 <tr>
                     <td>Stale Databases</td>
                     <td></td>
                     <td>
-                        <a href="https://palladiumgroup-my.sharepoint.com/:x:/r/personal/mary_gikura_thepalladiumgroup_com/_layouts/15/guestaccess.aspx?email=lousa.yogo%40thepalladiumgroup.com&e=4%3AP6Qi2d&at=9&CID=13149ec0-f5b1-3e05-8d39-e9f3fdf7de9c&share=EQU85MfsI1JFlw5HJHu9DkQB-iStEspiQ5aA5i4zPbU--A">View</a>
+                        <a href="https://palladiumgroup-my.sharepoint.com/:x:/g/personal/mary_gikura_thepalladiumgroup_com/EQU85MfsI1JFlw5HJHu9DkQBz5rZkpDSEnaKL2-K16Yifw?e=Xy06pC">View</a>
                     </td>
                 </tr>
                 <tr>
