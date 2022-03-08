@@ -72,7 +72,7 @@
 <div class="container-fluid">
     <div class="row" style="background-color: #000059">
         <div class="col p-5 align-content-center">
-            <img class="center" style="margin-top: 3px; margin-bottom: 3px" src="{{$message->embed('img.png')}}" alt="logo">
+            <img class="center" style="margin-top: 3px; margin-bottom: 3px" src="{{$message->embed('./public/img.png')}}" alt="logo">
         </div>
     </div>
     <div class="row">
@@ -148,7 +148,7 @@
             </table>
 
             <small>*% Variance was computed as =</small>
-            <img class="center" src="{{$message->embed('formular.png')}}" alt="formular">
+            <img class="center" src="{{$message->embed('./public/formular.png')}}" alt="formular">
             <br>
             <div style="text-align: center">
                 <a class="button button-primary" href="{{$dwhurl . 'reporting-rates'}}" target="_blank" rel="noopener">National Data Warehouse</a>

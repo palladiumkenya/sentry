@@ -86,7 +86,7 @@ class EmailJob implements ShouldQueue
                 );
 
                 try {
-                    Mail::send('emails.etl.completed',
+                    Mail::send('reports.partner.metrics',
                         [
                             'name' => $name,
                             'contactPerson' => $contactPerson,
@@ -102,8 +102,7 @@ class EmailJob implements ShouldQueue
                         ],
                         function ($message) use ($email) {
                             $message->to($email)->subject('NDWH DQA Report');
-                        }
-                    );
+                        });
                 } catch (Swift_IoException $e) {
                     Log::error($e);
                 }
