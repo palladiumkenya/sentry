@@ -11,8 +11,7 @@
     <style type="text/css">
         .center {
             display: block;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 5px auto 15px;
             width: 25%;
         }
 
@@ -94,29 +93,29 @@
                 <tr>
                     <td style=" padding: 15px;">Number of EMR Facilities</td>
                     <td>{{count($facility_partner)}} Facilities</td>
-                    <td><a href="http://197.248.44.226:7001/home">View</a></td>
+                    <td><a href="http://197.248.44.226:7001/home" target="_blank">View</a></td>
                 </tr>
                 <tr>
                     <td>Care and Treatment Reporting Rates</td>
-                    <td>{{round($ct_rr, 2)}}%</td>
-                    <td><a href="{{$dwhurl . 'reporting-rates'}}">View</a></td>
+                    <td>{{round($ct_rr, 1)}}%</td>
+                    <td><a href="{{$dwhurl . 'reporting-rates'}}" target="_blank">View</a></td>
                 </tr>
                 <tr>
                     <td>HTS Reporting Rates</td>
-                    <td>{{round($hts_rr, 2)}}%</td>
-                    <td><a href="{{$dwhurl . 'reporting-rates'}}">View</a></td>
+                    <td>{{round($hts_rr, 1)}}%</td>
+                    <td><a href="{{$dwhurl . 'reporting-rates'}}" target="_blank">View</a></td>
                 </tr>
                 <tr>
                     <td>Stale Databases</td>
                     <td></td>
                     <td>
-                        <a href="https://palladiumgroup-my.sharepoint.com/:x:/g/personal/mary_gikura_thepalladiumgroup_com/EQU85MfsI1JFlw5HJHu9DkQBz5rZkpDSEnaKL2-K16Yifw?e=Xy06pC">View</a>
+                        <a href="https://palladiumgroup-my.sharepoint.com/:x:/g/personal/mary_gikura_thepalladiumgroup_com/EQU85MfsI1JFlw5HJHu9DkQBz5rZkpDSEnaKL2-K16Yifw?e=Xy06pC" target="_blank">View</a>
                     </td>
                 </tr>
                 <tr>
                     <td>Number of facilities with incomplete uploads</td>
                     <td></td>
-                    <td><a href="{{$spoturl}}">View</a></td>
+                    <td><a href="{{$spoturl}}" target="_blank">View</a></td>
                 </tr>
             </table>
 
@@ -140,7 +139,7 @@
                         <td align="right">{{ $metric->dwh_value }}</td>
                         <td align="right">{{ date('d-m-Y', strtotime($metric->dwh_metric_date)) }}</td>
                         <td align="right">{{ abs($metric->dwh_value - $metric->value) }}</td>
-                        <td align="right">{{ round($metric->value == 0? 0 : abs($metric->dwh_value - $metric->value) * 100 / $metric->value , 2) }}
+                        <td align="right">{{ round($metric->value == 0? 0 : abs($metric->dwh_value - $metric->value) * 100 / $metric->value , 1) }}
                             %
                         </td>
                     </tr>
@@ -161,7 +160,7 @@
             <p>The Kenya HMIS Team</p>
         </div>
     </div>
-    <div class="row" style="background-color: #000059; padding-top: 3px; padding-bottom: 3px">
+    <div class="row" style="background-color: #000059; padding-top: 5px; padding-bottom: 3px">
         <div class="col p-5  text-white" style="text-align: center">
             <p style="text-align: center; color: white">If you have any questions, feel free message us at
                 help@palladiumgroup.on.spiceworks.com.</p>
