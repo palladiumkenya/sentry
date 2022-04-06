@@ -50,8 +50,8 @@ class PostLiveSyncIndicator implements ShouldQueue
             $this->liveSyncIndicator->save();
         } else {
             Log::error(
-                'PostLiveSyncIndicator: failed to post indicator '.
-                $this->liveSyncIndicator->name.': '.
+                'PostLiveSyncIndicator: failed to post indicator ' .
+                $this->liveSyncIndicator->name . ': ' .
                 $this->liveSyncIndicator->facility->name
             );
         }
