@@ -139,11 +139,16 @@
                         <td align="right">{{ $metric->dwh_value }}</td>
                         <td align="right">{{ date('d-m-Y', strtotime($metric->dwh_metric_date)) }}</td>
                         <td align="right">{{ abs($metric->dwh_value - $metric->value) }}</td>
-                        <td align="right">{{ round($metric->value == 0? 0 : abs($metric->dwh_value - $metric->value) * 100 / $metric->value , 1) }}
+                        <td align="right">{{ round($metric->value == 0 ? 0 : abs($metric->dwh_value - $metric->value) * 100 / $metric->value , 1) }}
                             %
                         </td>
                     </tr>
                 @endforeach
+                @if (count($metrics) == 0)
+                    <tr>
+                        <td colspan="7">No data found</td>
+                    </tr>
+                @endif
             </table>
 
             <small>*% Variance was computed as =</small>
