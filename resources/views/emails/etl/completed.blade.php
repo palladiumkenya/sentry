@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row" style="background-color: #000059">
             <div class="col p-5 align-content-center">
-                <img class="center" src="data:image/png;base64,{{base64_encode(file_get_contents('./public/img.png'))}}" alt="logo">
+                <img class="center" src="https://lh3.googleusercontent.com/xD9DmUfg8qDGM23dqRHWSycg0ivi8zDmNN2BsW-Ee2Ig28z6gO2ZjdMC_yRGubm80QbDcXSNbNRis9BTemopVecvlbF4ixvr7DlvFWpj7LJh7rS8_BAwR1QV_WeJd4AnJyGV6AIMBw=w2400" alt="logo">
             </div>
         </div>
         <div class="row">
@@ -39,22 +39,22 @@
                         <td style=" padding: 15px;"><a href="{{$dwhurl}}">View</a></td>
                     </tr>
                     <tr style="background: radial-gradient(circle at bottom, black 1px, transparent 1.5px) repeat-x bottom;background-size: 5px 4px;">
-                        <td style=" padding: 15px;">Difference (EMR value- NDW value)</td>
+                        <td style=" padding: 15px;">Stale Databases</td>
                         <td style=" padding: 15px;"> </td>
                         <td style=" padding: 15px;"><a href="https://palladiumgroup-my.sharepoint.com/:x:/r/personal/mary_gikura_thepalladiumgroup_com/_layouts/15/guestaccess.aspx?email=lousa.yogo%40thepalladiumgroup.com&e=4%3AP6Qi2d&at=9&CID=13149ec0-f5b1-3e05-8d39-e9f3fdf7de9c&share=EQU85MfsI1JFlw5HJHu9DkQB-iStEspiQ5aA5i4zPbU--A">View</a></td>
                     </tr>
                     <tr style="background: radial-gradient(circle at bottom, black 1px, transparent 1.5px) repeat-x bottom;background-size: 5px 4px;">
-                        <td style=" padding: 15px;">% Variance*</td>
+                        <td style=" padding: 15px;">Number of facilities with incomplete uploads</td>
                         <td style=" padding: 15px;"></td>
                         <td style=" padding: 15px;"><a href="{{$spoturl}}">View</a></td>
                     </tr>
                 </table>
                 @endcomponent
                 @component('mail::message')
-                <small role="presentation" >*% Variance was computed as =</small>
-                <img class="center" height="50px" src="data:image/png;base64,{{base64_encode(file_get_contents('./public/formular.png'))}}" alt="formular">
+                <small role="presentation" >*% Variance was computed as:</small>
+                <img class="center" src="https://lh3.googleusercontent.com/q-wFxwrbH9rYRLY_55HjL_ANrue4IFXPH2gj03kRkDqZp0eYNhfAlvjPseqdnAiFvVYdE9U4g7nKVt8yx9F57f-T72tBLJ9h7TTj30Fm_DlKfnyQijIC9y2ju0tgBsRrtY3QEziEiAS_R3Hm4rFTFv-ayMJ8GZg700UHmnjIEUbzzTcqizdB8ZoxfoILpgVjAILvwr--fsGjsIVXAaoS2HoIVDu4qeOCX5kXYkxCMFcjUNuvFRGYV1i19JSqxvhLFHMWe-TKqcAAhtmK-Diza9UIpT0FTHkFxeCab_iWNPM583L1MIFOfDx1bNkDoD1IDMLlBuZiZJC1SEvPAwsAx-4kPolnnLhOk7JZiJw6cfCCzgX-xZRzjeizCCbkRbIlkcn9i5q2-5Kmbn65b7aQdqY6Gv-cC5vfPUMWu3ioA52w_8L8PsgtSgTKxqUz5fi_Vf2XrPYvFlnBQHTqvGRVf7osb9cOZKta1X3ZWW6ba-XX27ROCW98r0q83GXgM405ym-eefd1ZPGsUPhck3h4ariFrXDIyKei3efkN2B01ToZw8E9_iJkMohDcfLeYDZjt4X90HLnZuv9SxF9Scbu8EZRi0A5t1IMD-kZ6ZEli4TZRhs_1qmLXM_N46nATZefEiLhgQN2hOGThJ54_yeci3T5wbkthhvgL7QurCxxQBGk1e_32fftgTj8Xz4zLVD-p0643DBX_xYZ9VOCYfET38hp=w842-h156-no?authuser=0" alt="formular">
 
-                @endcomponent
+                    @endcomponent
                 @component('mail::message')
                 <p>Data Alignment : - A comparison between National Data warehouse and EMR data</p>
                 @endcomponent
@@ -66,8 +66,8 @@
                     <td style=" padding: 15px;">EMR Value</td>
                     <td style=" padding: 15px;">NDW Calculation</td>
                     <td style=" padding: 15px;">NDW Date</td>
-                    <td style=" padding: 15px;">Difference</td>
-                    <td style=" padding: 15px;">Percentage</td>
+                    <td style=" padding: 15px;">Difference (EMR value- NDW value)</td>
+                    <td style=" padding: 15px;">% Variance*</td>
                     </thead>
                     @foreach($metrics as $metric)
                         <tr style="background: radial-gradient(circle at bottom, black 1px, transparent 1.5px) repeat-x bottom;background-size: 5px 4px;">
@@ -83,7 +83,7 @@
                 </table>
                 @endcomponent
                 @component('mail::button', ['url' => $dwhurl])
-                    National Data Warehouse</a>
+                    National Data Warehouse
                 @endcomponent
 <p>
                 <p>Kindly work with supported facilities to address any challenges they may have in uploading high quality

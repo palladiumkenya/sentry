@@ -71,7 +71,7 @@
 <div class="container-fluid">
     <div class="row" style="background-color: #000059">
         <div class="col p-5 align-content-center">
-            <img class="center" style="margin-top: 3px; margin-bottom: 3px" src="{{$message->embed('./public/img.png')}}" alt="logo">
+            <img class="center" style="margin-top: 3px; margin-bottom: 3px" src="/img.png" alt="logo">
         </div>
     </div>
     <div class="row">
@@ -111,7 +111,6 @@
                     <td>
                         <a href="https://palladiumgroup-my.sharepoint.com/:x:/g/personal/mary_gikura_thepalladiumgroup_com/EQU85MfsI1JFlw5HJHu9DkQBz5rZkpDSEnaKL2-K16Yifw?e=Xy06pC" target="_blank">View</a>
                     </td>
-
                 </tr>
                 <tr>
                     <td>Number of facilities with incomplete uploads</td>
@@ -153,7 +152,7 @@
             </table>
 
             <small>*% Variance was computed as =</small>
-            <img class="center" src="{{$message->embed('./public/formular.png')}}" alt="formular">
+            <img class="center" src="/formular.png" alt="formular">
             <br>
             <div style="text-align: center">
                 <a class="button button-primary" href="{{$dwhurl . 'reporting-rates'}}" target="_blank" rel="noopener">National Data Warehouse</a>

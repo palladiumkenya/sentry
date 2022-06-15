@@ -8,30 +8,33 @@ use App\Models\FacilityUpload;
 use App\Models\Partner;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+use App\Jobs\EtlJob as Etl;
+use Illuminate\Console\Command;
 
-Route::get('/test', function () {
+Route::get('/test/{email}', function ($email) {
 
     $partners = Partner::get();
     $partnersNames = [];
     foreach ($partners as $partner) {
         $partnersNames[] = $partner->name;
     }
-//    config(['database.connections.sqlsrv.database' => 'DWHIdentity']);
-//    $_ = DB::connection('sqlsrv')->table('Organizations')
-//        ->selectRaw('*')
-//        ->whereIn('Code', $partnersNames)
-//        ->get();
-//
-//    Log::info(
-//        json_encode($_)
-//    );
+    //    config(['database.connections.sqlsrv.database' => 'DWHIdentity']);
+    //    $_ = DB::connection('sqlsrv')->table('Organizations')
+    //        ->selectRaw('*')
+    //        ->whereIn('Code', $partnersNames)
+    //        ->get();
+    //
+    //    Log::info(
+    //        json_encode($_)
+    //    );
 
 
     foreach ($partners as $partner) {
 
         $etlJob = EtlJob::max('id');
-        $partner = Partner::where('id', 17)->first();
+        $partner = Partner::where('id', 1)->first();
         $indicators = [
             'HTS_TESTED' => 0,
             'HTS_TESTED_POS' => 0,
@@ -100,7 +103,7 @@ Route::get('/test', function () {
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://dwh.nascop.org/api/manifests/expected/ct?partner%5B%5D=Nyeri%20CHMT',
+            CURLOPT_URL => 'https://data.kenyahmis.org:8082/api/manifests/expected/ct?partner%5B%5D=Nyeri%20CHMT',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -113,12 +116,12 @@ Route::get('/test', function () {
             ),
         ));
         $expected_ct = curl_exec($curl);
-        $expected_ct = json_decode($expected_ct)->expected;
+        $expected_ct = $expected_ct ? json_decode($expected_ct)->expected : 0;
         curl_close($curl);
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://dwh.nascop.org/api/manifests/recency/ct?partner%5B%5D=Nyeri%20CHMT',
+            CURLOPT_URL => 'http://data.kenyahmis.org:8082/api/manifests/recency/ct?partner%5B%5D=Nyeri%20CHMT',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -133,7 +136,7 @@ Route::get('/test', function () {
             ),
         ));
         $recency_ct = curl_exec($curl);
-        $recency_ct = json_decode($recency_ct)->recency;
+        $recency_ct = $recency_ct ? json_decode($recency_ct)->recency : 0;
         curl_close($curl);
 
         if ($expected_ct > 0)
@@ -144,7 +147,7 @@ Route::get('/test', function () {
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://dwh.nascop.org/api/manifests/expected/hts?partner%5B%5D=Nyeri%20CHMT',
+            CURLOPT_URL => 'https://data.kenyahmis.org:8082/api/manifests/expected/hts?partner%5B%5D=Nyeri%20CHMT',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -157,12 +160,12 @@ Route::get('/test', function () {
             ),
         ));
         $expected_hts = curl_exec($curl);
-        $expected_hts = json_decode($expected_hts)->expected;
+        $expected_hts = $expected_hts ? json_decode($expected_hts)->expected :0;
         curl_close($curl);
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://dwh.nascop.org/api/manifests/recency/hts?partner%5B%5D=Nyeri%20CHMT',
+            CURLOPT_URL => 'https://data.kenyahmis.org:8082/api/manifests/recency/hts?partner%5B%5D=Nyeri%20CHMT',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -175,7 +178,7 @@ Route::get('/test', function () {
             ),
         ));
         $recency_hts = curl_exec($curl);
-        $recency_hts = json_decode($recency_hts)->recency;
+        $recency_hts = $recency_hts ? json_decode($recency_hts)->recency : 0;
         curl_close($curl);
 
         if ($expected_hts > 0)
@@ -185,19 +188,38 @@ Route::get('/test', function () {
 
         $difference = DB::table('partner_metrics')
             ->selectRaw('sum(`value`) as `value`, SUM(dwh_value) as dwh_value')
-            ->where('partner_id', $partner->id)
+            ->where('partner_id', 1)
             ->first();
 
-        return new App\Mail\ETLCompleted($partner,
-            $partner,
-            $partner,
-            $metrics,
-            $spoturl,
-            $dwhurl,
-            $facility_partner,
-            $ct_rr,
-            $hts_rr,
-            $partner,
-            $difference);
+        Mail::send('reports.partner.metricstest',
+            [
+                'name' => '',
+                'contactPerson' => '',
+                'unsubscribe_url' => '',
+                'metrics' => $metrics,
+                'spoturl' => $spoturl,
+                'dwhurl' => $dwhurl,
+                'facility_partner' => $facility_partner,
+                'ct_rr' => $ct_rr,
+                'hts_rr' => $hts_rr,
+                'partner' => $partner,
+                'difference' => $difference
+            ],
+            function ($message) use (&$email) {
+                $message->to($email)->subject('NDWH DQA Report');
+            });
+        return;
     }
+});
+
+Route::get('/email/start', function () {
+    ini_set('max_execution_time', -1);
+    $etlJob = new EtlJob;
+    $etlJob->save();
+
+    EtlJob::whereNull('started_at')->where('job_date', '<=', now())->each(function ($etlJob) {
+        Etl::dispatch($etlJob);
+    });
+    
+    return;
 });
