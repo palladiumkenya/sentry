@@ -111,6 +111,7 @@
                     <td>
                         <a href="https://palladiumgroup-my.sharepoint.com/:x:/g/personal/mary_gikura_thepalladiumgroup_com/EQU85MfsI1JFlw5HJHu9DkQBz5rZkpDSEnaKL2-K16Yifw?e=Xy06pC" target="_blank">View</a>
                     </td>
+
                 </tr>
                 <tr>
                     <td>Number of facilities with incomplete uploads</td>
