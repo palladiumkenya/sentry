@@ -121,7 +121,7 @@ class GenerateFacilityMetricsReport implements ShouldQueue
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://dwh.nascop.org/api/manifests/expected/ct?partner%5B%5D=' . str_replace(' ', '%20', $this->partner->name),
+            CURLOPT_URL => 'https://data.kenyahmis.org:8082/api/manifests/expected/ct?partner%5B%5D=' . str_replace(' ', '%20', $this->partner->name),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -139,7 +139,7 @@ class GenerateFacilityMetricsReport implements ShouldQueue
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://dwh.nascop.org/api/manifests/recency/ct?partner%5B%5D=' . str_replace(' ', '%20', $this->partner->name),
+            CURLOPT_URL => 'https://data.kenyahmis.org:8082/api/manifests/recency/ct?partner%5B%5D=' . str_replace(' ', '%20', $this->partner->name),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -163,7 +163,7 @@ class GenerateFacilityMetricsReport implements ShouldQueue
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://dwh.nascop.org/api/manifests/expected/hts?partner%5B%5D=Nyeri%20CHMT',
+            CURLOPT_URL => 'https://data.kenyahmis.org:8082/api/manifests/expected/hts?partner%5B%5D=' . str_replace(' ', '%20', $this->partner->name),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -181,7 +181,7 @@ class GenerateFacilityMetricsReport implements ShouldQueue
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://dwh.nascop.org/api/manifests/recency/hts?partner%5B%5D=Nyeri%20CHMT',
+            CURLOPT_URL => 'https://data.kenyahmis.org:8082/api/manifests/recency/hts?partner%5B%5D=' . str_replace(' ', '%20', $this->partner->name),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
