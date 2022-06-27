@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\EtlJob as Etl;
 use Illuminate\Console\Command;
+use Carbon\Carbon;
 
 Route::get('/test/{email}', function ($email) {
 
@@ -210,6 +211,53 @@ Route::get('/test/{email}', function ($email) {
             });
         return;
     }
+});
+
+Route::get('/email/covid', function () {
+    config(['database.connections.sqlsrv.database' => 'PortalDev']);
+    $table = DB::connection('sqlsrv')->table('PortalDev.dbo.FACT_COVID_STATS')
+    ->selectRaw('*')->get();
+    // Get previous Month and Year
+    $currentDateTime = Carbon::now();
+    $newDateTime = Carbon::now()->subMonth()->format('M_Y');
+
+    $jsonDecoded = json_decode($table, true); 
+    $fh = fopen('fileout_'.$newDateTime.'.csv', 'w');
+    if (is_array($jsonDecoded)) {
+        $counter = 0;
+        foreach ($jsonDecoded as $line) {
+            // sets the header row
+            if($counter == 0){
+                $header = array_keys($line);
+                fputcsv($fh, $header);
+            }
+            $counter++;
+
+            // sets the data row
+            foreach ($line as $key => $value) {
+                if ($value) {
+                    $line[$key] = $value;
+                }
+            }
+            // add each row to the csv file
+            if (is_array($line)) {
+                fputcsv($fh,$line);
+            }
+        }
+    }
+    fclose($fh);
+
+    // Send the email
+    Mail::send('reports.partner.covid',
+        [],
+        function ($message) use (&$fh) {
+            // email address of the recipients
+            $message->to("npm1@cdc.gov")->subject('Covid Report');
+            $message->cc(["mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com"]);
+            // attach the csv covid file
+            $message->attach('fileout.csv');
+        });
+
 });
 
 Route::get('/email/start', function () {
