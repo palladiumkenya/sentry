@@ -207,6 +207,7 @@ Route::get('/test/{email}', function ($email) {
                 'difference' => $difference
             ],
             function ($message) use (&$email) {
+                $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                 $message->to($email)->subject('NDWH DQA Report');
             });
         return;
@@ -251,6 +252,8 @@ Route::get('/email/covid', function () {
     Mail::send('reports.partner.covid',
         [],
         function ($message) use (&$fh) {
+            // email configurations
+            $message->from('dwh@mg.kenyahmis.org', 'NDWH');
             // email address of the recipients
             $message->to("npm1@cdc.gov")->subject('Covid Report');
             $message->cc(["mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com"]);
