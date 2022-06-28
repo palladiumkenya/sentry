@@ -222,7 +222,7 @@ Route::get('/email/covid', function () {
     $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
 
     $jsonDecoded = json_decode($table, true); 
-    $fh = fopen('fileout_'.$reportingMonth.'.csv', 'w');
+    $fh = fopen('fileout_Covid_'.$reportingMonth.'.csv', 'w');
     if (is_array($jsonDecoded)) {
         $counter = 0;
         foreach ($jsonDecoded as $line) {
@@ -250,7 +250,7 @@ Route::get('/email/covid', function () {
     // Send the email
     Mail::send('reports.partner.covid',
         [],
-        function ($message) use (&$fh) {
+        function ($message) use (&$fh, &$reportingMonth) {
             // email configurations
             $message->from('dwh@mg.kenyahmis.org', 'NDWH');
             // email address of the recipients
