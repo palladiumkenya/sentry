@@ -219,11 +219,10 @@ Route::get('/email/covid', function () {
     $table = DB::connection('sqlsrv')->table('PortalDev.dbo.FACT_COVID_STATS')
     ->selectRaw('*')->get();
     // Get previous Month and Year
-    $currentDateTime = Carbon::now();
-    $newDateTime = Carbon::now()->subMonth()->format('M_Y');
+    $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
 
     $jsonDecoded = json_decode($table, true); 
-    $fh = fopen('fileout_'.$newDateTime.'.csv', 'w');
+    $fh = fopen('fileout_'.$reportingMonth.'.csv', 'w');
     if (is_array($jsonDecoded)) {
         $counter = 0;
         foreach ($jsonDecoded as $line) {
@@ -258,7 +257,7 @@ Route::get('/email/covid', function () {
             $message->to("npm1@cdc.gov")->subject('Covid Report');
             $message->cc(["mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com"]);
             // attach the csv covid file
-            $message->attach('fileout.csv');
+            $message->attach('fileout_Covid_'.$reportingMonth.'.csv');
         });
 
 });
