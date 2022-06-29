@@ -30,7 +30,7 @@
     </div>
     <div class="row">
         <div class="col pt-5 p-20 justify-content-center">
-            <h5>Greetings Dr Kimanga,</h5>
+            <h5>Greetings,</h5>
             <p>Kindly find the attached Covid report.</p>
             <br>
             <p>Kind Regards,</p>

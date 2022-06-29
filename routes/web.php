@@ -254,8 +254,8 @@ Route::get('/email/covid', function () {
             // email configurations
             $message->from('dwh@mg.kenyahmis.org', 'NDWH');
             // email address of the recipients
-            $message->to("npm1@cdc.gov")->subject('Covid Report');
-            $message->cc(["mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com"]);
+            $message->to(["bwkitungulu@gmail.com", "jmbindyo@yahoo.com"])->subject('Covid Report');
+            $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com"]);
             // attach the csv covid file
             $message->attach('fileout_Covid_'.$reportingMonth.'.csv');
         });
