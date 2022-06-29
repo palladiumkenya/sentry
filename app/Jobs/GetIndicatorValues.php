@@ -92,7 +92,7 @@ class GetIndicatorValues implements ShouldQueue
                 $this->getTxPvls($this->period, $this->facilities);
                 $this->getMmd($this->period, $this->facilities);
                 $this->getRetentionOnArt12Months($this->period, $this->facilities);
-                $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
+                // $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
         }
     }
 
