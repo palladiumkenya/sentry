@@ -222,7 +222,7 @@ Route::get('/email/covid', function () {
     $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
 
     $jsonDecoded = json_decode($table, true); 
-    $fh = fopen('fileout_Covid_'.$reportingMonth.'.csv', 'w');
+    $fh = fopen('Covid_'.$reportingMonth.'.csv', 'w');
     if (is_array($jsonDecoded)) {
         $counter = 0;
         foreach ($jsonDecoded as $line) {
@@ -255,7 +255,7 @@ Route::get('/email/covid', function () {
             $message->from('dwh@mg.kenyahmis.org', 'NDWH');
             // email address of the recipients
             $message->to(["bwkitungulu@gmail.com", "jmbindyo@yahoo.com"])->subject('Covid Report');
-            $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com"]);
+            $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com"]);
             // attach the csv covid file
             $message->attach('fileout_Covid_'.$reportingMonth.'.csv');
         });

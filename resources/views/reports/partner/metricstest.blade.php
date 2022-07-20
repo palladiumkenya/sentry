@@ -76,7 +76,7 @@
     </div>
     <div class="row">
         <div class="col pt-5 p-20 justify-content-center">
-            <h5>Greetings {{ $partner->name }} ,</h5>
+            <h5>Greetings {{ $partner->name }} User,</h5>
             <p>The Kenya HMIS project is working with NASCOP to improve the availability and quality of data in the
                 National Data Warehouse (NDW). This requires every facility to upload complete and up-to-date databases
                 on a monthly basis to the NDW.</p>
@@ -131,24 +131,85 @@
                 <td>Difference (EMR value- NDW value)</td>
                 <td>% Variance*</td>
                 </thead>
-                @foreach($metrics as $metric)
+                <tbody>
                     <tr>
-                        <td style="width:20%">{{ str_replace('_', ' ', $metric->name) }}</td>
-                        <td align="right">{{ date('d-m-Y', strtotime($metric->metric_date)) }}</td>
-                        <td align="right">{{ $metric->value }}</td>
-                        <td align="right">{{ $metric->dwh_value }}</td>
-                        <td align="right">{{ date('d-m-Y', strtotime($metric->dwh_metric_date)) }}</td>
-                        <td align="right">{{ abs($metric->dwh_value - $metric->value) }}</td>
-                        <td align="right">{{ round($metric->value == 0 ? 0 : abs($metric->dwh_value - $metric->value) * 100 / $metric->value , 1) }}
+                        <td style="width:20%">HTS TESTED</td>
+                        <td align="right">29-09-2021</td>
+                        <td align="right">9</td>
+                        <td align="right">8</td>
+                        <td align="right">01-10-2021</td>
+                        <td align="right">1</td>
+                        <td align="right">11.11
                             %
                         </td>
                     </tr>
-                @endforeach
-                @if (count($metrics) == 0)
-                    <tr>
-                        <td colspan="7">No data found</td>
+                                    <tr>
+                        <td style="width:20%">HTS TESTED POS</td>
+                        <td align="right">29-09-2021</td>
+                        <td align="right">1</td>
+                        <td align="right">0</td>
+                        <td align="right">01-10-2021</td>
+                        <td align="right">1</td>
+                        <td align="right">100
+                            %
+                        </td>
                     </tr>
-                @endif
+                                    <tr>
+                        <td style="width:20%">HTS INDEX POS</td>
+                        <td align="right">29-09-2021</td>
+                        <td align="right">5</td>
+                        <td align="right">0</td>
+                        <td align="right">01-10-2021</td>
+                        <td align="right">5</td>
+                        <td align="right">100
+                            %
+                        </td>
+                    </tr>
+                                    <tr>
+                        <td style="width:20%">TX NEW</td>
+                        <td align="right">29-09-2021</td>
+                        <td align="right">1</td>
+                        <td align="right">1</td>
+                        <td align="right">01-10-2021</td>
+                        <td align="right">0</td>
+                        <td align="right">0
+                            %
+                        </td>
+                    </tr>
+                                    <tr>
+                        <td style="width:20%">TX CURR</td>
+                        <td align="right">29-09-2021</td>
+                        <td align="right">444</td>
+                        <td align="right">376</td>
+                        <td align="right">01-10-2021</td>
+                        <td align="right">68</td>
+                        <td align="right">15.32
+                            %
+                        </td>
+                    </tr>
+                                    <tr>
+                        <td style="width:20%">RETENTION ON ART 12 MONTHS</td>
+                        <td align="right">29-09-2021</td>
+                        <td align="right">4</td>
+                        <td align="right">0</td>
+                        <td align="right">01-10-2021</td>
+                        <td align="right">4</td>
+                        <td align="right">100
+                            %
+                        </td>
+                    </tr>
+                                    <tr>
+                        <td style="width:20%">RETENTION ON ART VL 1000 12 MONTHS</td>
+                        <td align="right">29-09-2021</td>
+                        <td align="right">1</td>
+                        <td align="right">0</td>
+                        <td align="right">01-10-2021</td>
+                        <td align="right">1</td>
+                        <td align="right">100
+                            %
+                        </td>
+                    </tr>
+                </tbody>
             </table>
 
             <small>*% Variance was computed as =</small>
