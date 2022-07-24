@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\EtlJob as Etl;
+use App\Jobs\GetIndicatorValues;
+use App\Jobs\PostLiveSyncIndicators;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
 
@@ -262,12 +264,24 @@ Route::get('/email/covid', function () {
 
 });
 
+Route::get('/livesync', function(){
+    ini_set('max_execution_time', -1);
+    Facility::where('etl', true)->chunk(100, function ($facilities) {
+            $f = [];
+            $facilities->each(function ($facility) use (&$f) {
+                $f[$facility->code] = $facility->id;
+            });
+            GetIndicatorValues::dispatchNow(null, null, $f);
+            PostLiveSyncIndicators::dispatchNow(array_values($f));
+    });
+});
+
 Route::get('/email/start', function () {
     ini_set('max_execution_time', -1);
     $etlJob = new EtlJob;
     $etlJob->save();
 
-    EtlJob::whereNull('started_at')->where('job_date', '<=', now())->each(function ($etlJob) {
+    EtlJob::whereNull('started_at')->where('job_date', '<=', now())->where('id', '=', $etlJob->id)->each(function ($etlJob) {
         Etl::dispatch($etlJob);
     });
     

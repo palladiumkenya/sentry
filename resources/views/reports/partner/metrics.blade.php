@@ -71,7 +71,7 @@
 <div class="container-fluid">
     <div class="row" style="background-color: #000059">
         <div class="col p-5 align-content-center">
-            <img class="center" style="margin-top: 3px; margin-bottom: 3px" src="{{$message->embed('./public/img.png')}}" alt="logo">
+            <img class="center" style="margin-top: 3px; margin-bottom: 3px" src="{{$message->embed('img.png')}}" alt="logo">
         </div>
     </div>
     <div class="row">

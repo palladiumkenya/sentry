@@ -42,7 +42,7 @@ class GetSpotFacilityUploads implements ShouldQueue
         $response = $client->request('GET', 'api/v1/transfers/facilities/'.$facility->uid, [
             'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
             'verify' => false,
-            'timeout'  => 30,
+            'timeout'  => 300,
             'http_errors' => false,
         ]);
         if ($response->getStatusCode() == 200) {

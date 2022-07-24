@@ -24,9 +24,6 @@
 <body>
 <div class="container-fluid">
     <div class="row" style="background-color: #000059">
-        <div class="col p-5 align-content-center">
-            <img class="center" style="margin-top: 3px; margin-bottom: 3px" src="{{$message->embed('img.png')}}" alt="logo">
-        </div>
     </div>
     <div class="row">
         <div class="col pt-5 p-20 justify-content-center">
@@ -38,6 +35,9 @@
         </div>
     </div>
     <div class="row" style="background-color: #000059; padding-top: 5px; padding-bottom: 3px">
+        <div class="col p-5 align-content-center">
+            <img class="center" style="margin-top: 3px; margin-bottom: 3px" src="{{$message->embed('img.png')}}" alt="logo">
+        </div>
         <div class="col p-5  text-white" style="text-align: center">
             <p style="text-align: center; color: white">This is a system generated email. Do not reply.</p>
         </div>
