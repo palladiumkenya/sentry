@@ -264,6 +264,93 @@ Route::get('/email/covid', function () {
 
 });
 
+Route::get('/email/comparison_txcurr', function () {
+    config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
+    $table = DB::connection('sqlsrv')->select(DB::raw('With
+ DHIS2_CurTx AS (
+     SELECT
+          [SiteCode],
+          [FacilityName],
+          [County],
+          [CurrentOnART_Total],
+          ReportMonth_Year
+      FROM [All_Staging_2016_2].[dbo].[FACT_CT_DHIS2]
+      WHERE ReportMonth_Year = '.Carbon::now()->subMonth()->format('Ym').'
+),
+NDW_CurTx AS (
+    SELECT
+        MFLCode,
+        FacilityName,
+        CTPartner,
+        COUNT(DISTINCT CONCAT(PatientID, \'-\', PatientPK,\'-\',MFLCode)) AS CurTx_total
+    FROM PortalDev.dbo.Fact_Trans_New_Cohort
+    WHERE ARTOutcome = \'V\'
+    GROUP BY MFLCode, FacilityName, CTPartner
+),
+tbl AS (
+    SELECT
+        NDW_CurTx.MFLCode AS mfl_code,
+        NDW_CurTx .FacilityName AS facility_name,
+        DHIS2_CurTx.County AS county,
+        NDW_CurTx.CTPartner,
+        DHIS2_CurTx.ReportMonth_Year AS DHIS2_report_month_year,
+        DHIS2_CurTx.CurrentOnART_Total AS count_dhis2,
+        NDW_CurTx .CurTx_total AS count_ndw,
+        DHIS2_CurTx.CurrentOnART_Total - NDW_CurTx .CurTx_total AS \'dhis2 - ndw\',
+        CAST(ROUND((CAST(DHIS2_CurTx.CurrentOnART_Total AS DECIMAL(7,2)) - CAST(NDW_CurTx .CurTx_total AS DECIMAL(7,2)))
+            /CAST(DHIS2_CurTx.CurrentOnART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS percentage_variance_from_dhis2,
+        CONVERT(DATE,GETDATE()) AS date_report_prepared
+    FROM NDW_CurTx 
+    LEFT JOIN DHIS2_CurTx ON CAST(NDW_CurTx.MFLCode AS int) = CAST(DHIS2_CurTx.SiteCode AS int)
+)
+SELECT
+    *
+FROM tbl
+ORDER BY percentage_variance_from_dhis2 DESC;'));
+    // Get previous Month and Year
+    $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
+
+    $jsonDecoded = json_decode(json_encode($table), true); 
+    $fh = fopen('fileout_Comparison_'.$reportingMonth.'.csv', 'w');
+    if (is_array($jsonDecoded)) {
+        $counter = 0;
+        foreach ($jsonDecoded as $line) {
+            // sets the header row
+            if($counter == 0){
+                $header = array_keys($line);
+                fputcsv($fh, $header);
+            }
+            $counter++;
+
+            // sets the data row
+            foreach ($line as $key => $value) {
+                if ($value) {
+                    $line[$key] = $value;
+                }
+            }
+            // add each row to the csv file
+            if (is_array($line)) {
+                fputcsv($fh,$line);
+            }
+        }
+    }
+    fclose($fh);
+
+    // Send the email
+    Mail::send('reports.partner.covid',
+        [],
+        function ($message) use (&$fh, &$reportingMonth) {
+            // email configurations
+            $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+            // email address of the recipients
+            $message->to(["mary.gikura@thepalladiumgroup.com"])->subject('Comparison Report');
+            // $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com"]);
+            // attach the csv covid file
+            $message->attach('fileout_Comparison_'.$reportingMonth.'.csv');
+        });
+
+});
+
 Route::get('/livesync', function(){
     ini_set('max_execution_time', -1);
     Facility::where('etl', true)->chunk(100, function ($facilities) {
@@ -271,7 +358,7 @@ Route::get('/livesync', function(){
             $facilities->each(function ($facility) use (&$f) {
                 $f[$facility->code] = $facility->id;
             });
-            GetIndicatorValues::dispatchNow(null, null, $f);
+            // GetIndicatorValues::dispatchNow(null, null, $f);
             PostLiveSyncIndicators::dispatchNow(array_values($f));
     });
 });
