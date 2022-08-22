@@ -100,7 +100,7 @@ RUN echo -e "server { \n\
 RUN echo -e "[supervisord] \n\
 nodaemon = true \n\
 [program:pre] \n\
-command = /bin/sh -c \"rm -Rf /var/www/html/vendor/laravel/nova && /usr/local/bin/composer install --no-interaction --optimize-autoloader --prefer-dist && chmod -R 777 /var/www/html/storage && /usr/bin/php /var/www/html/artisan config:clear && /usr/bin/php /var/www/html/artisan cache:clear && /usr/bin/php /var/www/html/artisan migrate --force && /usr/bin/php /var/www/html/artisan config:cache && supervisorctl start horizon\" \n\
+command = /bin/sh -c \"rm -Rf /var/www/html/vendor/laravel/nova && /usr/local/bin/composer install --no-interaction --optimize-autoloader --prefer-dist && chmod -R 777 /var/www/html/storage && chmod -R 777 /var/www/html/public && /usr/bin/php /var/www/html/artisan config:clear && /usr/bin/php /var/www/html/artisan cache:clear && /usr/bin/php /var/www/html/artisan migrate --force && /usr/bin/php /var/www/html/artisan config:cache && supervisorctl start horizon\" \n\
 autostart = true \n\
 autorestart = false \n\
 stdout_logfile=/dev/stdout \n\
