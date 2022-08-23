@@ -337,6 +337,7 @@ class MainController extends Controller
                 // email address of the recipients
                 $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Peads Report');
                 // $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com"]);
+                $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com"]);
                 // attach the csv covid file
                 $message->attach('fileout_Peads_'.$reportingMonth.'.csv');
             });
