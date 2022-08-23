@@ -12,6 +12,7 @@ use App\Jobs\GenerateFacilityMetricsReport;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 use Carbon\Carbon;
 
