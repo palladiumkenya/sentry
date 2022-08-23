@@ -13,6 +13,8 @@ use App\Jobs\GenerateFacilityMetricsReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use Carbon\Carbon;
+
 class MainController extends Controller
 {
     //
@@ -297,6 +299,8 @@ class MainController extends Controller
             config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
 
         $table = DB::connection('sqlsrv')->select(DB::raw($query));
+        // Get previous Month and Year
+        $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
         $jsonDecoded = json_decode(json_encode($table), true); 
         $fh = fopen('fileout_Peads_'.$reportingMonth.'.csv', 'w');
         if (is_array($jsonDecoded)) {
