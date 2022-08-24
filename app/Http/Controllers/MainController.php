@@ -386,16 +386,74 @@ class MainController extends Controller
         return "DONE";
     }
 
-    public function NUPIAlert()
+    public function DataTriangulation()
     {
-        config(['database.connections.sqlsrv.database' => 'PortalDev']);
-        $table = DB::connection('sqlsrv')->table('PortalDev.dbo.FACT_COVID_STATS')
-        ->selectRaw('*')->get();
         // Get previous Month and Year
         $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
 
+        $query = "With NDW_CurTx AS (
+                SELECT
+                    MFLCode,
+                    FacilityName,
+                    CTPartner,
+                    County,
+                    COUNT(DISTINCT CONCAT(PatientID, '-', PatientPK,'-',MFLCode)) AS CurTx_total
+                FROM PortalDev.dbo.Fact_Trans_New_Cohort
+                WHERE ARTOutcome = 'V'
+                GROUP BY MFLCode, FacilityName, CTPartner, County
+            ),
+            EMR As (SELECT
+            Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
+                facilityCode
+                ,facilityName
+                ,[value]
+                ,statusDate
+                ,indicatorDate
+            FROM livesync.dbo.indicator
+            where stage like '%EMR' and name like '%TX_CURR' and indicatorDate= EOMONTH(DATEADD(mm,-1,GETDATE()))
+            ),
+            DHIS2_CurTx AS (
+                SELECT
+                    [SiteCode],
+                    [FacilityName],
+                    [County],
+                    [CurrentOnART_Total],
+                    ReportMonth_Year
+                FROM [All_Staging_2016_2].[dbo].[FACT_CT_DHIS2]
+                WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')."
+            ),
+            LatestEMR AS (Select
+                    Emr.facilityCode 
+                ,Emr.facilityName
+                ,CONVERT (varchar,Emr.[value] ) As EMRValue
+                ,Emr.statusDate
+                ,Emr.indicatorDate
+                from EMR
+                where Num=1
+                )
+            Select
+                    coalesce (NDW_CurTx.MFLCode,LatestEMR.facilityCode ) As MFLCode,
+                    Coalesce (NDW_CurTx.FacilityName,LatestEMR.facilityName) As FacilityName,
+                    NDW_CurTx.CTPartner,
+                    NDW_CurTx.County,
+                    DHIS2_CurTx.CurrentOnART_Total As KHIS_TxCurr,
+                    NDW_CurTx.CurTx_total AS DWH_TXCurr,
+                    LatestEMR.EMRValue As EMR_TxCurr,
+                    DHIS2_CurTx.CurrentOnART_Total-CurTx_total As DiffKHISDWH,
+                    DHIS2_CurTx.CurrentOnART_Total-LatestEMR.EMRValue As DiffKHISEMR,
+                CAST(ROUND((CAST(DHIS2_CurTx.CurrentOnART_Total AS DECIMAL(7,2)) - CAST(NDW_CurTx .CurTx_total AS DECIMAL(7,2)))
+                    /CAST(DHIS2_CurTx.CurrentOnART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_DWH,
+                    CAST(ROUND((CAST(DHIS2_CurTx.CurrentOnART_Total AS DECIMAL(7,2)) - CAST(LatestEMR.EMRValue AS DECIMAL(7,2)))
+                    /CAST(DHIS2_CurTx.CurrentOnART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_EMR
+                from NDW_CurTx
+                left join LatestEMR on NDW_CurTx.MFLCode=LatestEMR.facilityCode
+                left join DHIS2_CurTx on NDW_CurTx.MFLCode=DHIS2_CurTx.SiteCode COLLATE Latin1_General_CI_AS";
+        
+        config(['database.connections.sqlsrv.database' => 'PortalDev']);
+        $table = DB::connection('sqlsrv')->select(DB::raw($query));
+        
         $jsonDecoded = json_decode($table, true); 
-        $fh = fopen('fileout_Covid_'.$reportingMonth.'.csv', 'w');
+        $fh = fopen('fileout_Triangulation_'.$reportingMonth.'.csv', 'w');
         if (is_array($jsonDecoded)) {
             $counter = 0;
             foreach ($jsonDecoded as $line) {
@@ -421,7 +479,56 @@ class MainController extends Controller
         fclose($fh);
 
         // Send the email
-        Mail::send('reports.partner.covid',
+        Mail::send('reports.partner.reports',
+            [],
+            function ($message) use (&$fh, &$reportingMonth) {
+                // email configurations
+                $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                // email address of the recipients
+                $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Data Triangulation Report');
+                $message->cc(["charles.bett@thepalladiumgroup.com"]);
+                // attach the csv covid file
+                $message->attach('fileout_Triangulation_'.$reportingMonth.'.csv');
+            });
+        return "DONE";
+    }
+
+    public function NUPIAlert()
+    {
+        // Get previous Month and Year
+        $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
+        $query = "";
+        config(['database.connections.sqlsrv.database' => 'PortalDev']);
+        $table = DB::connection('sqlsrv')->select(DB::raw($query));
+
+        $jsonDecoded = json_decode($table, true); 
+        $fh = fopen('fileout_NUPI_'.$reportingMonth.'.csv', 'w');
+        if (is_array($jsonDecoded)) {
+            $counter = 0;
+            foreach ($jsonDecoded as $line) {
+                // sets the header row
+                if($counter == 0){
+                    $header = array_keys($line);
+                    fputcsv($fh, $header);
+                }
+                $counter++;
+
+                // sets the data row
+                foreach ($line as $key => $value) {
+                    if ($value) {
+                        $line[$key] = $value;
+                    }
+                }
+                // add each row to the csv file
+                if (is_array($line)) {
+                    fputcsv($fh,$line);
+                }
+            }
+        }
+        fclose($fh);
+
+        // Send the email
+        Mail::send('reports.partner.reports',
             [],
             function ($message) use (&$fh, &$reportingMonth) {
                 // email configurations
@@ -430,7 +537,7 @@ class MainController extends Controller
                 $message->to(["charles.bett@thepalladiumgroup.com"])->subject('NUPI Report');
                 $message->cc(["charles.bett@thepalladiumgroup.com"]);
                 // attach the csv covid file
-                $message->attach('fileout_Covid_'.$reportingMonth.'.csv');
+                $message->attach('fileout_NUPI_'.$reportingMonth.'.csv');
             });
         return "DONE";
     }

@@ -382,3 +382,5 @@ Route::get('/email/start', function () {
 // Route::get('/user', [MainController::class, 'DQAReport']);
 
 Route::get('/peads', [MainController::class, 'PeadAlert']);
+
+Route::get('/data_triangulation', [MainController::class, 'DataTriangulation']);
