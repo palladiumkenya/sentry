@@ -342,7 +342,7 @@ class MainController extends Controller
 
         config(['database.connections.mysql.database' => 'portaldev']);
         $fac_not_reporting = DB::connection('mysql')->select(DB::raw($query2));
-        // Get previous Month and Year
+        
         $jsonDecoded = json_decode(json_encode($fac_not_reporting), true); 
         $fh = fopen('fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv', 'w');
         if (is_array($jsonDecoded)) {
@@ -451,8 +451,8 @@ class MainController extends Controller
         
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         $table = DB::connection('sqlsrv')->select(DB::raw($query));
-        
-        $jsonDecoded = json_decode($table, true); 
+
+        $jsonDecoded = json_decode(json_encode($table), true); 
         $fh = fopen('fileout_Triangulation_'.$reportingMonth.'.csv', 'w');
         if (is_array($jsonDecoded)) {
             $counter = 0;
