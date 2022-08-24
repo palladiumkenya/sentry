@@ -486,7 +486,7 @@ class MainController extends Controller
                 $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                 // email address of the recipients
                 $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Data Triangulation Report');
-                $message->cc(["charles.bett@thepalladiumgroup.com"]);
+                $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
                 // attach the csv covid file
                 $message->attach('fileout_Triangulation_'.$reportingMonth.'.csv');
             });
