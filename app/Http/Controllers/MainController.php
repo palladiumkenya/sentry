@@ -297,13 +297,54 @@ class MainController extends Controller
             Left join PaedsListed on facility_partner_combinations.MFLCode=PaedsListed.MFLCode
             Left join PaedsTested on facility_partner_combinations.MFLCode=PaedsTested.MFLCode
             Left join PaedsOnMMD on facility_partner_combinations.MFLCode=PaedsOnMMD.MFLCode";
-            config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
+        
+        $query2 = "SELECT * from (Select Distinct df.FacilityId,Name as FacilityName,County,subCounty,Agency,Partner, f.year,f.month, f.docketId ,f.timeId as uploaddate
+                from (select name,facilityId,county,subcounty,agency,partner, \"CT\" AS docket from portaldev.dim_facility where isCt = 1) df
+                LEFT JOIN (SELECT * FROM (
+                            SELECT DISTINCT ROW_NUMBER ( ) OVER (PARTITION BY FacilityId,docketId,Concat(Month(fm.timeId),'-', Year(fm.timeId)) ORDER BY (cast(fm.timeId as date)) desc) AS RowID,
+                            FacilityId,docketId,fm.timeId, dt.year,dt.month FROM  portaldev.fact_manifest fm
+                            inner join portaldev.dim_time dt on dt.timeId=fm.timeId
+                            where dt.year = ".Carbon::now()->subMonth()->format('Y')." and dt.month = ".Carbon::now()->subMonth()->format('m')."
+                )u where RowId=1) f on f.facilityId=df.facilityId and df.docket=f.docketId) Y
+                                WHERE uploaddate is null";
+        
+        
+        config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
 
         $table = DB::connection('sqlsrv')->select(DB::raw($query));
         // Get previous Month and Year
-        $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
+        $reportingMonth = Carbon::now()->subMonth()->format('M_Y_D');
         $jsonDecoded = json_decode(json_encode($table), true); 
-        $fh = fopen('fileout_Peads_'.$reportingMonth.'.csv', 'w');
+        $fh = fopen('fileout_Paeds_'.$reportingMonth.'.csv', 'w');
+        if (is_array($jsonDecoded)) {
+            $counter = 0;
+            foreach ($jsonDecoded as $line) {
+                // sets the header row
+                if($counter == 0){
+                    $header = array_keys($line);
+                    fputcsv($fh, $header);
+                }
+                $counter++;
+
+                // sets the data row
+                foreach ($line as $key => $value) {
+                    if ($value) {
+                        $line[$key] = $value;
+                    }
+                }
+                // add each row to the csv file
+                if (is_array($line)) {
+                    fputcsv($fh,$line);
+                }
+            }
+        }
+        fclose($fh);
+
+        config(['database.connections.mysql.database' => 'portaldev']);
+        $fac_not_reporting = DB::connection('mysql')->select(DB::raw($query2));
+        // Get previous Month and Year
+        $jsonDecoded = json_decode(json_encode($fac_not_reporting), true); 
+        $fh = fopen('fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv', 'w');
         if (is_array($jsonDecoded)) {
             $counter = 0;
             foreach ($jsonDecoded as $line) {
@@ -329,18 +370,19 @@ class MainController extends Controller
         fclose($fh);
 
         // Send the email
-        Mail::send('reports.partner.covid',
+        Mail::send('reports.partner.topline',
             [],
             function ($message) use (&$fh, &$reportingMonth) {
                 // email configurations
                 $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                 // email address of the recipients
-                $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Peads Report');
+                $message->to(["kennedy.muthoka@thepalladiumgroup.com"])->subject('Paediatric Topline Indicators');
                 // $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com"]);
-                $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com"]);
+                $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
                 // attach the csv covid file
-                $message->attach('fileout_Peads_'.$reportingMonth.'.csv');
+                $message->attach('fileout_Paeds_'.$reportingMonth.'.csv');
+                $message->attach('fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv');
             });
-        return;
+        return "DONE";
     }
 }
