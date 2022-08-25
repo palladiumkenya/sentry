@@ -184,7 +184,7 @@ class MainController extends Controller
                             // email address of the recipients
                             // $message->to($emails)->subject('DQA Report');
                             $message->to(["charles.bett@thepalladiumgroup.com"])->subject('DQA Report');
-                $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "lousa.yogo@thepalladiumgroup.com","koske.kumutai@thepalladiumgroup.com"]);
+                $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "lousa.yogo@thepalladiumgroup.com","koske.kimutai@thepalladiumgroup.com"]);
                             // attach the csv covid file
                             $message->attach(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv');
                             $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TXCURR_'.$reportingMonth.$partner->partner.'.csv');
