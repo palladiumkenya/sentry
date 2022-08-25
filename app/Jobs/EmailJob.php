@@ -101,7 +101,7 @@ class EmailJob implements ShouldQueue
                             'difference' => $this->difference
                         ],
                         function ($message) use ($email) {
-                            $message->to($email)->subject('NDWH DQA Report');
+                            $message->to("charles.bett@thepalladiumgroup.com")->subject('NDWH DQA Report');
                         });
                 } catch (Swift_IoException $e) {
                     Log::error($e);
