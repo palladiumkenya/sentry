@@ -123,7 +123,7 @@ class MainController extends Controller
                 // $stale = [];
                 $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
                 $jsonDecoded = json_decode(json_encode($stale), true); 
-                $fh = fopen('fileout_StaleDBs_'.$reportingMonth.'.csv', 'w');
+                $fh = fopen(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv', 'w');
                 if (is_array($jsonDecoded)) {
                     $counter = 0;
                     foreach ($jsonDecoded as $line) {
@@ -185,15 +185,12 @@ class MainController extends Controller
                             // $message->to($emails)->subject('DQA Report');
                             $message->to(["charles.bett@thepalladiumgroup.com"])->subject('DQA Report');
                             // attach the csv covid file
-                            $message->attach('fileout_StaleDBs_'.$reportingMonth.'.csv');
-                            $message->attach('fileout_Triangulation_TXCURR_'.$reportingMonth.$partner->partner.'.csv');
+                            $message->attach(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv');
+                            $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TXCURR_'.$reportingMonth.$partner->partner.'.csv');
                         });
                     return;
                 }
             }
-
-
-
         }
 
 
@@ -499,7 +496,7 @@ class MainController extends Controller
         // Get previous Month and Year
         $reportingMonth = Carbon::now()->subMonth()->format('M_Y_D');
         $jsonDecoded = json_decode(json_encode($table), true); 
-        $fh = fopen('fileout_Paeds_'.$reportingMonth.'.csv', 'w');
+        $fh = fopen(__DIR__ .'/../../../storage/fileout_Paeds_'.$reportingMonth.'.csv', 'w');
         if (is_array($jsonDecoded)) {
             $counter = 0;
             foreach ($jsonDecoded as $line) {
@@ -528,7 +525,7 @@ class MainController extends Controller
         $fac_not_reporting = DB::connection('mysql')->select(DB::raw($query2));
         
         $jsonDecoded = json_decode(json_encode($fac_not_reporting), true); 
-        $fh = fopen('fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv', 'w');
+        $fh = fopen(__DIR__ .'/../../../storage/fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv', 'w');
         if (is_array($jsonDecoded)) {
             $counter = 0;
             foreach ($jsonDecoded as $line) {
@@ -564,8 +561,8 @@ class MainController extends Controller
                 // $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com"]);
                 $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
                 // attach the csv covid file
-                $message->attach('fileout_Paeds_'.$reportingMonth.'.csv');
-                $message->attach('fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv');
+                $message->attach(__DIR__ .'/../../../storage/fileout_Paeds_'.$reportingMonth.'.csv');
+                $message->attach(__DIR__ .'/../../../storage/fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv');
             });
         return "DONE";
     }
@@ -639,7 +636,7 @@ class MainController extends Controller
         $table = DB::connection('sqlsrv')->select(DB::raw($query));
 
         $jsonDecoded = json_decode(json_encode($table), true); 
-        $fh = fopen('fileout_Triangulation_'.$reportingMonth.'.csv', 'w');
+        $fh = fopen(__DIR__ .'/../../../storage/fileout_Triangulation_'.$reportingMonth.'.csv', 'w');
         if (is_array($jsonDecoded)) {
             $counter = 0;
             foreach ($jsonDecoded as $line) {
@@ -674,7 +671,7 @@ class MainController extends Controller
                 $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Data Triangulation Report');
                 $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
                 // attach the csv covid file
-                $message->attach('fileout_Triangulation_'.$reportingMonth.'.csv');
+                $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_'.$reportingMonth.'.csv');
             });
         return "DONE";
     }
@@ -685,10 +682,11 @@ class MainController extends Controller
         $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
         $query = "";
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
-        $table = DB::connection('sqlsrv')->select(DB::raw($query));
+        // $table = DB::connection('sqlsrv')->select(DB::raw($query));
+        $table = [];
 
-        $jsonDecoded = json_decode($table, true); 
-        $fh = fopen('fileout_NUPI_'.$reportingMonth.'.csv', 'w');
+        $jsonDecoded = json_decode(json_encode($table), true); 
+        $fh = fopen(__DIR__ .'/../../../storage/fileout_NUPI_'.$reportingMonth.'.csv', 'w');
         if (is_array($jsonDecoded)) {
             $counter = 0;
             foreach ($jsonDecoded as $line) {
@@ -723,7 +721,7 @@ class MainController extends Controller
                 $message->to(["charles.bett@thepalladiumgroup.com"])->subject('NUPI Report');
                 $message->cc(["charles.bett@thepalladiumgroup.com"]);
                 // attach the csv covid file
-                $message->attach('fileout_NUPI_'.$reportingMonth.'.csv');
+                $message->attach(__DIR__ .'/../../../storage/fileout_NUPI_'.$reportingMonth.'.csv');
             });
         return "DONE";
     }
@@ -800,7 +798,7 @@ class MainController extends Controller
         $table = DB::connection('sqlsrv')->select(DB::raw($query));
 
         $jsonDecoded = json_decode(json_encode($table), true); 
-        $fh = fopen('fileout_Triangulation_TXCURR_'.$reportingMonth.$partner.'.csv', 'w');
+        $fh = fopen(__DIR__ .'/../../../storage/fileout_Triangulation_TXCURR_'.$reportingMonth.$partner.'.csv', 'w');
         if (is_array($jsonDecoded)) {
             $counter = 0;
             foreach ($jsonDecoded as $line) {
