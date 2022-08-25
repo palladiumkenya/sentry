@@ -340,7 +340,7 @@ Route::get('/email/comparison_txcurr', function () {
     fclose($fh);
 
     // Send the email
-    Mail::send('reports.partner.covid',
+    Mail::send('reports.partner.reports',
         [],
         function ($message) use (&$fh, &$reportingMonth) {
             // email configurations
