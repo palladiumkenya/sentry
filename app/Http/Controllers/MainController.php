@@ -147,20 +147,22 @@ class MainController extends Controller
                     }
                 }
                 fclose($fh);
-                $ct_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='CT' and partner = '".$partner->partner."'";
-                $ct_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='CT' and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."'";
+                $ct_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='CT'  COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+                $ct_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='CT' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
                 
-                $hts_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='HTS' and partner = '".$partner->partner."'";
-                $hts_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='HTS' and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."'";
+                $hts_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='HTS' COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+                $hts_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='HTS' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
                 
                 config(['database.connections.mysql.database' => 'portaldev']);
-                $ct_expected = DB::connection('mysql')->select(DB::raw($ct_expected_partner));
-                $ct_recency = DB::connection('mysql')->select(DB::raw($ct_recency_partner));
-                $hts_expected = DB::connection('mysql')->select(DB::raw($hts_expected_partner));
-                $hts_recency = DB::connection('mysql')->select(DB::raw($hts_recency_partner));
+                $ct_expected = DB::connection('mysql')->select(DB::raw($ct_expected_partner))[0];
+                $ct_recency = DB::connection('mysql')->select(DB::raw($ct_recency_partner))[0];
+                $hts_expected = DB::connection('mysql')->select(DB::raw($hts_expected_partner))[0];
+                $hts_recency = DB::connection('mysql')->select(DB::raw($hts_recency_partner))[0];
+                
 
                 $ct_per = $ct_recency->totalrecency * 100 / $ct_expected->totalexpected ;
                 $hts_per = $hts_recency->totalrecency *100 / $hts_expected->totalexpected;
+                // return $hts_per;
                 $this->GenerateSDPTXCurrReport($partner->partner);
 
 
