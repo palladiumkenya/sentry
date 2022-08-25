@@ -384,4 +384,4 @@ Route::get('/dqa', [MainController::class, 'DQAReport']);
 Route::get('/peads', [MainController::class, 'PeadAlert']);
 
 Route::get('/data_triangulation', [MainController::class, 'DataTriangulation']);
-Route::get('/nupi', [MainController::class, 'DataTriangulation']);
+Route::get('/nupi', [MainController::class, 'NUPIAlert']);

@@ -121,7 +121,7 @@ class MainController extends Controller
                 
                 $stale = DB::connection('sqlsrv')->select(DB::raw($stale_query));
                 // $stale = [];
-                $reportingMonth = Carbon::now()->subMonth()->format('M_Y_D');
+                $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
                 $jsonDecoded = json_decode(json_encode($stale), true); 
                 $fh = fopen('fileout_StaleDBs_'.$reportingMonth.'.csv', 'w');
                 if (is_array($jsonDecoded)) {
