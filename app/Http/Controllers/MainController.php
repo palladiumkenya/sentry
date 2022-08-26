@@ -570,7 +570,7 @@ class MainController extends Controller
         // Get previous Month and Year
         $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
 
-        $query = "With NDW_CurTx AS (
+        $query_txcurr = "With NDW_CurTx AS (
                 SELECT
                     MFLCode,
                     FacilityName,
@@ -630,11 +630,99 @@ class MainController extends Controller
                 left join LatestEMR on NDW_CurTx.MFLCode=LatestEMR.facilityCode
                 left join DHIS2_CurTx on NDW_CurTx.MFLCode=DHIS2_CurTx.SiteCode COLLATE Latin1_General_CI_AS";
         
+        $query_txnew = "With NDW_NewTx AS (
+                select  
+                    MFLCode,
+                    FacilityName,
+                    CTPartner,
+                    County,
+                    SUM([StartedART]) txNew 
+            from PortalDev.dbo.FACT_Trans_Newly_Started 
+            where [StartedART] > 0 
+            and Start_Year = ".Carbon::now()->subMonth()->format('Y')." and StartART_Month =".Carbon::now()->subMonth()->format('m')."
+            GROUP BY MFLCode, FacilityName, CTPartner, County
+            ),
+            EMR As (SELECT
+            Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
+                facilityCode
+                ,facilityName
+                ,[value]
+                ,statusDate
+                ,indicatorDate
+            FROM livesync.dbo.indicator
+            where stage like '%EMR' and name like '%TX_NEW' and indicatorDate= EOMONTH(DATEADD(mm,-1,GETDATE()))
+            ),
+            DHIS2_TxNew AS (
+                SELECT
+                    [SiteCode],
+                    [FacilityName],
+                    [County],
+                    [StartedART_Total],
+                    ReportMonth_Year
+                FROM [All_Staging_2016_2].[dbo].[FACT_CT_DHIS2]
+                WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')."
+            ),
+            LatestEMR AS (Select
+                    Emr.facilityCode 
+                ,Emr.facilityName
+                ,CONVERT (varchar,Emr.[value] ) As EMRValue
+                ,Emr.statusDate
+                ,Emr.indicatorDate
+                from EMR
+                where Num=1
+                )
+            Select
+                    coalesce (NDW_NewTx.MFLCode,LatestEMR.facilityCode ) As MFLCode,
+                    Coalesce (NDW_NewTx.FacilityName,LatestEMR.facilityName) As FacilityName,
+                    NDW_NewTx.CTPartner,
+                    NDW_NewTx.County,
+                    DHIS2_TxNew.StartedART_Total As KHIS_TxNew,
+                    NDW_NewTx.txNew AS DWH_TXNew,
+                    LatestEMR.EMRValue As EMR_TxNew,
+                    DHIS2_TxNew.StartedART_Total-txNew As DiffKHISDWH,
+                    DHIS2_TxNew.StartedART_Total-LatestEMR.EMRValue As DiffKHISEMR,
+                CAST(ROUND((CAST(DHIS2_TxNew.StartedART_Total AS DECIMAL(7,2)) - CAST(NDW_NewTx .txNew AS DECIMAL(7,2)))
+                    /CAST(DHIS2_TxNew.StartedART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_DWH,
+                    CAST(ROUND((CAST(DHIS2_TxNew.StartedART_Total AS DECIMAL(7,2)) - CAST(LatestEMR.EMRValue AS DECIMAL(7,2)))
+                    /CAST(DHIS2_TxNew.StartedART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_EMR,
+                    CAST(ROUND((CAST(LatestEMR.EMRValue AS DECIMAL(7,2)) - CAST(NDW_NewTx .txNew AS DECIMAL(7,2)))
+                    /CAST(NULLIF(LatestEMR.EMRValue, 0)  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_EMR_DWH
+                from NDW_NewTx
+                left join LatestEMR on NDW_NewTx.MFLCode=LatestEMR.facilityCode
+                left join DHIS2_TxNew on NDW_NewTx.MFLCode=DHIS2_TxNew.SiteCode COLLATE Latin1_General_CI_AS";
+        
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
-        $table = DB::connection('sqlsrv')->select(DB::raw($query));
+        $table = DB::connection('sqlsrv')->select(DB::raw($query_txcurr));
+        $table2 = DB::connection('sqlsrv')->select(DB::raw($query_txnew));
 
         $jsonDecoded = json_decode(json_encode($table), true); 
-        $fh = fopen(__DIR__ .'/../../../storage/fileout_Triangulation_'.$reportingMonth.'.csv', 'w');
+        $fh = fopen(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv', 'w');
+        if (is_array($jsonDecoded)) {
+            $counter = 0;
+            foreach ($jsonDecoded as $line) {
+                // sets the header row
+                if($counter == 0){
+                    $header = array_keys($line);
+                    fputcsv($fh, $header);
+                }
+                $counter++;
+
+                // sets the data row
+                foreach ($line as $key => $value) {
+                    if ($value) {
+                        $line[$key] = $value;
+                    }
+                }
+                // add each row to the csv file
+                if (is_array($line)) {
+                    fputcsv($fh,$line);
+                }
+            }
+        }
+        fclose($fh);
+        
+        $jsonDecoded = json_decode(json_encode($table2), true); 
+        $fh = fopen(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv', 'w');
         if (is_array($jsonDecoded)) {
             $counter = 0;
             foreach ($jsonDecoded as $line) {
@@ -668,8 +756,9 @@ class MainController extends Controller
                 // email address of the recipients
                 $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Data Triangulation Report');
                 $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
-                // attach the csv covid file
-                $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_'.$reportingMonth.'.csv');
+                // attach the csv file
+                $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv');
+                $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv');
             });
         return "DONE";
     }
