@@ -690,10 +690,146 @@ class MainController extends Controller
                 from NDW_NewTx
                 left join LatestEMR on NDW_NewTx.MFLCode=LatestEMR.facilityCode
                 left join DHIS2_TxNew on NDW_NewTx.MFLCode=DHIS2_TxNew.SiteCode COLLATE Latin1_General_CI_AS";
+        $query_hts_tested = "With NDW AS (SELECT
+            Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
+                facilityCode
+                ,facilityName
+                ,[value]
+                ,statusDate
+                ,indicatorDate
+            FROM livesync.dbo.indicator
+            where stage like '%DWH' and name like '%HTS_TESTED' and indicatorDate= EOMONTH(DATEADD(mm,-1,GETDATE()))
+            ),
+            EMR As (SELECT
+            Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
+                facilityCode
+                ,facilityName
+                ,[value]
+                ,statusDate
+                ,indicatorDate
+            FROM livesync.dbo.indicator
+            where stage like '%EMR' and name like '%HTS_TESTED' and indicatorDate>= DATEADD(m, DATEDIFF(m, 0, GETDATE()), 0) 
+            ),
+            DHIS2_TxNew AS (
+                SELECT
+                    [SiteCode],
+                    [FacilityName],
+                    [County],
+                    Tested_Total,
+                    ReportMonth_Year
+                FROM [All_Staging_2016_2].[dbo].[FACT_HTS_DHIS2]
+                WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')."
+            ),
+            LatestDWH AS (Select
+                    NDW.facilityCode 
+                ,NDW.facilityName
+                ,CONVERT (varchar,NDW.[value] ) As DWHValue
+                ,NDW.statusDate
+                ,NDW.indicatorDate
+                from NDW
+                where Num=1
+                ),
+                LatestEMR AS (Select
+                    Emr.facilityCode 
+                ,Emr.facilityName
+                ,CONVERT (varchar,Emr.[value] ) As EMRValue
+                ,Emr.statusDate
+                ,Emr.indicatorDate
+                from EMR
+                where Num=1
+                )
+                Select
+                    coalesce (LatestDWH.facilityCode,LatestEMR.facilityCode ) As MFLCode,
+                    Coalesce (LatestDWH.facilityName,LatestEMR.facilityName) As FacilityName,
+                    --LatestDWH.CTPartner,
+                    --NDW.County,
+                    DHIS2_TxNew.Tested_Total As KHIS_Value,
+                    LatestDWH.DWHValue AS DWHValue,
+                    LatestEMR.EMRValue As EMRValue,
+                    DHIS2_TxNew.Tested_Total-DWHValue As DiffKHISDWH,
+                    DHIS2_TxNew.Tested_Total-LatestEMR.EMRValue As DiffKHISEMR,
+                CAST(ROUND((CAST(DHIS2_TxNew.Tested_Total AS DECIMAL(7,2)) - CAST(DWHValue AS DECIMAL(7,2)))
+                    /CAST(DHIS2_TxNew.Tested_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_DWH,
+                    CAST(ROUND((CAST(DHIS2_TxNew.Tested_Total AS DECIMAL(7,2)) - CAST(LatestEMR.EMRValue AS DECIMAL(7,2)))
+                    /CAST(DHIS2_TxNew.Tested_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_EMR,
+                    CAST(ROUND((CAST(LatestEMR.EMRValue AS DECIMAL(7,2)) - CAST(DWHValue AS DECIMAL(7,2)))
+                    /CAST(NULLIF(LatestEMR.EMRValue, 0)  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_EMR_DWH
+                from LatestEMR
+                left join LatestDWH on LatestDWH.facilityCode=LatestEMR.facilityCode
+                left join DHIS2_TxNew on CONVERT (varchar,LatestEMR.facilityCode)=DHIS2_TxNew.SiteCode COLLATE Latin1_General_CI_AS";
+        $query_hts_pos = "With NDW AS (SELECT
+            Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
+                facilityCode
+                ,facilityName
+                ,[value]
+                ,statusDate
+                ,indicatorDate
+            FROM livesync.dbo.indicator
+            where stage like '%DWH' and name like '%HTS_TESTED_POS' and indicatorDate>= DATEADD(m, DATEDIFF(m, 0, GETDATE()), 0) 
+            ),
+            EMR As (SELECT
+            Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
+                facilityCode
+                ,facilityName
+                ,[value]
+                ,statusDate
+                ,indicatorDate
+            FROM livesync.dbo.indicator
+            where stage like '%EMR' and name like '%HTS_TESTED_POS' and indicatorDate= EOMONTH(DATEADD(mm,-1,GETDATE()))
+            ),
+            DHIS2_TxNew AS (
+                SELECT
+                    [SiteCode],
+                    [FacilityName],
+                    [County],
+                    [Positive_Total],
+                    ReportMonth_Year
+                FROM [All_Staging_2016_2].[dbo].[FACT_HTS_DHIS2]
+                WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')."
+            ),
+            LatestDWH AS (Select
+                    NDW.facilityCode 
+                ,NDW.facilityName
+                ,CONVERT (varchar,NDW.[value] ) As DWHValue
+                ,NDW.statusDate
+                ,NDW.indicatorDate
+                from NDW
+                where Num=1
+                ),
+            LatestEMR AS (Select
+                    Emr.facilityCode 
+                ,Emr.facilityName
+                ,CONVERT (varchar,Emr.[value] ) As EMRValue
+                ,Emr.statusDate
+                ,Emr.indicatorDate
+                from EMR
+                where Num=1
+                )
+            Select
+                    coalesce (LatestDWH.facilityCode,LatestEMR.facilityCode ) As MFLCode,
+                    Coalesce (LatestDWH.facilityName,LatestEMR.facilityName) As FacilityName,
+                    --LatestDWH.CTPartner,
+                    --NDW.County,
+                    DHIS2_TxNew.Positive_Total As KHIS_Value,
+                    LatestDWH.DWHValue AS DWHValue,
+                    LatestEMR.EMRValue As EMRValue,
+                    DHIS2_TxNew.Positive_Total-DWHValue As DiffKHISDWH,
+                    DHIS2_TxNew.Positive_Total-LatestEMR.EMRValue As DiffKHISEMR,
+                CAST(ROUND((CAST(DHIS2_TxNew.Positive_Total AS DECIMAL(7,2)) - CAST(DWHValue AS DECIMAL(7,2)))
+                    /CAST(DHIS2_TxNew.Positive_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_DWH,
+                    CAST(ROUND((CAST(DHIS2_TxNew.Positive_Total AS DECIMAL(7,2)) - CAST(LatestEMR.EMRValue AS DECIMAL(7,2)))
+                    /CAST(DHIS2_TxNew.Positive_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_EMR,
+                    CAST(ROUND((CAST(LatestEMR.EMRValue AS DECIMAL(7,2)) - CAST(DWHValue AS DECIMAL(7,2)))
+                    /CAST(NULLIF(LatestEMR.EMRValue, 0)  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_EMR_DWH
+                from LatestEMR
+                left join LatestDWH on LatestDWH.facilityCode=LatestEMR.facilityCode
+                left join DHIS2_TxNew on CONVERT (varchar,LatestEMR.facilityCode)=DHIS2_TxNew.SiteCode COLLATE Latin1_General_CI_AS";
         
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         $table = DB::connection('sqlsrv')->select(DB::raw($query_txcurr));
         $table2 = DB::connection('sqlsrv')->select(DB::raw($query_txnew));
+        $table3 = DB::connection('sqlsrv')->select(DB::raw($query_hts_tested));
+        $table3 = DB::connection('sqlsrv')->select(DB::raw($query_hts_pos));
 
         $jsonDecoded = json_decode(json_encode($table), true); 
         $fh = fopen(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv', 'w');
@@ -746,6 +882,58 @@ class MainController extends Controller
             }
         }
         fclose($fh);
+        
+        $jsonDecoded = json_decode(json_encode($table3), true); 
+        $fh = fopen(__DIR__ .'/../../../storage/fileout_Triangulation_HTSTEST'.$reportingMonth.'.csv', 'w');
+        if (is_array($jsonDecoded)) {
+            $counter = 0;
+            foreach ($jsonDecoded as $line) {
+                // sets the header row
+                if($counter == 0){
+                    $header = array_keys($line);
+                    fputcsv($fh, $header);
+                }
+                $counter++;
+
+                // sets the data row
+                foreach ($line as $key => $value) {
+                    if ($value) {
+                        $line[$key] = $value;
+                    }
+                }
+                // add each row to the csv file
+                if (is_array($line)) {
+                    fputcsv($fh,$line);
+                }
+            }
+        }
+        fclose($fh);
+        
+        $jsonDecoded = json_decode(json_encode($table3), true); 
+        $fh = fopen(__DIR__ .'/../../../storage/fileout_Triangulation_HTSPOS'.$reportingMonth.'.csv', 'w');
+        if (is_array($jsonDecoded)) {
+            $counter = 0;
+            foreach ($jsonDecoded as $line) {
+                // sets the header row
+                if($counter == 0){
+                    $header = array_keys($line);
+                    fputcsv($fh, $header);
+                }
+                $counter++;
+
+                // sets the data row
+                foreach ($line as $key => $value) {
+                    if ($value) {
+                        $line[$key] = $value;
+                    }
+                }
+                // add each row to the csv file
+                if (is_array($line)) {
+                    fputcsv($fh,$line);
+                }
+            }
+        }
+        fclose($fh);
 
         // Send the email
         Mail::send('reports.partner.reports',
@@ -759,6 +947,8 @@ class MainController extends Controller
                 // attach the csv file
                 $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv');
                 $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv');
+                $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSTEST'.$reportingMonth.'.csv');
+                $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSPOS'.$reportingMonth.'.csv');
             });
         return "DONE";
     }
