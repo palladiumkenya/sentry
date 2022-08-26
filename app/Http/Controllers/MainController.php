@@ -148,22 +148,34 @@ class MainController extends Controller
                 }
                 fclose($fh);
                 $ct_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='CT'  COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+                $ct_expected_partner_ll = "select * from portaldev.expected_uploads where docket='CT'  COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
                 $ct_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='CT' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+                $ct_recency_partner_ll = "select * from portaldev.recency_uploads where docket='CT' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
                 
                 $hts_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='HTS' COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+                $hts_expected_partner_ll = "select * from portaldev.expected_uploads where docket='HTS' COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
                 $hts_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='HTS' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+                $hts_recency_partner_ll = "select * from portaldev.recency_uploads where docket='HTS' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
                 
                 config(['database.connections.mysql.database' => 'portaldev']);
                 $ct_expected = DB::connection('mysql')->select(DB::raw($ct_expected_partner))[0];
                 $ct_recency = DB::connection('mysql')->select(DB::raw($ct_recency_partner))[0];
                 $hts_expected = DB::connection('mysql')->select(DB::raw($hts_expected_partner))[0];
                 $hts_recency = DB::connection('mysql')->select(DB::raw($hts_recency_partner))[0];
+                $ct_expected_ll = DB::connection('mysql')->select(DB::raw($ct_expected_partner_ll));
+                $ct_recency_ll = DB::connection('mysql')->select(DB::raw($ct_recency_partner_ll));
+                $hts_expected_ll = DB::connection('mysql')->select(DB::raw($hts_expected_partner_ll));
+                $hts_recency_ll = DB::connection('mysql')->select(DB::raw($hts_recency_partner_ll));
                 
 
                 $ct_per = $ct_recency->totalrecency * 100 / $ct_expected->totalexpected ;
                 $hts_per = $hts_recency->totalrecency *100 / $hts_expected->totalexpected;
                 // return $hts_per;
                 $this->GenerateSDPTXCurrReport($partner->partner);
+                $this->CreateCSV(__DIR__ .'/../../../storage/fileout_ct_expected_line_list_'.$reportingMonth.'.csv', $ct_expected_ll);
+                $this->CreateCSV(__DIR__ .'/../../../storage/fileout_hts_expected_line_list_'.$reportingMonth.'.csv', $hts_expected_ll);
+                $this->CreateCSV(__DIR__ .'/../../../storage/fileout_ct_recency_line_list_'.$reportingMonth.'.csv', $ct_recency_ll);
+                $this->CreateCSV(__DIR__ .'/../../../storage/fileout_hts_recency_line_list_'.$reportingMonth.'.csv', $hts_recency_ll);
 
                 
                 if (count($contacts) !== 0) {
@@ -184,7 +196,11 @@ class MainController extends Controller
                             $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "lousa.yogo@thepalladiumgroup.com","koske.kimutai@thepalladiumgroup.com"]);
                             // attach the csv covid file
                             $message->attach(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv');
-                            $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TXCURR_'.$reportingMonth.$partner->partner.'.csv');
+                            // $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TXCURR_'.$reportingMonth.$partner->partner.'.csv');
+                            $message->attach(__DIR__ .'/../../../storage/fileout_hts_recency_line_list_'.$reportingMonth.'.csv');
+                            $message->attach(__DIR__ .'/../../../storage/fileout_ct_recency_line_list_'.$reportingMonth.'.csv');
+                            $message->attach(__DIR__ .'/../../../storage/fileout_hts_expected_line_list_'.$reportingMonth.'.csv');
+                            $message->attach(__DIR__ .'/../../../storage/fileout_ct_expected_line_list_'.$reportingMonth.'.csv');
                         });
                     return;
                 }
@@ -1101,5 +1117,35 @@ class MainController extends Controller
         fclose($fh);
 
         return ;
+    }
+
+    public function CreateCSV($name, $data){
+        
+        $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
+        $jsonDecoded = json_decode(json_encode($data), true); 
+        $fh = fopen($name, 'w');
+        if (is_array($jsonDecoded)) {
+            $counter = 0;
+            foreach ($jsonDecoded as $line) {
+                // sets the header row
+                if($counter == 0){
+                    $header = array_keys($line);
+                    fputcsv($fh, $header);
+                }
+                $counter++;
+
+                // sets the data row
+                foreach ($line as $key => $value) {
+                    if ($value) {
+                        $line[$key] = $value;
+                    }
+                }
+                // add each row to the csv file
+                if (is_array($line)) {
+                    fputcsv($fh,$line);
+                }
+            }
+        }
+        fclose($fh);
     }
 }
