@@ -249,7 +249,7 @@ class MainController extends Controller
                     CTPartner,
                     count(*) as no_ovc_0_17_yrs
                 from PortalDev.dbo.Fact_Trans_New_Cohort
-                where ARTOutcome = 'V'
+                where TXCurr=1
                     and CTAgency = 'CDC'
                     and ageLV between 0 and 17
                     and OVCEnrollmentDate is not null
@@ -276,7 +276,7 @@ class MainController extends Controller
                     and documented_viral_loads_last_12.PatientPK = cohort.PatientPK
                     and documented_viral_loads_last_12.SiteCode = cohort.MFLCode
                 where ageLV between 0 and 17
-                    and ARTOutcome = 'V'
+                    and TXCurr=1
                     and CTAgency = 'CDC'
                 group by MFLCode, FacilityName, CTPartner, County
             ), documented_regimen_0_19_yrs as (
@@ -288,7 +288,7 @@ class MainController extends Controller
                         count(*) as no_txcurr_0_19_yrs_documented_regimen
                 from PortalDev.dbo.Fact_Trans_New_Cohort as cohort
                 where ageLV between 0 and 19
-                    and ARTOutcome = 'V'
+                    and TXCurr=1
                     and CTAgency = 'CDC'
                 group by MFLCode, FacilityName, CTPartner, County
             ),
@@ -364,7 +364,7 @@ class MainController extends Controller
                 CTAgency,
                 Count (*)PaedsTXCurr
             from PortalDev.dbo.Fact_Trans_New_Cohort
-            where ageLV between 0 and 19  and CTAgency ='CDC' and ARTOutcome='V'
+            where ageLV between 0 and 19  and CTAgency ='CDC' and TXCurr=1
             group by
                 MFLCode,
                 FacilityName,
@@ -381,7 +381,7 @@ class MainController extends Controller
                 CTAgency,
                 Count (*)Females15TXCurr
             from PortalDev.dbo.Fact_Trans_New_Cohort
-            where ageLV >=15 and CTAgency ='CDC' and ARTOutcome='V' and Gender='Female'
+            where ageLV >=15 and CTAgency ='CDC' and TXCurr=1 and Gender='Female'
             group by
                 MFLCode,
                 FacilityName,
@@ -396,13 +396,16 @@ class MainController extends Controller
                 Cohort.County,
                 Cohort.CTPartner,
                 Cohort.CTAgency,
-                Count (*)PaedsListed
+                Count (Distinct concat(ContactPatientPK,Sitecode))PaedsListed
             FROM [All_Staging_2016_2].[dbo].[stg_ContactListing] listing 
             inner join PortalDev.dbo.Fact_Trans_New_Cohort Cohort on
             listing.PatientID=Cohort.PatientID and
             listing.PatientPK=Cohort.PatientPK and
             listing.SiteCode=Cohort.MFLCode
             where ContactAge<15
+                    and cohort.Gender = 'Female'
+                    and cohort.ageLV >= 15
+                    and cohort.TXCurr =1
             Group by
                 MFLCode,
                 Coalesce (listing.FacilityName,Cohort.FacilityName),
@@ -417,7 +420,7 @@ class MainController extends Controller
                 Cohort.County,
                 Cohort.CTPartner,
                 Cohort.CTAgency,
-                Count (*)PaedsTested
+                Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsTested
             FROM [All_Staging_2016_2].[dbo].[stg_ContactListing] listing 
             inner join PortalDev.dbo.Fact_Trans_New_Cohort Cohort on
             listing.PatientID=Cohort.PatientID and
@@ -427,6 +430,9 @@ class MainController extends Controller
             listing.ContactPatientPK=tests.PatientPk and
             listing.SiteCode=tests.SiteCode
             where ContactAge<15
+                    and cohort.Gender = 'Female'
+                    and cohort.ageLV >= 15
+                    and cohort.TXCurr = 1
             Group by
                 MFLCode,
                 Coalesce (listing.FacilityName,Cohort.FacilityName),
@@ -449,7 +455,6 @@ class MainController extends Controller
                     ELSE NULL END AS MMDStatus
                 from PortalDev.dbo.Fact_Trans_New_Cohort as cohort
                 where ageLV between 0 and 19
-                    and ARTOutcome = 'V'
                     and CTAgency = 'CDC'
             ),
             PaedsOnMMD AS (Select
@@ -1018,8 +1023,6 @@ class MainController extends Controller
             });
         return "DONE";
     }
-
-
 
     public function GenerateSDPTXCurrReport($partner)
     {
