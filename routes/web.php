@@ -379,9 +379,9 @@ Route::get('/email/start', function () {
     return;
 });
 
-Route::get('/dqa', [MainController::class, 'DQAReport']);
+Route::get('/dqa/{email}', [MainController::class, 'DQAReport']);
 
-Route::get('/peads', [MainController::class, 'PeadAlert']);
+Route::get('/peads/{email}', [MainController::class, 'PeadAlert']);
 
-Route::get('/data_triangulation', [MainController::class, 'DataTriangulation']);
-Route::get('/nupi', [MainController::class, 'NUPIAlert']);
+Route::get('/data_triangulation/{email}', [MainController::class, 'DataTriangulation']);
+Route::get('/nupi/{email}', [MainController::class, 'NUPIAlert']);

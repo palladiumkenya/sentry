@@ -943,11 +943,11 @@ cellspacing="0" width="100%" border="0">
  <div class="v-text-align" style="color: #ffffff; line-height: 140%; text-align: left; word-wrap: break-word;">
  <p style="font-size: 14px; line-height: 140%; text-align: center;">If you have any
 questions, feel free message us at help@palladiumgroup.on.spiceworks.com.</p>
-<p style="font-size: 14px; line-height: 140%; text-align: center;">All right reserved. Update
-email preferences or unsubscribe.</p>
+<p style="font-size: 14px; line-height: 140%; text-align: center;">If you wish to unsubscribe from this mailing list, please click <a href="{{$unsubscribe_url}}">Unsubscribe.</a></p>
 <p style="font-size: 14px; line-height: 140%; text-align: center;">+254 717 969471</p>
 <p style="font-size: 14px; line-height: 140%; text-align: center;">Nairobi, Kenya</p>
 <p style="font-size: 14px; line-height: 140%; text-align: center;">Terms of use | Privacy Policy</p>
+ <p style="font-size: 14px; line-height: 140%; text-align: center;">* Do not reply. This email address is for outgoing emails only.</p>
 <p style="font-size: 14px; line-height: 140%; text-align: center;"> </p>
  </div>
  </td>

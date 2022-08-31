@@ -18,8 +18,26 @@ use Carbon\Carbon;
 
 class MainController extends Controller
 {
+    private $test_emails = [
+        // "pascal.mwele@thepalladiumgroup.com", 
+        // "lavatsa.leon@thepalladiumgroup.com", 
+        // "andrine.njagi@thepalladiumgroup.com", 
+        // "evans.munene@thepalladiumgroup.com",
+        // "lousa.yogo@thepalladiumgroup.com",
+        // "nobert.mumo@thepalladiumgroup.com",
+        // "mary.gikura@thepalladiumgroup.com",
+        // "dennis.ndwiga@thepalladiumgroup.com",
+        // "paul.nthusi@thepalladiumgroup.com",
+        // "margaret.gichuhi@thepalladiumgroup.com",
+        // "mary.kilewe@thepalladiumgroup.com",
+        // "stephen.chege@thepalladiumgroup.com",
+        // "juliet.tangut@thepalladiumgroup.com",
+        // "koske.kimutai@thepalladiumgroup.com",
+        "charles.bett@thepalladiumgroup.com",
+        // "kennedy.muthoka@thepalladiumgroup.com"
+    ];
     //
-    public function DQAReport()
+    public function DQAReport($email)
     {
         $partners_query = "select count(facilityId) facilities, partner
             from PortalDev.dbo.all_EMRSites q 
@@ -176,9 +194,13 @@ class MainController extends Controller
                 $this->CreateCSV(__DIR__ .'/../../../storage/fileout_hts_expected_line_list_'.$reportingMonth.'.csv', $hts_expected_ll);
                 $this->CreateCSV(__DIR__ .'/../../../storage/fileout_ct_recency_line_list_'.$reportingMonth.'.csv', $ct_recency_ll);
                 $this->CreateCSV(__DIR__ .'/../../../storage/fileout_hts_recency_line_list_'.$reportingMonth.'.csv', $hts_recency_ll);
-
                 
-                if (count($contacts) !== 0) {
+
+                if($email = "Test") {
+                    $unsubscribe_url = str_replace(
+                            '{{email}}', $this->test_emails[0],
+                            nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+                        );
                     Mail::send('reports.partner.dqa',
                         [
                             'partner' => $partner,
@@ -186,6 +208,38 @@ class MainController extends Controller
                             'hts_per' => $hts_per,
                             'reportMonth' => Carbon::now()->subMonth()->format('M Y'),
                             'stale_num' => count($stale),//5,
+                            'unsubscribe_url' => $unsubscribe_url,
+                        ],
+                        function ($message) use (&$fh, &$emails, &$reportingMonth,&$partner) {
+                            // email configurations
+                            $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                            // email address of the recipients
+                            // $message->to($emails)->subject('DQA Report');
+                            $message->to($this->test_emails)->subject('DQA Report');
+                            // attach the csv covid file
+                            $message->attach(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv');
+                            // $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TXCURR_'.$reportingMonth.$partner->partner.'.csv');
+                            $message->attach(__DIR__ .'/../../../storage/fileout_hts_recency_line_list_'.$reportingMonth.'.csv');
+                            $message->attach(__DIR__ .'/../../../storage/fileout_ct_recency_line_list_'.$reportingMonth.'.csv');
+                            $message->attach(__DIR__ .'/../../../storage/fileout_hts_expected_line_list_'.$reportingMonth.'.csv');
+                            $message->attach(__DIR__ .'/../../../storage/fileout_ct_expected_line_list_'.$reportingMonth.'.csv');
+                        });
+                    return "Test sent!!";
+                    
+                }
+                else if (count($contacts) !== 0) {
+                    $unsubscribe_url = str_replace(
+                            '{{email}}', $contacts,
+                            nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+                        );
+                    Mail::send('reports.partner.dqa',
+                        [
+                            'partner' => $partner,
+                            'ct_per' => $ct_per,
+                            'hts_per' => $hts_per,
+                            'reportMonth' => Carbon::now()->subMonth()->format('M Y'),
+                            'stale_num' => count($stale),//5,
+                            'unsubscribe_url' => $unsubscribe_url,
                         ],
                         function ($message) use (&$fh, &$emails, &$reportingMonth,&$partner) {
                             // email configurations
@@ -226,7 +280,7 @@ class MainController extends Controller
         return "DONE";
     }
 
-    public function PeadAlert()
+    public function PeadAlert($email)
     {
         $query = "with otz_10_19_yrs as (
             select
@@ -569,24 +623,55 @@ class MainController extends Controller
         }
         fclose($fh);
 
-        // Send the email
-        Mail::send('reports.partner.topline',
-            [],
-            function ($message) use (&$fh, &$reportingMonth) {
-                // email configurations
-                $message->from('dwh@mg.kenyahmis.org', 'NDWH');
-                // email address of the recipients
-                $message->to(["kennedy.muthoka@thepalladiumgroup.com"])->subject('Paediatric Topline Indicators');
-                // $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com"]);
-                $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
-                // attach the csv covid file
-                $message->attach(__DIR__ .'/../../../storage/fileout_Paeds_'.$reportingMonth.'.csv');
-                $message->attach(__DIR__ .'/../../../storage/fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv');
-            });
-        return "DONE";
+        if($email = "Test") {
+            $unsubscribe_url = str_replace(
+                    '{{email}}', $this->test_emails[0],
+                    nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+                );
+            // Send the email
+            Mail::send('reports.partner.topline',
+                [
+                    'unsubscribe_url' => $unsubscribe_url
+                ],
+                function ($message) use (&$fh, &$reportingMonth) {
+                    // email configurations
+                    $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                    // email address of the recipients
+                    $message->to($this->test_emails)->subject('Paediatric Topline Indicators');
+                    // $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com"]);
+                    $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
+                    // attach the csv covid file
+                    $message->attach(__DIR__ .'/../../../storage/fileout_Paeds_'.$reportingMonth.'.csv');
+                    $message->attach(__DIR__ .'/../../../storage/fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv');
+                });
+            return "DONE";
+
+        }else{
+            $unsubscribe_url = str_replace(
+                    '{{email}}', "",
+                    nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+                );
+            // Send the email
+            Mail::send('reports.partner.topline',
+                [
+                    'unsubscribe_url' => $unsubscribe_url
+                ],
+                function ($message) use (&$fh, &$reportingMonth) {
+                    // email configurations
+                    $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                    // email address of the recipients
+                    $message->to(["kennedy.muthoka@thepalladiumgroup.com"])->subject('Paediatric Topline Indicators');
+                    // $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com"]);
+                    $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
+                    // attach the csv covid file
+                    $message->attach(__DIR__ .'/../../../storage/fileout_Paeds_'.$reportingMonth.'.csv');
+                    $message->attach(__DIR__ .'/../../../storage/fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv');
+                });
+            return "DONE";
+        }
     }
 
-    public function DataTriangulation()
+    public function DataTriangulation($email)
     {
         // Get previous Month and Year
         $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
@@ -956,25 +1041,54 @@ class MainController extends Controller
         }
         fclose($fh);
 
-        // Send the email
-        Mail::send('reports.partner.reports',
-            [],
-            function ($message) use (&$fh, &$reportingMonth) {
-                // email configurations
-                $message->from('dwh@mg.kenyahmis.org', 'NDWH');
-                // email address of the recipients
-                $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Data Triangulation Report');
-                $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
-                // attach the csv file
-                $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv');
-                $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv');
-                $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSTEST'.$reportingMonth.'.csv');
-                $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSPOS'.$reportingMonth.'.csv');
-            });
-        return "DONE";
+        if($email = "Test") {
+            $unsubscribe_url = str_replace(
+                    '{{email}}', $this->test_emails[0],
+                    nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+                );
+
+            // Send the email
+            Mail::send('reports.partner.reports',
+                ['unsubscribe_url' => $unsubscribe_url],
+                function ($message) use (&$fh, &$reportingMonth) {
+                    // email configurations
+                    $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                    // email address of the recipients
+                    $message->to($this->test_emails)->subject('Data Triangulation Report');
+                    // attach the csv file
+                    $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv');
+                    $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv');
+                    $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSTEST'.$reportingMonth.'.csv');
+                    $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSPOS'.$reportingMonth.'.csv');
+                });
+            return "DONE";
+        } else {
+            $unsubscribe_url = str_replace(
+                    '{{email}}', "",
+                    nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+                );
+
+            // Send the email
+            Mail::send('reports.partner.reports',
+                ['unsubscribe_url' => $unsubscribe_url],
+                function ($message) use (&$fh, &$reportingMonth) {
+                    // email configurations
+                    $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                    // email address of the recipients
+                    $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Data Triangulation Report');
+                    $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
+                    // attach the csv file
+                    $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv');
+                    $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv');
+                    $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSTEST'.$reportingMonth.'.csv');
+                    $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSPOS'.$reportingMonth.'.csv');
+                });
+            return "DONE";
+
+        }
     }
 
-    public function NUPIAlert()
+    public function NUPIAlert($email)
     {
         // Get previous Month and Year
         $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
@@ -1009,19 +1123,46 @@ class MainController extends Controller
         }
         fclose($fh);
 
-        // Send the email
-        Mail::send('reports.partner.reports',
-            [],
-            function ($message) use (&$fh, &$reportingMonth) {
-                // email configurations
-                $message->from('dwh@mg.kenyahmis.org', 'NDWH');
-                // email address of the recipients
-                $message->to(["charles.bett@thepalladiumgroup.com"])->subject('NUPI Report');
-                $message->cc(["charles.bett@thepalladiumgroup.com"]);
-                // attach the csv covid file
-                $message->attach(__DIR__ .'/../../../storage/fileout_NUPI_'.$reportingMonth.'.csv');
-            });
-        return "DONE";
+        if($email = "Test") {
+            $unsubscribe_url = str_replace(
+                    '{{email}}', $this->test_emails[0],
+                    nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+                );
+
+            // Send the email
+            Mail::send('reports.partner.reports',
+                ['unsubscribe_url' => $unsubscribe_url],
+                function ($message) use (&$fh, &$reportingMonth) {
+                    // email configurations
+                    $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                    // email address of the recipients
+                    $message->to($this->test_emails)->subject('NUPI Report');
+                    
+                    // attach the csv covid file
+                    $message->attach(__DIR__ .'/../../../storage/fileout_NUPI_'.$reportingMonth.'.csv');
+                });
+            return "DONE";
+        }else {
+            $unsubscribe_url = str_replace(
+                    '{{email}}', '',
+                    nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+                );
+
+            // Send the email
+            Mail::send('reports.partner.reports',
+                ['unsubscribe_url' => $unsubscribe_url],
+                function ($message) use (&$fh, &$reportingMonth) {
+                    // email configurations
+                    $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                    // email address of the recipients
+                    $message->to(["charles.bett@thepalladiumgroup.com"])->subject('NUPI Report');
+                    $message->cc(["charles.bett@thepalladiumgroup.com"]);
+                    // attach the csv covid file
+                    $message->attach(__DIR__ .'/../../../storage/fileout_NUPI_'.$reportingMonth.'.csv');
+                });
+            return "DONE";
+
+        }
     }
 
     public function GenerateSDPTXCurrReport($partner)
