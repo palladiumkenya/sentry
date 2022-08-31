@@ -1048,7 +1048,7 @@ class MainController extends Controller
                 );
 
             // Send the email
-            Mail::send('reports.partner.reports',
+            Mail::send('reports.partner.triangulation',
                 ['unsubscribe_url' => $unsubscribe_url],
                 function ($message) use (&$fh, &$reportingMonth) {
                     // email configurations
@@ -1069,7 +1069,7 @@ class MainController extends Controller
                 );
 
             // Send the email
-            Mail::send('reports.partner.reports',
+            Mail::send('reports.partner.triangulation',
                 ['unsubscribe_url' => $unsubscribe_url],
                 function ($message) use (&$fh, &$reportingMonth) {
                     // email configurations
