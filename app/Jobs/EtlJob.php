@@ -50,12 +50,12 @@ class EtlJob implements ShouldQueue
             });
         });
 
-        $partners = Partner::get();
-        PartnerMetric::truncate();
+        // $partners = Partner::get();
+        // PartnerMetric::truncate();
 
-        foreach ($partners as $partner) {
-            GenerateFacilityMetricsReport::dispatchNow($etlJob, $partner);
-        }
+        // foreach ($partners as $partner) {
+        //     GenerateFacilityMetricsReport::dispatchNow($etlJob, $partner);
+        // }
 
 //        if ($partner) {
 //            SendEtlCompletedEmail::dispatchNow($partner, $etlJob, Facility::where('etl', true)->pluck('id'));

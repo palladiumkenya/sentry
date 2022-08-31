@@ -28,8 +28,8 @@ class GetIndicatorValues implements ShouldQueue
     {
         $this->indicator = $indicator;
         $this->period = is_null($period) ?
-            now()->startOf('month')->sub(1, 'month')->endOf('month')->endOfDay() :
-            Carbon::parse($period)->endOf('month')->endOfDay();
+            now()->startOf('month')->sub(1, 'month')->endOf('month')->startOf('day') :
+            Carbon::parse($period)->endOf('month');
         $this->facilities = $facilities;
     }
 
@@ -82,15 +82,15 @@ class GetIndicatorValues implements ShouldQueue
             default:
                 $this->getHtsTested($this->period, $this->facilities);
                 $this->getHtsTestedPos($this->period, $this->facilities);
-                $this->getHtsLinked($this->period, $this->facilities);
-                $this->getHtsIndex($this->period, $this->facilities);
+                // $this->getHtsLinked($this->period, $this->facilities);
+                // $this->getHtsIndex($this->period, $this->facilities);
                 $this->getHtsIndexPos($this->period, $this->facilities);
                 $this->getTxNew($this->period, $this->facilities);
                 $this->getTxCurr($this->period, $this->facilities);
                 // $this->getTxRtt($this->period, $this->facilities);
                 // $this->getTxMl($this->period, $this->facilities);
-                $this->getTxPvls($this->period, $this->facilities);
-                $this->getMmd($this->period, $this->facilities);
+                // $this->getTxPvls($this->period, $this->facilities);
+                // $this->getMmd($this->period, $this->facilities);
                 $this->getRetentionOnArt12Months($this->period, $this->facilities);
                 // $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
         }
