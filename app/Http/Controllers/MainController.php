@@ -639,7 +639,6 @@ class MainController extends Controller
                     $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                     // email address of the recipients
                     $message->to($this->test_emails)->subject('Paediatric Topline Indicators');
-                    // $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com"]);
                     $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
                     // attach the csv covid file
                     $message->attach(__DIR__ .'/../../../storage/fileout_Paeds_'.$reportingMonth.'.csv');
