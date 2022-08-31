@@ -510,6 +510,7 @@ class MainController extends Controller
                 from PortalDev.dbo.Fact_Trans_New_Cohort as cohort
                 where ageLV between 0 and 19
                     and CTAgency = 'CDC'
+                    and ARTOutcome='V'
             ),
             PaedsOnMMD AS (Select
                         MFLCode,
