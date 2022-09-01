@@ -498,12 +498,9 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                             </div>
                         </div>
                     </div>
-                    <div class="u-row-container v-row-background-image--outer" style="padding:
-0px;background-color: #ffffff">
-                        <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color:
-transparent;">
-                            <div class="v-row-background-image--inner" style="border-collapse: collapse;display:
-table;width: 100%;height: 100%;background-color: transparent;">
+                    <div class="u-row-container v-row-background-image--outer" style="padding:0px;background-color: #ffffff">
+                        <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color:transparent;">
+                            <div class="v-row-background-image--inner" style="border-collapse: collapse;display:table;width: 100%;height: 100%;background-color: transparent;">
                                 <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0"
 border="0"><tr><td class="v-row-background-image--outer" style="padding:
 0px;background-color: #ffffff;" align="center"><table cellpadding="0" cellspacing="0"

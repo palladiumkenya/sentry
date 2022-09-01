@@ -370,6 +370,28 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                                                 </p>
                                                                 
                                                                 <p style="font-size: 14px; line-height: 140%;"> </p>
+                                                                <p>
+                                                                    <strong>otz_10_19_yrs</strong> - these are the no. of patients who are TXCurr between age 10 (inclusive) to 19 (inclusive) who are recorded as enrolled into the OTZ program<br/>
+
+                                                                    <strong>ovc_0_17_yrs</strong> - these are the no. of patients who are TXCurr between age 17 (inclusive)  and below who are recorded as enrolled into the OVC program<br/>
+
+                                                                    <strong>txcurr_0_19_yrs_valid_vl_12_months</strong> -  these are the no. of patients who are TXCurr between between age 19 (inclusive) and below who have a documented VL within the last 12 months from the end of the previous reporting month<br/>
+
+                                                                    <strong>documented_regimen_0_19_yrs</strong> -  these are the no. of patients who are TXCurr , with age between 19 (inclusive) and below who have a documented regimen as of last visit<br/>
+
+                                                                    <strong>documented_weight_last_2_visits</strong> -  these are the no. of patients who are TXCurr , with age between  19 (inclusive) and below who have a documented weight in either the last visit or second last visit<br/>
+
+                                                                    <strong>Paeds</strong> - these are the no. of patients who are TXCurr  with age between 19 (inclusive) and below<br/>
+
+                                                                    <strong>FemaleAdults</strong> - these are the no. of patients who are TXCurr, are Female and have age greater than 15 (inclusive) and above<br/>
+
+                                                                    <strong>PaedsListed</strong> - these are the the no. of patients who less than 15 years elicited from female patients who are TXCurr and have age greater than 15 (inclusive) and above<br/>
+
+                                                                    <strong>PaedsTested</strong> - these are the no. of tested patients who are less than 15 years and were elicited from female patients - who are TXCurr and have age greater than 15 (inclusive) and above<br/>
+
+                                                                    <strong>PaedsOnMMD</strong> - these are the no. of patients who are TXCurr between age 19 (inclusive) and below whose MMD is more than 84 (inclusive) days<br/>
+                                                                </p>
+                                                                <p style="font-size: 14px; line-height: 140%;"> </p>
                                                                 <p style="font-size: 14px; line-height: 140%;">Kind
                                                                     Regards,</p>
                                                                 <p style="font-size: 14px; line-height: 140%;"> </p>
