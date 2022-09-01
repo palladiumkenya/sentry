@@ -369,8 +369,9 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                                                     style="font-size: 14px; line-height: 140%; text-align: justify;">
                                                                 </p>
                                                                 
-                                                                <p style="font-size: 14px; line-height: 140%;"> </p>
-                                                                <p>
+                                                                <p style="font-size: 14px; line-height: 140%;"> </p><br/><br/>
+                                                                <p style="font-size: 14px; line-height: 140%; text-align: justify;">
+                                                                <h6>Indicator Notes:</h6> <br/>
                                                                     <strong>otz_10_19_yrs</strong> - these are the no. of patients who are TXCurr between age 10 (inclusive) to 19 (inclusive) who are recorded as enrolled into the OTZ program<br/>
 
                                                                     <strong>ovc_0_17_yrs</strong> - these are the no. of patients who are TXCurr between age 17 (inclusive)  and below who are recorded as enrolled into the OVC program<br/>
