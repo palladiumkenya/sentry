@@ -19,22 +19,23 @@ use Carbon\Carbon;
 class MainController extends Controller
 {
     private $test_emails = [
-        "pascal.mwele@thepalladiumgroup.com", 
-        "lavatsa.leon@thepalladiumgroup.com", 
-        "andrine.njagi@thepalladiumgroup.com", 
-        "evans.munene@thepalladiumgroup.com",
-        "lousa.yogo@thepalladiumgroup.com",
-        "nobert.mumo@thepalladiumgroup.com",
-        "mary.gikura@thepalladiumgroup.com",
-        "dennis.ndwiga@thepalladiumgroup.com",
-        "paul.nthusi@thepalladiumgroup.com",
-        "margaret.gichuhi@thepalladiumgroup.com",
-        "mary.kilewe@thepalladiumgroup.com",
-        "stephen.chege@thepalladiumgroup.com",
-        "juliet.tangut@thepalladiumgroup.com",
-        "koske.kimutai@thepalladiumgroup.com",
+        // "pascal.mwele@thepalladiumgroup.com", 
+        // "lavatsa.leon@thepalladiumgroup.com", 
+        // "andrine.njagi@thepalladiumgroup.com", 
+        // "evans.munene@thepalladiumgroup.com",
+        // "lousa.yogo@thepalladiumgroup.com",
+        // "nobert.mumo@thepalladiumgroup.com",
+        // "mary.gikura@thepalladiumgroup.com",
+        // "dennis.ndwiga@thepalladiumgroup.com",
+        // "paul.nthusi@thepalladiumgroup.com",
+        // "margaret.gichuhi@thepalladiumgroup.com",
+        // "mary.kilewe@thepalladiumgroup.com",
+        // "stephen.chege@thepalladiumgroup.com",
+        // "juliet.tangut@thepalladiumgroup.com",
+        // "koske.kimutai@thepalladiumgroup.com",
         "charles.bett@thepalladiumgroup.com",
-        "kennedy.muthoka@thepalladiumgroup.com"
+        "cbrianbet@gmail.com",
+        // "kennedy.muthoka@thepalladiumgroup.com"
     ];
     //
     public function DQAReport($email)
@@ -215,9 +216,8 @@ class MainController extends Controller
                                 // email configurations
                                 $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                                 // email address of the recipients
-                                // $message->to($emails)->subject('DQA Report');
                                 $message->to([$test])->subject('DQA Report');
-                                // attach the csv covid file
+                                // attach the csv  file
                                 $message->attach(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv');
                                 // $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TXCURR_'.$reportingMonth.$partner->partner.'.csv');
                                 $message->attach(__DIR__ .'/../../../storage/fileout_hts_recency_line_list_'.$reportingMonth.'.csv');
@@ -251,7 +251,7 @@ class MainController extends Controller
                             // $message->to($emails)->subject('DQA Report');
                             $message->to(["charles.bett@thepalladiumgroup.com"])->subject('DQA Report');
                             $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "lousa.yogo@thepalladiumgroup.com","koske.kimutai@thepalladiumgroup.com"]);
-                            // attach the csv covid file
+                            // attach the csv file
                             $message->attach(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv');
                             // $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TXCURR_'.$reportingMonth.$partner->partner.'.csv');
                             $message->attach(__DIR__ .'/../../../storage/fileout_hts_recency_line_list_'.$reportingMonth.'.csv');
@@ -1085,7 +1085,7 @@ class MainController extends Controller
                     $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                     // email address of the recipients
                     $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Data Triangulation Report');
-                    $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
+                    // $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
                     // attach the csv file
                     $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv');
                     $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv');
