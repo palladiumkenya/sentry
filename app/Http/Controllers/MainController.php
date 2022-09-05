@@ -235,7 +235,7 @@ class MainController extends Controller
                         Received.Received
                         from Combined
                         left join Received on Combined.MFLCode=Received.Code
-                        where Received<ExpectedPatients and CTPartner = " . $partner->partner;
+                        where Received<ExpectedPatients and CTPartner = '" . $partner->partner ."'";
                 
 
                 $incomplete_up = DB::connection('sqlsrv')->select(DB::raw($incomplete_up_query));
