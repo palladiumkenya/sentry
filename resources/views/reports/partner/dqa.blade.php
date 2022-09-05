@@ -507,7 +507,7 @@ line-height: 19.6px; color: #2314c6; text-decoration: underline;"><a href="https
                 style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Raleway',sans-serif;" align="left">
             
                 <div class="v-text-align" style="line-height: 140%; text-align: left; word-wrap: breakword;">
-                    <p style="font-size: 14px; line-height: 140%; text-align: center;">5</p>
+                    <p style="font-size: 14px; line-height: 140%; text-align: center;">{{$incomplete_up}}</p>
                 </div>
             </td>
             <td class="v-container-padding-padding"

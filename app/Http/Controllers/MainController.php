@@ -140,6 +140,7 @@ class MainController extends Controller
                 
                 $stale = DB::connection('sqlsrv')->select(DB::raw($stale_query));
                 // $stale = [];
+
                 $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
                 $jsonDecoded = json_decode(json_encode($stale), true); 
                 $fh = fopen(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv', 'w');
@@ -166,6 +167,104 @@ class MainController extends Controller
                     }
                 }
                 fclose($fh);
+                
+                $incomplete_up_query = "With Uploads as (
+                    Select  [DateRecieved],ROW_NUMBER()OVER(Partition by Sitecode Order by [DateRecieved] Desc) as Num ,
+                        SiteCode,
+                        cast( [DateRecieved]as date) As DateReceived,
+                        Emr,
+                        Name,
+                        Start,
+                        PatientCount
+                    from DWAPICentral.dbo.FacilityManifest 
+                    where cast  (DateRecieved as date)> DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE())-1, 0) --First day of previous month
+                    and cast (DateRecieved as date) <= DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1) --Last Day of previous month
+
+                    ),
+                    LatestUploads AS (
+                    Select 
+                        SiteCode,
+                        cast( [DateRecieved]as date) As DateReceived,
+                        Emr,
+                        Name,
+                        Start,
+                        PatientCount
+                    from Uploads
+                    where Num=1
+                    ),
+
+                    Received As (
+                    Select distinct 
+                        Fac.Code,
+                        fac.Name,
+                    Count (*) As Received
+                    FROM [DWAPICentral].[dbo].[PatientExtract](NoLock) Patient
+                    INNER JOIN [DWAPICentral].[dbo].[Facility](NoLock) Fac ON Patient.[FacilityId] = Fac.Id AND Fac.Voided=0 and Fac.Code>0
+                    group by 
+                        Fac.Code,
+                        fac.Name
+                        ),
+                    Facilities AS (
+                    Select distinct
+                        MFLCode,
+                        FacilityName,
+                        CTPartner,
+                        CTAgency
+                    from PortalDev.dbo.Fact_Trans_New_Cohort
+                    ),
+
+                    Combined AS (
+                    Select distinct
+                        MFLCode,
+                        FacilityName,
+                        CTPartner,
+                        CTAgency,
+                        LatestUploads.DateReceived,
+                        LatestUploads.PatientCount As ExpectedPatients
+                        from Facilities
+                        left join LatestUploads on Facilities.MFLCode=LatestUploads.SiteCode
+                        
+                    )
+                    Select 
+                        MFLCode,
+                        FacilityName,
+                        CTPartner,
+                        CTAgency,
+                        DateReceived,
+                        ExpectedPatients,
+                        Received.Received
+                        from Combined
+                        left join Received on Combined.MFLCode=Received.Code
+                        where Received<ExpectedPatients and CTPartner = " . $partner->partner;
+                
+
+                $incomplete_up = DB::connection('sqlsrv')->select(DB::raw($incomplete_up_query));
+                $jsonDecoded = json_decode(json_encode($incomplete_up), true); 
+                $fh = fopen(__DIR__ .'/../../../storage/fileout_Incomplete_Uploads_'.$reportingMonth.'.csv', 'w');
+                if (is_array($jsonDecoded)) {
+                    $counter = 0;
+                    foreach ($jsonDecoded as $line) {
+                        // sets the header row
+                        if($counter == 0){
+                            $header = array_keys($line);
+                            fputcsv($fh, $header);
+                        }
+                        $counter++;
+
+                        // sets the data row
+                        foreach ($line as $key => $value) {
+                            if ($value) {
+                                $line[$key] = $value;
+                            }
+                        }
+                        // add each row to the csv file
+                        if (is_array($line)) {
+                            fputcsv($fh,$line);
+                        }
+                    }
+                }
+                fclose($fh);
+
                 $ct_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='CT'  COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
                 $ct_expected_partner_ll = "select * from portaldev.expected_uploads where docket='CT'  COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
                 $ct_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='CT' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
@@ -211,6 +310,7 @@ class MainController extends Controller
                                 'reportMonth' => Carbon::now()->subMonth()->format('M Y'),
                                 'stale_num' => count($stale),//5,
                                 'unsubscribe_url' => $unsubscribe_url,
+                                'incomplete_up' => $incomplete_up
                             ],
                             function ($message) use (&$fh, &$emails, &$reportingMonth,&$partner, &$test) {
                                 // email configurations
@@ -224,6 +324,7 @@ class MainController extends Controller
                                 $message->attach(__DIR__ .'/../../../storage/fileout_ct_recency_line_list_'.$reportingMonth.'.csv');
                                 $message->attach(__DIR__ .'/../../../storage/fileout_hts_expected_line_list_'.$reportingMonth.'.csv');
                                 $message->attach(__DIR__ .'/../../../storage/fileout_ct_expected_line_list_'.$reportingMonth.'.csv');
+                                $message->attach(__DIR__ .'/../../../storage/fileout_Incomplete_Uploads_'.$reportingMonth.'.csv');
                             });
                     
                     }
@@ -243,6 +344,7 @@ class MainController extends Controller
                             'reportMonth' => Carbon::now()->subMonth()->format('M Y'),
                             'stale_num' => count($stale),//5,
                             'unsubscribe_url' => $unsubscribe_url,
+                            'incomplete_up' => count($incomplete_up)
                         ],
                         function ($message) use (&$fh, &$emails, &$reportingMonth,&$partner) {
                             // email configurations
@@ -702,7 +804,7 @@ class MainController extends Controller
                 ,statusDate
                 ,indicatorDate
             FROM livesync.dbo.indicator
-            where stage like '%EMR' and name like '%TX_CURR' and indicatorDate= EOMONTH(DATEADD(mm,-1,GETDATE()))
+            where stage like '%EMR' and name like '%TX_CURR' and indicatorDate= EOMONTH(DATEADD(mm,-2,GETDATE()))
             ),
             DHIS2_CurTx AS (
                 SELECT
@@ -712,7 +814,7 @@ class MainController extends Controller
                     [CurrentOnART_Total],
                     ReportMonth_Year
                 FROM [All_Staging_2016_2].[dbo].[FACT_CT_DHIS2]
-                WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')."
+                WHERE ReportMonth_Year = ".Carbon::now()->subMonth(2)->format('Ym')."
             ),
             LatestEMR AS (Select
                     Emr.facilityCode 
