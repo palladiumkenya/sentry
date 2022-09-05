@@ -310,7 +310,7 @@ class MainController extends Controller
                                 'reportMonth' => Carbon::now()->subMonth()->format('M Y'),
                                 'stale_num' => count($stale),//5,
                                 'unsubscribe_url' => $unsubscribe_url,
-                                'incomplete_up' => $incomplete_up
+                                'incomplete_up' => count($incomplete_up)
                             ],
                             function ($message) use (&$fh, &$emails, &$reportingMonth,&$partner, &$test) {
                                 // email configurations
