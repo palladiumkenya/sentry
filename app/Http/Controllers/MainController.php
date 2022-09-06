@@ -140,8 +140,8 @@ class MainController extends Controller
                     left join HIS_Implementation.dbo.ALL_EMRSites EMRSites on EMRSites.MFL_Code=summary.FacilityCode
                     where proportion < 0.5 and SDP = '".$partner->partner."'";
                 
-                // $stale = DB::connection('sqlsrv')->select(DB::raw($stale_query));
-                $stale = [];
+                $stale = DB::connection('sqlsrv')->select(DB::raw($stale_query));
+                // $stale = [];
 
                 $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
                 $jsonDecoded = json_decode(json_encode($stale), true); 
@@ -240,8 +240,8 @@ class MainController extends Controller
                         where Received<ExpectedPatients and CTPartner = '" . $partner->partner ."'";
                 
 
-                // $incomplete_up = DB::connection('sqlsrv')->select(DB::raw($incomplete_up_query));
-                $incomplete_up = [];
+                $incomplete_up = DB::connection('sqlsrv')->select(DB::raw($incomplete_up_query));
+                // $incomplete_up = [];
                 $jsonDecoded = json_decode(json_encode($incomplete_up), true); 
                 $fh = fopen(__DIR__ .'/../../../storage/fileout_Incomplete_Uploads_'.$reportingMonth.'.csv', 'w');
                 if (is_array($jsonDecoded)) {
