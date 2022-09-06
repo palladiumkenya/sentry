@@ -563,8 +563,8 @@ class GetIndicatorValues implements ShouldQueue
     {
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         $fetched = [];
-        DB::connection('sqlsrv')->table('FACT_ART_Retention731')
-            ->selectRaw('MFLCode as facility_code, SUM(m12_Last12MVLSup) as value')
+        DB::connection('sqlsrv')->table('FACT_Trans_Retention')
+            ->selectRaw('MFLCode as facility_code, sum (12Mstatus) as value')
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
             ->where('StartYear', $period->format('Y'))
