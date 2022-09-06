@@ -7,12 +7,14 @@ use App\Models\Facility;
 use App\Models\EtlJob;
 use App\Models\Partner;
 use App\Models\PartnerMetric;
+use App\Exports\DQAExport;
 
 use App\Jobs\GenerateFacilityMetricsReport;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 
 use Carbon\Carbon;
 
@@ -138,8 +140,8 @@ class MainController extends Controller
                     left join HIS_Implementation.dbo.ALL_EMRSites EMRSites on EMRSites.MFL_Code=summary.FacilityCode
                     where proportion < 0.5 and SDP = '".$partner->partner."'";
                 
-                $stale = DB::connection('sqlsrv')->select(DB::raw($stale_query));
-                // $stale = [];
+                // $stale = DB::connection('sqlsrv')->select(DB::raw($stale_query));
+                $stale = [];
 
                 $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
                 $jsonDecoded = json_decode(json_encode($stale), true); 
@@ -238,7 +240,8 @@ class MainController extends Controller
                         where Received<ExpectedPatients and CTPartner = '" . $partner->partner ."'";
                 
 
-                $incomplete_up = DB::connection('sqlsrv')->select(DB::raw($incomplete_up_query));
+                // $incomplete_up = DB::connection('sqlsrv')->select(DB::raw($incomplete_up_query));
+                $incomplete_up = [];
                 $jsonDecoded = json_decode(json_encode($incomplete_up), true); 
                 $fh = fopen(__DIR__ .'/../../../storage/fileout_Incomplete_Uploads_'.$reportingMonth.'.csv', 'w');
                 if (is_array($jsonDecoded)) {
@@ -284,6 +287,10 @@ class MainController extends Controller
                 $ct_recency_ll = DB::connection('mysql')->select(DB::raw($ct_recency_partner_ll));
                 $hts_expected_ll = DB::connection('mysql')->select(DB::raw($hts_expected_partner_ll));
                 $hts_recency_ll = DB::connection('mysql')->select(DB::raw($hts_recency_partner_ll));
+                // dd($hts_expected_ll);
+                
+
+                Excel::store(new DQAExport([$stale, $incomplete_up, $hts_recency_ll, $ct_recency_ll, $ct_expected_ll, $hts_expected_ll]), 'fileout_DQA_'.$reportingMonth.'.xlsx');
                 
 
                 $ct_per = $ct_recency->totalrecency * 100 / $ct_expected->totalexpected ;
@@ -297,11 +304,13 @@ class MainController extends Controller
                 
 
                 if($email = "Test") {
+                    
                     foreach ($this->test_emails as $test){
                         $unsubscribe_url = str_replace(
                                 '{{email}}', $test,
                                 nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
                             );
+                        // Send the email
                         Mail::send('reports.partner.dqa',
                             [
                                 'partner' => $partner,
@@ -316,15 +325,15 @@ class MainController extends Controller
                                 // email configurations
                                 $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                                 // email address of the recipients
-                                $message->to([$test])->subject('DQA Report');
+                                $message->to($test)->subject('DQA Report');
                                 // attach the csv  file
-                                $message->attach(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv');
+                                // $message->attach(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv');
                                 // $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TXCURR_'.$reportingMonth.$partner->partner.'.csv');
-                                $message->attach(__DIR__ .'/../../../storage/fileout_hts_recency_line_list_'.$reportingMonth.'.csv');
-                                $message->attach(__DIR__ .'/../../../storage/fileout_ct_recency_line_list_'.$reportingMonth.'.csv');
-                                $message->attach(__DIR__ .'/../../../storage/fileout_hts_expected_line_list_'.$reportingMonth.'.csv');
-                                $message->attach(__DIR__ .'/../../../storage/fileout_ct_expected_line_list_'.$reportingMonth.'.csv');
-                                $message->attach(__DIR__ .'/../../../storage/fileout_Incomplete_Uploads_'.$reportingMonth.'.csv');
+                                $message->attach(__DIR__ .'/../../../storage/app/fileout_DQA_'.$reportingMonth.'.xlsx');
+                                // $message->attach(__DIR__ .'/../../../storage/fileout_ct_recency_line_list_'.$reportingMonth.'.csv');
+                                // $message->attach(__DIR__ .'/../../../storage/fileout_hts_expected_line_list_'.$reportingMonth.'.csv');
+                                // $message->attach(__DIR__ .'/../../../storage/fileout_ct_expected_line_list_'.$reportingMonth.'.csv');
+                                // $message->attach(__DIR__ .'/../../../storage/fileout_Incomplete_Uploads_'.$reportingMonth.'.csv');
                             });
                     
                     }
