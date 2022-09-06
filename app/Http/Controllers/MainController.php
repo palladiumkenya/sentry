@@ -804,7 +804,7 @@ class MainController extends Controller
                 ,statusDate
                 ,indicatorDate
             FROM livesync.dbo.indicator
-            where stage like '%EMR' and name like '%TX_CURR' and indicatorDate= EOMONTH(DATEADD(mm,-2,GETDATE()))
+            where stage like '%EMR' and name like '%TX_CURR' and indicatorDate= EOMONTH(DATEADD(mm,-1,GETDATE()))
             ),
             DHIS2_CurTx AS (
                 SELECT
@@ -814,7 +814,7 @@ class MainController extends Controller
                     [CurrentOnART_Total],
                     ReportMonth_Year
                 FROM [All_Staging_2016_2].[dbo].[FACT_CT_DHIS2]
-                WHERE ReportMonth_Year = ".Carbon::now()->subMonth(2)->format('Ym')."
+                WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')."
             ),
             LatestEMR AS (Select
                     Emr.facilityCode 

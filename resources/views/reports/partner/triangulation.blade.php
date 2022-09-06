@@ -477,6 +477,93 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <div class="u-row-container v-row-background-image--outer" style="padding:0px;background-color: #ffffff">
+                                                                    <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflowwrap: break-word;word-wrap: break-word;word-break: break-word;background-color:transparent;">
+                                                                        <div class="v-row-background-image--inner" style="border-collapse: collapse;display:table;width: 100%;height: 100%;background-color: transparent;">
+                                                                        <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0"
+                                                                        border="0"><tr><td class="v-row-background-image--outer" style="padding:
+                                                                        0px;background-color: #ffffff;" align="center"><table cellpadding="0" cellspacing="0"
+                                                                        border="0" style="width:600px;"><tr class="v-row-background-image--inner"
+                                                                        style="background-color: transparent;"><![endif]-->
+
+                                                                        <!--[if (mso)|(IE)]><td align="center" width="600" style="background-color: #ffffff;width:
+                                                                        600px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid
+                                                                        transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;borderradius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+                                                                            <div class="u-col u-col-100" style="max-width: 320px;min-width: 600px;display: tablecell;vertical-align: top;">
+                                                                                <div style="background-color: #ffffff;height: 100%;width: 100% !important;border-radius:0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+                                                                                    <!--[if (!mso)&(!IE)]><!--><div style="height: 100%; padding: 0px;border-top: 0px solid
+                                                                                    transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;borderbottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius: 0px; -moz-borderradius: 0px;"><!--<![endif]-->
+
+                                                                                        <table style="font-family:'Raleway',sans-serif;" role="presentation" cellpadding="0"
+                                                                                        cellspacing="0" width="100%" border="0">
+                                                                                            <tbody>
+                                                                                                <tr>
+                                                                                                    <td class="v-container-padding-padding" style="overflow-wrap:break-word;wordbreak:break-word;padding:10px;font-family:'Raleway',sans-serif;" align="left">
+
+                                                                                                        <div class="v-text-align" style="line-height: 140%; text-align: left; word-wrap: breakword;">
+                                                                                                        <p style="font-size: 14px; line-height: 140%;">The calculation used to measure variance
+                                                                                                        between KenyaEMR and DWH is as follows:</p>
+                                                                                                        </div>
+                                                                                                    </td>
+                                                                                                </tr>
+                                                                                            </tbody>
+                                                                                        </table>
+                                                                                    <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+                                                                                </div>
+                                                                            </div>
+                                                                        <!--[if (mso)|(IE)]></td><![endif]-->
+                                                                        <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="u-row-container v-row-background-image--outer" style="padding:0px;background-color: #ffffff">
+                                                                    <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflowwrap: break-word;word-wrap: break-word;word-break: break-word;background-color:transparent;">
+                                                                        <div class="v-row-background-image--inner" style="border-collapse: collapse;display:table;width: 100%;height: 100%;background-color: transparent;">
+                                                                        <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0"
+                                                                        border="0"><tr><td class="v-row-background-image--outer" style="padding:
+                                                                        0px;background-color: #ffffff;" align="center"><table cellpadding="0" cellspacing="0"
+                                                                        border="0" style="width:600px;"><tr class="v-row-background-image--inner"
+                                                                        style="background-color: transparent;"><![endif]-->
+
+                                                                        <!--[if (mso)|(IE)]><td align="center" width="600" style="background-color: #ffffff;width:
+                                                                        600px;padding: 0px 0px 60px;border-top: 0px solid transparent;border-left: 0px solid
+                                                                        transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;borderradius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+                                                                            <div class="u-col u-col-100" style="max-width: 320px;min-width: 600px;display: tablecell;vertical-align: top;">
+                                                                                <div style="background-color: #ffffff;height: 100%;width: 100% !important;border-radius:
+                                                                                0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
+                                                                                    <!--[if (!mso)&(!IE)]><!--><div style="height: 100%; padding: 0px 0px 60px;border-top:
+                                                                                    0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid
+                                                                                    transparent;border-bottom: 0px solid transparent;border-radius: 0px;-webkit-border-radius:
+                                                                                    0px; -moz-border-radius: 0px;"><!--<![endif]-->
+
+                                                                                        <table style="font-family:'Raleway',sans-serif;" role="presentation" cellpadding="0"
+                                                                                        cellspacing="0" width="100%" border="0">
+                                                                                            <tbody>
+                                                                                                <tr>
+                                                                                                    <td class="v-container-padding-padding" style="overflow-wrap:break-word;wordbreak:break-word;padding:10px;font-family:'Raleway',sans-serif;" align="left">
+
+                                                                                                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                                                                                            <tr>
+                                                                                                            <td class="v-text-align" style="padding-right: 0px;padding-left: 0px;" align="center">
+
+                                                                                                            <img align="center" border="0" src="https://assets.unlayer.com/projects/97186/1662385197220-EMR-&-DWHvariance.png" alt="" title="" style="outline: none;text-decoration: none;-ms-interpolationmode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float:
+                                                                                                            none;width: 100%;max-width: 267px;" width="267" class="v-src-width v-src-max-width"/>
+
+                                                                                                            </td>
+                                                                                                            </tr>
+                                                                                                        </table>
+                                                                                                    </td>
+                                                                                                </tr>
+                                                                                            </tbody>
+                                                                                        </table>
+                                                                                    <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+                                                                                </div>
+                                                                            </div>
+                                                                        <!--[if (mso)|(IE)]></td><![endif]-->
+                                                                        <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                                 <p style="font-size: 14px; line-height: 140%;"> </p>
                                                                 <p style="font-size: 14px; line-height: 140%;">Kind
                                                                     Regards,</p>
