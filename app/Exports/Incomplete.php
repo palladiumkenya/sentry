@@ -20,26 +20,30 @@ class Incomplete implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
     public function map($row): array
     {
         return [
-            $row->{'MFL Code'},
+            $row->FacilityCode,
             $row->FacilityName,
-            $row->CTPartner,
-            $row->CTAgency,
-            $row->DateReceived,
-            $row->ExpectedPatients,
-            $row->Received
+            $row->SDP,
+            $row->County,
+            $row->avg_visits,
+            $row->current_no_of_visits,
+            $row->DateUploaded,
+            $row->DateQueryExecuted,
+            $row->percentage_of_avg_visits
         ];
     }
 
     public function headings(): array
     {
         return [
-            'MFL Code',
-            'Facility',
-            'Agency',
-            'Partner',
-            'Date Received',
-            'Expected Patients',
-            'Received'
+            'Facility Code',
+            'Facility Name',
+            'SDP',
+            'County',
+            'AVG Visits',
+            'Current No of Visits',
+            'Date Uploaded',
+            'Date Query Executed',
+            '% of AVG Visits'
         ];
     }
 

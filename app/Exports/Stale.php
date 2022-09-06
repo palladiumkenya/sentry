@@ -20,30 +20,26 @@ class Stale implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithM
     public function map($row): array
     {
         return [
-            $row->FacilityCode,
+            $row->{'MFL Code'},
             $row->FacilityName,
-            $row->SDP,
-            $row->County,
-            $row->avg_visits,
-            $row->current_no_of_visits,
-            $row->DateUploaded,
-            $row->DateQueryExecuted,
-            $row->percentage_of_avg_visits
+            $row->CTPartner,
+            $row->CTAgency,
+            $row->DateReceived,
+            $row->ExpectedPatients,
+            $row->Received
         ];
     }
 
     public function headings(): array
     {
         return [
-            'Facility Code',
-            'Facility Name',
-            'SDP',
-            'County',
-            'AVG Visits',
-            'Current No of Visits',
-            'Date Uploaded',
-            'Date Query Executed',
-            '% of AVG Visits'
+            'MFL Code',
+            'Facility',
+            'Agency',
+            'Partner',
+            'Date Received',
+            'Expected Patients',
+            'Received'
         ];
     }
 
