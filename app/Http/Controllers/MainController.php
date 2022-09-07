@@ -675,7 +675,7 @@ class MainController extends Controller
                             SELECT DISTINCT ROW_NUMBER ( ) OVER (PARTITION BY FacilityId,docketId,Concat(Month(fm.timeId),'-', Year(fm.timeId)) ORDER BY (cast(fm.timeId as date)) desc) AS RowID,
                             FacilityId,docketId,fm.timeId, dt.year,dt.month FROM  portaldev.fact_manifest fm
                             inner join portaldev.dim_time dt on dt.timeId=fm.timeId
-                            where dt.year = ".Carbon::now()->subMonth()->format('Y')." and dt.month = ".Carbon::now()->subMonth()->format('m')."
+                            where dt.year = ".Carbon::now()->subMonth(3)->format('Y')." and dt.month = ".Carbon::now()->subMonth(3)->format('m')."
                 )u where RowId=1) f on f.facilityId=df.facilityId and df.docket=f.docketId) Y
                                 WHERE uploaddate is null and Agency = 'CDC'";
         
@@ -756,7 +756,7 @@ class MainController extends Controller
                         $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                         // email address of the recipients
                         $message->to($test)->subject('Paediatric Topline Indicators');
-                        $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
+                        // $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
                         // attach the csv covid file
                         $message->attach(__DIR__ .'/../../../storage/fileout_Paeds_'.$reportingMonth.'.csv');
                         $message->attach(__DIR__ .'/../../../storage/fileout_FacilitiesNotReporting_'.$reportingMonth.'.csv');
@@ -1196,7 +1196,7 @@ class MainController extends Controller
                     $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                     // email address of the recipients
                     $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Data Triangulation Report');
-                    // $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
+                    $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com"]);
                     // attach the csv file
                     $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv');
                     $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv');
