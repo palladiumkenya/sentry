@@ -34,9 +34,9 @@ class MainController extends Controller
         // "mary.kilewe@thepalladiumgroup.com",
         // "stephen.chege@thepalladiumgroup.com",
         // "juliet.tangut@thepalladiumgroup.com",
-        // "koske.kimutai@thepalladiumgroup.com",
+        "koske.kimutai@thepalladiumgroup.com",
         "charles.bett@thepalladiumgroup.com",
-        "cbrianbet@gmail.com",
+        // "cbrianbet@gmail.com",
         // "kennedy.muthoka@thepalladiumgroup.com"
     ];
     //
