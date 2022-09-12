@@ -8,6 +8,7 @@ use App\Models\EtlJob;
 use App\Models\Partner;
 use App\Models\PartnerMetric;
 use App\Exports\DQAExport;
+use App\Exports\TriangulationExport;
 
 use App\Jobs\GenerateFacilityMetricsReport;
 
@@ -34,7 +35,7 @@ class MainController extends Controller
         // "mary.kilewe@thepalladiumgroup.com",
         // "stephen.chege@thepalladiumgroup.com",
         // "juliet.tangut@thepalladiumgroup.com",
-        "koske.kimutai@thepalladiumgroup.com",
+        // "koske.kimutai@thepalladiumgroup.com",
         "charles.bett@thepalladiumgroup.com",
         // "cbrianbet@gmail.com",
         // "kennedy.muthoka@thepalladiumgroup.com"
@@ -376,9 +377,6 @@ class MainController extends Controller
         }
 
 
-
-
-
         // Send the email
         Mail::send('reports.partner.dqa',
             [],
@@ -675,7 +673,7 @@ class MainController extends Controller
                             SELECT DISTINCT ROW_NUMBER ( ) OVER (PARTITION BY FacilityId,docketId,Concat(Month(fm.timeId),'-', Year(fm.timeId)) ORDER BY (cast(fm.timeId as date)) desc) AS RowID,
                             FacilityId,docketId,fm.timeId, dt.year,dt.month FROM  portaldev.fact_manifest fm
                             inner join portaldev.dim_time dt on dt.timeId=fm.timeId
-                            where dt.year = ".Carbon::now()->subMonth(3)->format('Y')." and dt.month = ".Carbon::now()->subMonth(3)->format('m')."
+                            where dt.year = ".Carbon::now()->subMonth()->format('Y')." and dt.month = ".Carbon::now()->subMonth()->format('m')."
                 )u where RowId=1) f on f.facilityId=df.facilityId and df.docket=f.docketId) Y
                                 WHERE uploaddate is null and Agency = 'CDC'";
         
@@ -1049,11 +1047,20 @@ class MainController extends Controller
                 left join LatestDWH on LatestDWH.facilityCode=LatestEMR.facilityCode
                 left join DHIS2_TxNew on CONVERT (varchar,LatestEMR.facilityCode)=DHIS2_TxNew.SiteCode COLLATE Latin1_General_CI_AS";
         
+        $query_index_pos = "Select * from latest_facility_metrics_vw where IndicatorName = 'HTS_INDEX_POS'";
+        $query_retention_art_vl_1000 = "Select * from latest_facility_metrics_vw where IndicatorName = 'RETENTION_ON_ART_VL_1000_12_MONTHS'";
+        $query_retention_art_vl = "Select * from latest_facility_metrics_vw where IndicatorName = 'RETENTION_ON_ART_12_MONTHS'";
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         $table = DB::connection('sqlsrv')->select(DB::raw($query_txcurr));
         $table2 = DB::connection('sqlsrv')->select(DB::raw($query_txnew));
         $table3 = DB::connection('sqlsrv')->select(DB::raw($query_hts_tested));
         $table3 = DB::connection('sqlsrv')->select(DB::raw($query_hts_pos));
+
+        $index_pos = GetDataFromDB($query_index_pos, 'mysql', 'sentry');
+        $retention_art_vl_1000 = GetDataFromDB($query_retention_art_vl_1000, 'mysql', 'sentry');
+        $retention_art_vl = GetDataFromDB($query_retention_art_vl, 'mysql', 'sentry');
+        Excel::store(new TriangulationExport([$index_pos, $retention_art_vl, $retention_art_vl_1000]), 'fileout_Triangulation_'.$reportingMonth.'.xlsx');
+
 
         $jsonDecoded = json_decode(json_encode($table), true); 
         $fh = fopen(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv', 'w');
@@ -1179,6 +1186,7 @@ class MainController extends Controller
                         $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv');
                         $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSTEST'.$reportingMonth.'.csv');
                         $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSPOS'.$reportingMonth.'.csv');
+                        $message->attach(__DIR__ .'/../../../storage/app/fileout_Triangulation_'.$reportingMonth.'.xlsx');
                     });
             }
             return "DONE";
@@ -1202,6 +1210,7 @@ class MainController extends Controller
                     $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv');
                     $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSTEST'.$reportingMonth.'.csv');
                     $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_HTSPOS'.$reportingMonth.'.csv');
+                    $message->attach(__DIR__ .'/../../../storage/app/fileout_Triangulation_'.$reportingMonth.'.xlsx');
                 });
             return "DONE";
 
@@ -1285,6 +1294,13 @@ class MainController extends Controller
             return "DONE";
 
         }
+    }
+
+    public function EHealthAssessment($email)
+    {
+        $query = '';
+
+        SendEmail();
     }
 
     public function GenerateSDPTXCurrReport($partner)
@@ -1385,6 +1401,22 @@ class MainController extends Controller
         return ;
     }
 
+    public function SendEmail($report, $recepients, $cc = [], $attachments = [], $unsubscribe_url = '')
+    {
+        Mail::send($report,
+            ['unsubscribe_url' => $unsubscribe_url],
+            function ($message) use (&$fh, &$recepients, &$cc, &$attachments) {
+                // email configurations
+                $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                // email address of the recipients
+                $message->to($recepients)->subject('NUPI Report');
+                $message->cc($cc);
+                // attach the file
+                foreach($attachments as $attach)
+                    $message->attach($attach);
+            });
+    }
+
     public function CreateCSV($name, $data){
         
         $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
@@ -1413,5 +1445,14 @@ class MainController extends Controller
             }
         }
         fclose($fh);
+    }
+
+    public function GetDataFromDB($query = '', $connection = 'sqlsrv', $db = ''){
+        if ($connection == 'mysql'){
+            config(['database.connections.mysql.database' => $db]);
+        } else if ($connection == 'mssql'){
+            config(['database.connections.sqlsrv.database' => $db]);
+        }
+        return DB::connection($connection)->select(DB::raw($query));
     }
 }
