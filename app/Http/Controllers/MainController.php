@@ -1056,9 +1056,9 @@ class MainController extends Controller
         $table3 = DB::connection('sqlsrv')->select(DB::raw($query_hts_tested));
         $table3 = DB::connection('sqlsrv')->select(DB::raw($query_hts_pos));
 
-        $index_pos = GetDataFromDB($query_index_pos, 'mysql', 'sentry');
-        $retention_art_vl_1000 = GetDataFromDB($query_retention_art_vl_1000, 'mysql', 'sentry');
-        $retention_art_vl = GetDataFromDB($query_retention_art_vl, 'mysql', 'sentry');
+        $index_pos = $this->GetDataFromDB($query_index_pos, 'mysql', 'sentry');
+        $retention_art_vl_1000 = $this->GetDataFromDB($query_retention_art_vl_1000, 'mysql', 'sentry');
+        $retention_art_vl = $this->GetDataFromDB($query_retention_art_vl, 'mysql', 'sentry');
         Excel::store(new TriangulationExport([$index_pos, $retention_art_vl, $retention_art_vl_1000]), 'fileout_Triangulation_'.$reportingMonth.'.xlsx');
 
 
