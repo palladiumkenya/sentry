@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\MainController;
 use App\Models\EtlJob;
+use App\Models\EmailContacts;
 use App\Models\FacilityMetric;
 use App\Models\Facility;
 use App\Models\FacilityPartner;
@@ -249,18 +250,22 @@ Route::get('/email/covid', function () {
         }
     }
     fclose($fh);
+    $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'Covid')->pluck('email')->toArray(); 
+    $emails_cc = EmailContacts::where('is_cc', 1 )->where('list_subscribed', 'Covid')->pluck('email')->toArray(); 
 
     // Send the email
     Mail::send('reports.partner.covid',
         [],
-        function ($message) use (&$fh, &$reportingMonth) {
+        function ($message) use (&$fh, &$reportingMonth, &$emails, &$emails_cc) {
             // email configurations
             $message->from('dwh@mg.kenyahmis.org', 'NDWH');
             // email address of the recipients
-            $message->to(["bwkitungulu@gmail.com", "jmbindyo@yahoo.com"])->subject('Covid Report');
-            $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", 
-            "nobert.mumo@thepalladiumgroup.com", "pascal.mwele@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com", 
-            "lilian.taligoola@thepalladiumgroup.com", "benedette.otieno@thepalladiumgroup.com", "ann.kiwara@thepalladiumgroup.com"]);
+            $message->to($emails)->subject('Covid Report');
+            // $message->to(["bwkitungulu@gmail.com", "jmbindyo@yahoo.com"])->subject('Covid Report');
+            $message->cc([$emails_cc]); 
+            // $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", 
+            // "nobert.mumo@thepalladiumgroup.com", "pascal.mwele@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com", 
+            // "lilian.taligoola@thepalladiumgroup.com", "benedette.otieno@thepalladiumgroup.com", "ann.kiwara@thepalladiumgroup.com"]);
             // attach the csv covid file
             $message->attach('fileout_Covid_'.$reportingMonth.'.csv');
         });
@@ -385,3 +390,4 @@ Route::get('/peads/{email}', [MainController::class, 'PeadAlert']);
 
 Route::get('/data_triangulation/{email}', [MainController::class, 'DataTriangulation']);
 Route::get('/nupi/{email}', [MainController::class, 'NUPIAlert']);
+Route::get('/unsubscribe/{email}', [MainController::class, 'Unsubscribe']);

@@ -527,7 +527,7 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                                             <div class="v-text-align" style="color: #ffffff; line-height: 140%; text-align: left; word-wrap: break-word;">
                                                                 <p style="font-size: 14px; line-height: 140%; text-align: center;">If you have any
                                                                 questions, feel free message us at help@palladiumgroup.on.spiceworks.com.</p>
-                                                                <p style="font-size: 14px; line-height: 140%; text-align: center;">If you wish to unsubscribe from this mailing list, please click <a href="{{$unsubscribe_url}}">Unsubscribe.</a></p>
+                                                                <!-- <p style="font-size: 14px; line-height: 140%; text-align: center;">If you wish to unsubscribe from this mailing list, please click <a href="">Unsubscribe.</a></p> -->
                                                                 <p style="font-size: 14px; line-height: 140%; text-align: center;">+254 717 969471</p>
                                                                 <p style="font-size: 14px; line-height: 140%; text-align: center;">Nairobi, Kenya</p>
                                                                 <p style="font-size: 14px; line-height: 140%; text-align: center;">Terms of use | Privacy Policy</p>

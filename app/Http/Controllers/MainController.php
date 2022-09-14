@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Facility;
 use App\Models\EtlJob;
 use App\Models\Partner;
+use App\Models\EmailContacts;
 use App\Models\PartnerMetric;
 use App\Exports\DQAExport;
 use App\Exports\TriangulationExport;
@@ -305,8 +306,9 @@ class MainController extends Controller
                 
 
                 if($email = "Test") {
+                    $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'DQA')->pluck('email')->toArray(); 
                     
-                    foreach ($this->test_emails as $test){
+                    foreach ($emails as $test){
                         $unsubscribe_url = str_replace(
                                 '{{email}}', $test,
                                 nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
@@ -394,7 +396,7 @@ class MainController extends Controller
 
     public function PeadAlert($email)
     {
-        $query = "with otz_10_19_yrs as (
+        $query = "WITH otz_10_19_yrs as (
             select
                 MFLCode,
                 FacilityName,
@@ -739,7 +741,9 @@ class MainController extends Controller
         fclose($fh);
 
         if($email = "Test") {
-            foreach ($this->test_emails as $test){
+            $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'Paeds')->pluck('email')->toArray(); 
+            
+            foreach ($emails as $test){
                 $unsubscribe_url = str_replace(
                         '{{email}}', $test,
                         nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
@@ -1049,7 +1053,7 @@ class MainController extends Controller
         
         $query_index_pos = "Select * from latest_facility_metrics_vw where IndicatorName = 'HTS_INDEX_POS'";
         $query_retention_art_vl_1000 = "Select * from latest_facility_metrics_vw where IndicatorName = 'RETENTION_ON_ART_VL_1000_12_MONTHS'";
-        $query_retention_art_vl = "Select * from latest_facility_metrics_vw where IndicatorName = 'RETENTION_ON_ART_12_MONTHS'";
+        $query_retention_art_vl = "SELECT * from latest_facility_metrics_vw where IndicatorName = 'RETENTION_ON_ART_12_MONTHS'";
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         $table = DB::connection('sqlsrv')->select(DB::raw($query_txcurr));
         $table2 = DB::connection('sqlsrv')->select(DB::raw($query_txnew));
@@ -1167,7 +1171,9 @@ class MainController extends Controller
         fclose($fh);
 
         if($email = "Test") {
-            foreach ($this->test_emails as $test){
+            $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'Triangulation')->pluck('email')->toArray(); 
+            
+            foreach ($emails as $test){
                 $unsubscribe_url = str_replace(
                     '{{email}}', $test,
                     nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
@@ -1323,7 +1329,9 @@ class MainController extends Controller
         fclose($fh);
 
         if($email = "Test") {
-            foreach ($this->test_emails as $test){
+            $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'Paeds')->pluck('email')->toArray(); 
+            
+            foreach ($emails as $test){
                 $unsubscribe_url = str_replace(
                     '{{email}}', $test,
                     nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
