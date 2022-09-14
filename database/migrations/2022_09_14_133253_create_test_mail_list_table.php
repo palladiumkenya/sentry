@@ -17,7 +17,7 @@ class CreateTestMailListTable extends Migration
             $table->id();
             $table->string('email')->nullable()->index();
             $table->string('name')->nullable();
-            $table->string('list_subscribed')->nullable();
+            $table->enum('list_subscribed', ['Paeds','Covid','DQA','NUPI','Triangulation'])->nullable();
             $table->boolean('is_main');
             $table->boolean('is_cc');
             $table->timestamps();
