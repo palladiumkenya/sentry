@@ -1221,10 +1221,80 @@ class MainController extends Controller
     {
         // Get previous Month and Year
         $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
-        $query = "";
+        $query = "with facilities_list as (
+                select 
+                    distinct 
+                    FacilityName,
+                    MFLCode,
+                    CTPartner,
+                    FileName as EMR
+                from PortalDev.dbo.Fact_Trans_New_Cohort    
+            ),
+            khis as (
+                select
+                    facilities_list.CTPartner as SDP,
+                    facilities_list.EMR,
+                    facilities_list.FacilityName,
+                    facilities_list.MFLCode,
+                    sum(CurrentOnART_Total) as TXCurr_khis
+                from All_Staging_2016_2.dbo.FACT_CT_DHIS2 as khis
+                inner join facilities_list on cast(facilities_list.MFLCode as nvarchar)= cast(khis.SiteCode as nvarchar)  collate Latin1_General_CI_AS
+                where ReportMonth_Year = '".Carbon::now()->subMonth(2)->format('Ym')."'
+                group by 
+                    facilities_list.CTPartner, 
+                    facilities_list.EMR, 
+                    facilities_list.FacilityName, 
+                    facilities_list.MFLCode
+            ),
+            nupi as (
+            select 
+                distinct PatientID as client_upn,
+                replace(ccc_no, '-' , '') as nupi_no,
+                FileName as EMR_Type,
+                FacilityName as Facility,
+                MFLCode,
+                CTPartner as SDIP,
+                CTAgency as Agency,
+                ARTOutcome as ARTOutcomeJuly2022
+            from tmp_and_adhoc.dbo.nupi_dataset_20220826 
+            inner join PortalDev.dbo.Fact_Trans_New_Cohort as cohort on  replace(ccc_no, '-' , '') = cohort.PatientID
+                and nupi_dataset_20220826.origin_facility_kmfl_code = cohort.MFLCode
+            ),
+            nupi_by_facility as (
+            select 
+                    SDIP,
+                    EMR_Type,
+                    Facility,
+                    MFLCode,
+                    count(*) as clients_with_nupi
+                from nupi
+                group by 
+                    SDIP, 
+                    EMR_Type, 
+                    Facility, 
+                    MFLCode
+            )
+            select
+                coalesce(khis.FacilityName,nupi_by_facility.Facility) as Facility,
+                coalesce(khis.MFLCode,nupi_by_facility.MFLCode) as MFLCode,
+                coalesce(khis.SDP, nupi_by_facility.SDIP) as SDIP,
+                coalesce(khis.EMR, nupi_by_facility.EMR_Type) as EMR,
+                sum(TXCurr_khis) as TXCurr_khis,
+                sum(clients_with_nupi) as clients_with_nupi,
+                round(cast(sum(clients_with_nupi) as float) / cast(sum(TXCurr_khis) as float), 2) * 100 as proportion_with_nupi_no
+            from nupi_by_facility 
+            full join khis on nupi_by_facility.SDIP = khis.SDP
+                and nupi_by_facility.EMR_Type = khis.EMR 
+                and nupi_by_facility.MFLCode =  khis.MFLCode
+            group by 
+                coalesce(khis.FacilityName,nupi_by_facility.Facility) ,
+                coalesce(khis.MFLCode,nupi_by_facility.MFLCode),
+                coalesce(khis.SDP, nupi_by_facility.SDIP),
+                coalesce(khis.EMR, nupi_by_facility.EMR_Type)
+            order by round(cast(sum(clients_with_nupi) as float) / cast(sum(TXCurr_khis) as float), 2) desc;";
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
-        // $table = DB::connection('sqlsrv')->select(DB::raw($query));
-        $table = [];
+        $table = DB::connection('sqlsrv')->select(DB::raw($query));
+        // $table = [];
 
         $jsonDecoded = json_decode(json_encode($table), true); 
         $fh = fopen(__DIR__ .'/../../../storage/fileout_NUPI_'.$reportingMonth.'.csv', 'w');
