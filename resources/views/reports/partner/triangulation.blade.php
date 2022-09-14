@@ -546,7 +546,7 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                                                                                             <tr>
                                                                                                             <td class="v-text-align" style="padding-right: 0px;padding-left: 0px;" align="center">
 
-                                                                                                            <img align="center" border="0" src="https://assets.unlayer.com/projects/97186/1662385197220-EMR-&-DWHvariance.png" alt="" title="" style="outline: none;text-decoration: none;-ms-interpolationmode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float:
+                                                                                                            <img align="center" border="0" src="{{$message->embed('EMR-&-DWH-variance.png')}}" alt="" title="" style="outline: none;text-decoration: none;-ms-interpolationmode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float:
                                                                                                             none;width: 100%;max-width: 267px;" width="267" class="v-src-width v-src-max-width"/>
 
                                                                                                             </td>
