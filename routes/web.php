@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\EmailController;
 use App\Models\EtlJob;
 use App\Models\EmailContacts;
 use App\Models\FacilityMetric;
@@ -347,8 +348,7 @@ Route::get('/email/comparison_txcurr', function () {
             $message->from('dwh@mg.kenyahmis.org', 'NDWH');
             // email address of the recipients
             $message->to(["mary.gikura@thepalladiumgroup.com"])->subject('Comparison Report');
-            // $message->cc(["npm1@cdc.gov", "mary.gikura@thepalladiumgroup.com", "kennedy.muthoka@thepalladiumgroup.com", "charles.bett@thepalladiumgroup.com", "Evans.Munene@thepalladiumgroup.com", "koske.kimutai@thepalladiumgroup.com"]);
-            // attach the csv covid file
+            // attach the csv file
             $message->attach('fileout_Comparison_'.$reportingMonth.'.csv');
         });
     return;
@@ -385,4 +385,5 @@ Route::get('/peads/{email}', [MainController::class, 'PeadAlert']);
 
 Route::get('/data_triangulation/{email}', [MainController::class, 'DataTriangulation']);
 Route::get('/nupi/{email}', [MainController::class, 'NUPIAlert']);
-Route::get('/unsubscribe/{email}', [MainController::class, 'Unsubscribe']);
+Route::get('/unsubscribe/{email}', [EmailController::class, 'Unsubscribe'])->name('Unsubscribe');
+Route::get('/resubscribe/{email}', [EmailController::class, 'Resubscribe'])->name('resubscribe');
