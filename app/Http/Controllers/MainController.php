@@ -54,11 +54,11 @@ class MainController extends Controller
         $partners = DB::connection('sqlsrv')->select(DB::raw($partners_query));
         if($email = "Test") {
             
-            $ct_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='CT'  COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
-            $ct_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='CT' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+            $ct_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='CT'  COLLATE utf8mb4_general_ci ";
+            $ct_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='CT' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m');
             
-            $hts_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='HTS' COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
-            $hts_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='HTS' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+            $hts_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='HTS' COLLATE utf8mb4_general_ci";
+            $hts_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='HTS' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m');
             
             config(['database.connections.mysql.database' => 'portaldev']);
             $ct_expected = DB::connection('mysql')->select(DB::raw($ct_expected_partner))[0];
