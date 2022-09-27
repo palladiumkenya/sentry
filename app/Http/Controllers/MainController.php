@@ -53,6 +53,22 @@ class MainController extends Controller
         //Partners 
         $partners = DB::connection('sqlsrv')->select(DB::raw($partners_query));
         if($email = "Test") {
+            
+            $ct_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='CT'  COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+            $ct_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='CT' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+            
+            $hts_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='HTS' COLLATE utf8mb4_general_ci and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+            $hts_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='HTS' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m')." and partner = '".$partner->partner."' COLLATE utf8mb4_general_ci";
+            
+            config(['database.connections.mysql.database' => 'portaldev']);
+            $ct_expected = DB::connection('mysql')->select(DB::raw($ct_expected_partner))[0];
+            $ct_recency = DB::connection('mysql')->select(DB::raw($ct_recency_partner))[0];
+            $hts_expected = DB::connection('mysql')->select(DB::raw($hts_expected_partner))[0];
+            $hts_recency = DB::connection('mysql')->select(DB::raw($hts_recency_partner))[0];
+
+            $ct_per = $ct_recency->totalrecency * 100 / $ct_expected->totalexpected ;
+            $hts_per = $hts_recency->totalrecency *100 / $hts_expected->totalexpected;
+            
             $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'DQA')->pluck('email')->toArray(); 
             $stale_query= "with clean_data as (
                         select 
