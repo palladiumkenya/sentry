@@ -340,7 +340,7 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                                                     <strong><span
                                                                             style="font-family: 'Playfair Display', serif; font-size: 16px; line-height: 25.6px;"><span
                                                                                 style="line-height: 25.6px; font-size: 16px;">
-                                                                                Hello {{ $partner->partner }}!
+                                                                                Hello {{ !empty($partner->partner) ? $partner->partner:'' }}!
                                                                             </span></span></strong></p>
                                                                 <p
                                                                     style="font-size: 14px; line-height: 160%; text-align: center;">
@@ -389,7 +389,7 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                         
                                                             <div class="v-text-align" style="line-height: 140%; text-align: left; word-wrap: breakword;">
                                                                 <p style="font-size: 14px; line-height: 140%; text-align: center;">
-                                                                    {{$partner->facilities}} Facilities</p>
+                                                                    {{!empty($partner->partner) ? $partner->partner:''}} Facilities</p>
                                                             </div>
                                                         </td>
                                                         <td class="v-container-padding-padding"
@@ -427,13 +427,13 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                                         <td class="v-container-padding-padding"
                                                             style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Raleway',sans-serif;"
                                                             align="left">
-                                        
+
                                                             <div class="v-text-align" style="line-height: 140%; text-align: left; word-wrap: breakword;">
                                                                 <p style="font-size: 14px; line-height: 140%; text-align: right;">
                                                                     <span style="text-decoration: underline; font-size: 14px; line-height: 19.6px;"><span
                                                                             style="font-size: 14px; line-height: 19.6px; color: #2314c6; text-decoration: underline;">
                                                                             <a
-                                                                                href="{{'https://dwh.nascop.org/#/reporting-rates/ct?partner='.$partner->partner}}">View</a>
+                                                                                href="{{'https://dwh.nascop.org/#/reporting-rates/ct?partner='.optional($partner)->partner}}">View</a>
                                                                         </span></span>
                                                                 </p>
                                                             </div>
@@ -467,7 +467,7 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                                                     <span style="text-decoration: underline; font-size: 14px; line-height: 19.6px;"><span
                                                                             style="font-size: 14px; line-height: 19.6px; color: #2314c6; text-decoration: underline;">
                                                                             <a
-                                                                                href="{{'https://dwh.nascop.org/#/reporting-rates/hts?partner='.$partner->partner}}">View</a>
+                                                                                href="{{'https://dwh.nascop.org/#/reporting-rates/hts?partner='.optional($partner)->partner}}">View</a>
                                                                         </span></span>
                                                                 </p>
                                                             </div>
@@ -532,7 +532,7 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                                                     <span style="text-decoration: underline; font-size: 14px; line-height: 19.6px;"><span
                                                                             style="font-size: 14px; line-height: 19.6px; color: #2314c6; text-decoration: underline;">
                                                                             <a
-                                                                                href="{{'https://spot.kenyahmis.org/#/?partner='.$partner->partner}}">View</a></span></span>
+                                                                                href="{{'https://spot.kenyahmis.org/#/?partner='.optional($partner)->partner}}">View</a></span></span>
                                                                 </p>
                                                             </div>
                                                         </td>
@@ -665,7 +665,7 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
                                                             align="left">
                                                             <div class="v-text-align" align="center">
                                                                 
-                                                                <a href="{{'https://dwh.nascop.org/#/?partner='.$partner->partner}}" target="_blank"
+                                                                <a href="{{'https://dwh.nascop.org/#/?partner='.optional($partner)->partner}}" target="_blank"
                                                                     class="v-size-width"
                                                                     style="box-sizing: border-box;display: inline-block;font-family:'Raleway',sans-serif;text-decoration:
                                         none;-webkit-text-size-adjust: none;text-align: center;color: #FFFFFF; background-color:
