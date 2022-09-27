@@ -287,7 +287,7 @@ class MainController extends Controller
                         'unsubscribe_url' => $unsubscribe_url,
                         'incomplete_up' => count($incomplete_up)
                     ],
-                    function ($message) use (&$fh, &$emails, &$reportingMonth,&$partner, &$test) {
+                    function ($message) use (&$fh, &$emails, &$reportingMonth, &$test) {
                         // email configurations
                         $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                         // email address of the recipients
