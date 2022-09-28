@@ -269,6 +269,223 @@ Route::get('/email/covid', function () {
 });
 
 Route::get('/email/comparison_txcurr', function () {
+    $ct_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='CT'  COLLATE utf8mb4_general_ci ";
+    $ct_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='CT' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m');
+    
+    $hts_expected_partner = "select sum(expected) as totalexpected from portaldev.expected_uploads where docket='HTS' COLLATE utf8mb4_general_ci";
+    $hts_recency_partner = "select sum(recency) as totalrecency from portaldev.recency_uploads where docket='HTS' COLLATE utf8mb4_general_ci and year=".Carbon::now()->subMonth()->format('Y')." and month=".Carbon::now()->subMonth()->format('m');
+    
+    config(['database.connections.mysql.database' => 'portaldev']);
+    $ct_expected = DB::connection('mysql')->select(DB::raw($ct_expected_partner))[0];
+    $ct_recency = DB::connection('mysql')->select(DB::raw($ct_recency_partner))[0];
+    $hts_expected = DB::connection('mysql')->select(DB::raw($hts_expected_partner))[0];
+    $hts_recency = DB::connection('mysql')->select(DB::raw($hts_recency_partner))[0];
+
+    $ct_per = $ct_recency->totalrecency * 100 / $ct_expected->totalexpected ;
+    $hts_per = $hts_recency->totalrecency *100 / $hts_expected->totalexpected;
+    
+    $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'DQA')->pluck('email')->toArray(); 
+    $stale_query= "with clean_data as (
+                select 
+                    distinct FacilityCode,
+                    FacilityName,
+                    visits,
+                    DateUploaded,
+                    DateQueryExecuted
+                from [DWHData Analytics].dbo.AllStaging_StgNumbers
+                where 
+                    FacilityCode is not null
+                    and DateUploaded is not null
+            ),
+            visits_per_facility_per_upload_date as (
+            /* get the latest facility and dateUploaded entry for each month */
+                select 
+                    FacilityCode,
+                    FacilityName,
+                    visits,
+                    DateUploaded,
+                    DateQueryExecuted,
+                    row_number() over (partition by FacilityCode, DateUploaded order by DateQueryExecuted desc) as rk
+                from clean_data
+            ),
+            facility_monthly_avg_visits as (
+                select
+                    FacilityCode,
+                    FacilityName,
+                    avg(visits) as avg_visits
+                from visits_per_facility_per_upload_date
+                where DateUploaded < dateadd(day, 1, eomonth(getdate(), -1)) /* ommit uploads done on the current month from avg computation */
+                    and rk = 1
+                group by 
+                    FacilityCode,
+                    FacilityName
+            ),
+            previous_month_facility_visits as (
+                select 
+                    FacilityCode,
+                    FacilityName,
+                    visits as no_of_visits,
+                    DateUploaded,
+                    DateQueryExecuted,
+                    row_number() over (partition by FacilityCode order by DateQueryExecuted desc) as rk
+                from clean_data
+            where DateUploaded > dateadd(day, 1, eomonth(getdate(), -1))  /* get only uploads from the beginning of current month */
+            ),
+            summary as (
+                select 
+                    facility_monthly_avg_visits.FacilityCode,
+                    facility_monthly_avg_visits.FacilityName,
+                    rk,
+                    facility_monthly_avg_visits.avg_visits,
+                    previous_month_facility_visits.no_of_visits,
+                    DateUploaded,
+                    DateQueryExecuted,
+                    round(cast(previous_month_facility_visits.no_of_visits as float)/cast(facility_monthly_avg_visits.avg_visits as float), 3) as proportion
+                from facility_monthly_avg_visits
+                left join previous_month_facility_visits ON previous_month_facility_visits.FacilityCode = facility_monthly_avg_visits.FacilityCode and rk = 1
+            )
+            select 
+                FacilityCode,
+                FacilityName,
+                SDP,
+                County,
+                avg_visits,
+                no_of_visits as current_no_of_visits,
+                DateUploaded,
+                DateQueryExecuted,
+                proportion * 100 as percentage_of_avg_visits
+            from summary
+            left join HIS_Implementation.dbo.ALL_EMRSites EMRSites on EMRSites.MFL_Code=summary.FacilityCode
+            where proportion < 0.5 ";
+        
+    $stale = DB::connection('sqlsrv')->select(DB::raw($stale_query));
+    // $stale = [];
+
+    $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
+    $jsonDecoded = json_decode(json_encode($stale), true); 
+    $fh = fopen(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv', 'w');
+    if (is_array($jsonDecoded)) {
+        $counter = 0;
+        foreach ($jsonDecoded as $line) {
+            // sets the header row
+            if($counter == 0){
+                $header = array_keys($line);
+                fputcsv($fh, $header);
+            }
+            $counter++;
+
+            // sets the data row
+            foreach ($line as $key => $value) {
+                if ($value) {
+                    $line[$key] = $value;
+                }
+            }
+            // add each row to the csv file
+            if (is_array($line)) {
+                fputcsv($fh,$line);
+            }
+        }
+    }
+    fclose($fh);
+    
+    $incomplete_up_query = "With Uploads as (
+        Select  [DateRecieved],ROW_NUMBER()OVER(Partition by Sitecode Order by [DateRecieved] Desc) as Num ,
+            SiteCode,
+            cast( [DateRecieved]as date) As DateReceived,
+            Emr,
+            Name,
+            Start,
+            PatientCount
+        from DWAPICentral.dbo.FacilityManifest 
+        where cast  (DateRecieved as date)> DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE())-1, 0) --First day of previous month
+        and cast (DateRecieved as date) <= DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1) --Last Day of previous month
+
+        ),
+        LatestUploads AS (
+        Select 
+            SiteCode,
+            cast( [DateRecieved]as date) As DateReceived,
+            Emr,
+            Name,
+            Start,
+            PatientCount
+        from Uploads
+        where Num=1
+        ),
+
+        Received As (
+        Select distinct 
+            Fac.Code,
+            fac.Name,
+        Count (*) As Received
+        FROM [DWAPICentral].[dbo].[PatientExtract](NoLock) Patient
+        INNER JOIN [DWAPICentral].[dbo].[Facility](NoLock) Fac ON Patient.[FacilityId] = Fac.Id AND Fac.Voided=0 and Fac.Code>0
+        group by 
+            Fac.Code,
+            fac.Name
+            ),
+        Facilities AS (
+        Select distinct
+            MFLCode,
+            FacilityName,
+            CTPartner,
+            CTAgency
+        from PortalDev.dbo.Fact_Trans_New_Cohort
+        ),
+
+        Combined AS (
+        Select distinct
+            MFLCode,
+            FacilityName,
+            CTPartner,
+            CTAgency,
+            LatestUploads.DateReceived,
+            LatestUploads.PatientCount As ExpectedPatients
+            from Facilities
+            left join LatestUploads on Facilities.MFLCode=LatestUploads.SiteCode
+            
+        )
+        Select 
+            MFLCode,
+            FacilityName,
+            CTPartner,
+            CTAgency,
+            DateReceived,
+            ExpectedPatients,
+            Received.Received
+            from Combined
+            left join Received on Combined.MFLCode=Received.Code
+            where Received<ExpectedPatients";
+    
+
+    $incomplete_up = DB::connection('sqlsrv')->select(DB::raw($incomplete_up_query));
+    // $incomplete_up = [];
+
+    $jsonDecoded = json_decode(json_encode($incomplete_up), true); 
+    $fh = fopen(__DIR__ .'/../../../storage/fileout_Incomplete_Uploads_'.$reportingMonth.'.csv', 'w');
+    if (is_array($jsonDecoded)) {
+        $counter = 0;
+        foreach ($jsonDecoded as $line) {
+            // sets the header row
+            if($counter == 0){
+                $header = array_keys($line);
+                fputcsv($fh, $header);
+            }
+            $counter++;
+
+            // sets the data row
+            foreach ($line as $key => $value) {
+                if ($value) {
+                    $line[$key] = $value;
+                }
+            }
+            // add each row to the csv file
+            if (is_array($line)) {
+                fputcsv($fh,$line);
+            }
+        }
+    }
+    fclose($fh);
     config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
     $table = DB::connection('sqlsrv')->select(DB::raw('With
         DHIS2_CurTx AS (
@@ -349,6 +566,8 @@ Route::get('/email/comparison_txcurr', function () {
             // email address of the recipients
             $message->to(["mary.gikura@thepalladiumgroup.com"])->subject('Comparison Report');
             // attach the csv file
+            $message->attach(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv');
+            $message->attach(__DIR__ .'/../../../storage/fileout_Incomplete_Uploads_'.$reportingMonth.'.csv');
             $message->attach('fileout_Comparison_'.$reportingMonth.'.csv');
         });
     return;
