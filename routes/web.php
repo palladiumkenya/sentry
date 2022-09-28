@@ -284,7 +284,6 @@ Route::get('/email/comparison_txcurr', function () {
     $ct_per = $ct_recency->totalrecency * 100 / $ct_expected->totalexpected ;
     $hts_per = $hts_recency->totalrecency *100 / $hts_expected->totalexpected;
     
-    $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'DQA')->pluck('email')->toArray(); 
     $stale_query= "with clean_data as (
                 select 
                     distinct FacilityCode,
