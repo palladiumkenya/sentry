@@ -362,7 +362,7 @@ Route::get('/email/comparison_txcurr', function () {
 
     $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
     $jsonDecoded = json_decode(json_encode($stale), true); 
-    $fh = fopen(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv', 'w');
+    $fh = fopen('fileout_StaleDBs_'.$reportingMonth.'.csv', 'w');
     if (is_array($jsonDecoded)) {
         $counter = 0;
         foreach ($jsonDecoded as $line) {
@@ -461,7 +461,7 @@ Route::get('/email/comparison_txcurr', function () {
     // $incomplete_up = [];
 
     $jsonDecoded = json_decode(json_encode($incomplete_up), true); 
-    $fh = fopen(__DIR__ .'/../../../storage/fileout_Incomplete_Uploads_'.$reportingMonth.'.csv', 'w');
+    $fh = fopen('fileout_Incomplete_Uploads_'.$reportingMonth.'.csv', 'w');
     if (is_array($jsonDecoded)) {
         $counter = 0;
         foreach ($jsonDecoded as $line) {
@@ -597,8 +597,8 @@ Route::get('/email/comparison_txcurr', function () {
             // email address of the recipients
             $message->to(["mary.gikura@thepalladiumgroup.com"])->subject('Comparison Report');
             // attach the csv file
-            $message->attach(__DIR__ .'/../../../storage/fileout_StaleDBs_'.$reportingMonth.'.csv');
-            $message->attach(__DIR__ .'/../../../storage/fileout_Incomplete_Uploads_'.$reportingMonth.'.csv');
+            $message->attach('fileout_StaleDBs_'.$reportingMonth.'.csv');
+            $message->attach('fileout_Incomplete_Uploads_'.$reportingMonth.'.csv');
             $message->attach('fileout_Comparison_'.$reportingMonth.'.csv');
         });
     return;
