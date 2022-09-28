@@ -487,47 +487,79 @@ Route::get('/email/comparison_txcurr', function () {
     }
     fclose($fh);
     config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
-    $table = DB::connection('sqlsrv')->select(DB::raw('With
-        DHIS2_CurTx AS (
-            SELECT
-                [SiteCode],
-                [FacilityName],
-                [County],
-                [CurrentOnART_Total],
-                ReportMonth_Year
-            FROM [All_Staging_2016_2].[dbo].[FACT_CT_DHIS2]
-            WHERE ReportMonth_Year = '.Carbon::now()->subMonth()->format('Ym').'
-        ),
-        NDW_CurTx AS (
-            SELECT
+    $table = DB::connection('sqlsrv')->select(DB::raw("WITH NDW_CurTx AS (
+                SELECT
+                    MFLCode,
+                    FacilityName,
+                    CTPartner,
+                    County,
+                    COUNT(DISTINCT CONCAT(PatientID, '-', PatientPK,'-',MFLCode)) AS CurTx_total
+                FROM PortalDev.dbo.Fact_Trans_New_Cohort
+                WHERE ARTOutcome = 'V'
+                GROUP BY MFLCode, FacilityName, CTPartner, County
+            ),
+            Upload As (
+            SELECT distinct
                 MFLCode,
-                FacilityName,
-                CTPartner,
-                COUNT(DISTINCT CONCAT(PatientID, \'-\', PatientPK,\'-\',MFLCode)) AS CurTx_total
-            FROM PortalDev.dbo.Fact_Trans_New_Cohort
-            WHERE ARTOutcome = \'V\'
-            GROUP BY MFLCode, FacilityName, CTPartner
-        ),
-        tbl AS (
-            SELECT
-                NDW_CurTx.MFLCode AS mfl_code,
-                NDW_CurTx .FacilityName AS facility_name,
-                DHIS2_CurTx.County AS county,
-                NDW_CurTx.CTPartner,
-                DHIS2_CurTx.ReportMonth_Year AS DHIS2_report_month_year,
-                DHIS2_CurTx.CurrentOnART_Total AS count_dhis2,
-                NDW_CurTx .CurTx_total AS count_ndw,
-                DHIS2_CurTx.CurrentOnART_Total - NDW_CurTx .CurTx_total AS \'dhis2 - ndw\',
+                FacName As FacilityName,
+                [CT Partner],
+                SiteAbstractionDate,
+                DateUploaded
+                from All_Staging_2016_2.dbo.Cohort2015_2016
+            ),
+            EMR As (SELECT
+            Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
+                facilityCode
+                ,facilityName
+                ,[value]
+                ,statusDate
+                ,indicatorDate
+            FROM livesync.dbo.indicator
+            where stage like '%EMR' and name like '%TX_CURR' and indicatorDate= EOMONTH(DATEADD(mm,-1,GETDATE()))
+            ),
+            DHIS2_CurTx AS (
+                SELECT
+                    [SiteCode],
+                    [FacilityName],
+                    [County],
+                    [CurrentOnART_Total],
+                    ReportMonth_Year
+                FROM [All_Staging_2016_2].[dbo].[FACT_CT_DHIS2]
+                WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')."
+            ),
+            LatestEMR AS (Select
+                    Emr.facilityCode 
+                ,Emr.facilityName
+                ,CONVERT (varchar,Emr.[value] ) As EMRValue
+                ,Emr.statusDate
+                ,Emr.indicatorDate
+                from EMR
+                where Num=1
+                )
+            Select
+                    coalesce (NDW_CurTx.MFLCode,LatestEMR.facilityCode ) As MFLCode,
+                    Coalesce (NDW_CurTx.FacilityName,LatestEMR.facilityName) As FacilityName,
+                    NDW_CurTx.CTPartner,
+                    NDW_CurTx.County,
+                    DHIS2_CurTx.CurrentOnART_Total As KHIS_TxCurr,
+                    NDW_CurTx.CurTx_total AS DWH_TXCurr,
+                    LatestEMR.EMRValue As EMR_TxCurr,
+                    LatestEMR.EMRValue-CurTx_total As Diff_EMR_DWH,
+                    DHIS2_CurTx.CurrentOnART_Total-CurTx_total As DiffKHISDWH,
+                    DHIS2_CurTx.CurrentOnART_Total-LatestEMR.EMRValue As DiffKHISEMR,
+                CAST(ROUND((CAST(LatestEMR.EMRValue AS DECIMAL(7,2)) - CAST(NDW_CurTx .CurTx_total AS DECIMAL(7,2)))
+                    /NULLIF(CAST(LatestEMR.EMRValue  AS DECIMAL(7,2)),0)* 100, 2) AS float) AS Percent_variance_EMR_DWH,
                 CAST(ROUND((CAST(DHIS2_CurTx.CurrentOnART_Total AS DECIMAL(7,2)) - CAST(NDW_CurTx .CurTx_total AS DECIMAL(7,2)))
-                    /CAST(DHIS2_CurTx.CurrentOnART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS percentage_variance_from_dhis2,
-                CONVERT(DATE,GETDATE()) AS date_report_prepared
-            FROM NDW_CurTx 
-            LEFT JOIN DHIS2_CurTx ON CAST(NDW_CurTx.MFLCode AS int) = CAST(DHIS2_CurTx.SiteCode AS int)
-        )
-        SELECT
-            *
-        FROM tbl
-        ORDER BY percentage_variance_from_dhis2 DESC;'));
+                    /CAST(DHIS2_CurTx.CurrentOnART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_DWH,
+                    CAST(ROUND((CAST(DHIS2_CurTx.CurrentOnART_Total AS DECIMAL(7,2)) - CAST(LatestEMR.EMRValue AS DECIMAL(7,2)))
+                    /CAST(DHIS2_CurTx.CurrentOnART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_EMR,
+                    cast (Upload.DateUploaded as date)As DateUploaded,
+                    cast (Upload.SiteAbstractionDate as date) As SiteAbstractionDate
+                from NDW_CurTx
+                left join LatestEMR on NDW_CurTx.MFLCode=LatestEMR.facilityCode
+                left join DHIS2_CurTx on NDW_CurTx.MFLCode=DHIS2_CurTx.SiteCode COLLATE Latin1_General_CI_AS
+                left join Upload on NDW_CurTx.MFLCode=Upload.MFLCode
+                ORDER BY Percent_variance_EMR_DWH DESC"));
     // Get previous Month and Year
     $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
 
