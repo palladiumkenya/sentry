@@ -640,8 +640,8 @@ class MainController extends Controller
                 SiteCode,
                 PatientPK
                 from All_Staging_2016_2.dbo.vw_GetViralLoads
-                where OrderedbyDate between dateadd(m, -12, dateadd(day, 1, eomonth(getdate(), -1))) -- subtract 12 months from last day of previous completed month
-                    and eomonth(dateadd(mm, -1, getdate())) --get last day of previous completed month
+                where OrderedbyDate between dateadd(m, -13, dateadd(day, 1, eomonth(getdate(), -2))) -- subtract 12 months from last day of previous completed month
+                    and eomonth(dateadd(mm, -2, getdate())) --get last day of previous completed month
                     and TestResult is not null
             ), txcurr_0_19_yrs_valid_vl_12_months as (
                 select
@@ -886,7 +886,7 @@ class MainController extends Controller
                             SELECT DISTINCT ROW_NUMBER ( ) OVER (PARTITION BY FacilityId,docketId,Concat(Month(fm.timeId),'-', Year(fm.timeId)) ORDER BY (cast(fm.timeId as date)) desc) AS RowID,
                             FacilityId,docketId,fm.timeId, dt.year,dt.month FROM  portaldevtest.fact_manifest fm
                             inner join portaldevtest.dim_time dt on dt.timeId=fm.timeId
-                            where dt.year = ".Carbon::now()->subMonth()->format('Y')." and dt.month = ".Carbon::now()->subMonth()->format('m')."
+                            where dt.year = ".Carbon::now()->subMonth(2)->format('Y')." and dt.month = ".Carbon::now()->subMonth(2)->format('m')."
                 )u where RowId=1) f on f.facilityId=df.facilityId and df.docket=f.docketId) Y
                                 WHERE uploaddate is null and Agency = 'CDC'";
         
