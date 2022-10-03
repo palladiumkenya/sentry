@@ -614,7 +614,7 @@ class MainController extends Controller
                 CTPartner,
                 County,
                 count(*) as no_otz_10_19_yrs
-            from PortalDev.dbo.FACT_Trans_OTZEnrollments
+            from PortalDevTest.dbo.FACT_Trans_OTZEnrollments
             where TXCurr = 1
                 and CTAgency = 'CDC'
                 and DATIM_AgeGroup in ('10 to 14', '15 to 19')
@@ -627,7 +627,7 @@ class MainController extends Controller
                     County,
                     CTPartner,
                     count(*) as no_ovc_0_17_yrs
-                from PortalDev.dbo.Fact_Trans_New_Cohort
+                from PortalDevTest.dbo.Fact_Trans_New_Cohort
                 where TXCurr=1
                     and CTAgency = 'CDC'
                     and ageLV between 0 and 17
@@ -650,7 +650,7 @@ class MainController extends Controller
                         County,
                         CTPartner,
                         count(*) as no_txcurr_0_19_yrs_valid_vl_12_months
-                from PortalDev.dbo.Fact_Trans_New_Cohort as cohort
+                from PortalDevTest.dbo.Fact_Trans_New_Cohort as cohort
                 inner join documented_viral_loads_last_12 on documented_viral_loads_last_12.PatientId = cohort.PatientId
                     and documented_viral_loads_last_12.PatientPK = cohort.PatientPK
                     and documented_viral_loads_last_12.SiteCode = cohort.MFLCode
@@ -665,7 +665,7 @@ class MainController extends Controller
                         County,
                         CTPartner,
                         count(*) as no_txcurr_0_19_yrs_documented_regimen
-                from PortalDev.dbo.Fact_Trans_New_Cohort as cohort
+                from PortalDevTest.dbo.Fact_Trans_New_Cohort as cohort
                 where ageLV between 0 and 19
                     and TXCurr=1
                     and CTAgency = 'CDC'
@@ -690,7 +690,7 @@ class MainController extends Controller
                 ageLV,
                 ARTOutcome
                 from visit_weight_and_height_ordering
-                Left join PortalDev.dbo.Fact_Trans_New_Cohort on visit_weight_and_height_ordering.PatientID=Fact_Trans_New_Cohort.PatientID
+                Left join PortalDevTest.dbo.Fact_Trans_New_Cohort on visit_weight_and_height_ordering.PatientID=Fact_Trans_New_Cohort.PatientID
                 and visit_weight_and_height_ordering.PatientPK=Fact_Trans_New_Cohort.PatientPK
                 and visit_weight_and_height_ordering.SiteCode=Fact_Trans_New_Cohort.MFLCode
                 where rank = 1
@@ -720,7 +720,7 @@ class MainController extends Controller
                     FacilityName,
                     CTPartner,
                     County
-                from PortalDev.dbo.Fact_Trans_New_Cohort
+                from PortalDevTest.dbo.Fact_Trans_New_Cohort
                 where CTAgency = 'CDC'
             ),
             documented_weight_last_2_visits as (
@@ -743,7 +743,7 @@ class MainController extends Controller
                 CTPartner,
                 CTAgency,
                 Count (*)PaedsTXCurr
-            from PortalDev.dbo.Fact_Trans_New_Cohort
+            from PortalDevTest.dbo.Fact_Trans_New_Cohort
             where ageLV between 0 and 19  and CTAgency ='CDC' and TXCurr=1
             group by
                 MFLCode,
@@ -760,7 +760,7 @@ class MainController extends Controller
                 CTPartner,
                 CTAgency,
                 Count (*)Females15TXCurr
-            from PortalDev.dbo.Fact_Trans_New_Cohort
+            from PortalDevTest.dbo.Fact_Trans_New_Cohort
             where ageLV >=15 and CTAgency ='CDC' and TXCurr=1 and Gender='Female'
             group by
                 MFLCode,
@@ -778,7 +778,7 @@ class MainController extends Controller
                 Cohort.CTAgency,
                 Count (Distinct concat(ContactPatientPK,Sitecode))PaedsListed
             FROM [All_Staging_2016_2].[dbo].[stg_ContactListing] listing 
-            inner join PortalDev.dbo.Fact_Trans_New_Cohort Cohort on
+            inner join PortalDevTest.dbo.Fact_Trans_New_Cohort Cohort on
             listing.PatientID=Cohort.PatientID and
             listing.PatientPK=Cohort.PatientPK and
             listing.SiteCode=Cohort.MFLCode
@@ -802,7 +802,7 @@ class MainController extends Controller
                 Cohort.CTAgency,
                 Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsTested
             FROM [All_Staging_2016_2].[dbo].[stg_ContactListing] listing 
-            inner join PortalDev.dbo.Fact_Trans_New_Cohort Cohort on
+            inner join PortalDevTest.dbo.Fact_Trans_New_Cohort Cohort on
             listing.PatientID=Cohort.PatientID and
             listing.PatientPK=Cohort.PatientPK and
             listing.SiteCode=Cohort.MFLCode
@@ -833,7 +833,7 @@ class MainController extends Controller
                         CASE WHEN ABS(DATEDIFF(DAY,dtLastVisit ,NextAppointmentDate) ) <=83 THEN 0
                     WHEN ABS(DATEDIFF(DAY,dtLastVisit ,NextAppointmentDate) )   >= 84 THEN  1
                     ELSE NULL END AS MMDStatus
-                from PortalDev.dbo.Fact_Trans_New_Cohort as cohort
+                from PortalDevTest.dbo.Fact_Trans_New_Cohort as cohort
                 where ageLV between 0 and 19
                     and CTAgency = 'CDC'
                     and ARTOutcome='V'
@@ -881,14 +881,15 @@ class MainController extends Controller
             left join PaedsOnMMD on facility_partner_combinations.MFLCode=PaedsOnMMD.MFLCode";
         
         $query2 = "SELECT * from (Select Distinct df.FacilityId,Name as FacilityName,County,subCounty,Agency,Partner, f.year,f.month, f.docketId ,f.timeId as uploaddate
-                from (select name,facilityId,county,subcounty,agency,partner, \"CT\" AS docket from portaldev.dim_facility where isCt = 1) df
+                from (select name,facilityId,county,subcounty,agency,partner, \"CT\" AS docket from portaldevtest.dim_facility where isCt = 1) df
                 LEFT JOIN (SELECT * FROM (
                             SELECT DISTINCT ROW_NUMBER ( ) OVER (PARTITION BY FacilityId,docketId,Concat(Month(fm.timeId),'-', Year(fm.timeId)) ORDER BY (cast(fm.timeId as date)) desc) AS RowID,
-                            FacilityId,docketId,fm.timeId, dt.year,dt.month FROM  portaldev.fact_manifest fm
-                            inner join portaldev.dim_time dt on dt.timeId=fm.timeId
+                            FacilityId,docketId,fm.timeId, dt.year,dt.month FROM  portaldevtest.fact_manifest fm
+                            inner join portaldevtest.dim_time dt on dt.timeId=fm.timeId
                             where dt.year = ".Carbon::now()->subMonth()->format('Y')." and dt.month = ".Carbon::now()->subMonth()->format('m')."
                 )u where RowId=1) f on f.facilityId=df.facilityId and df.docket=f.docketId) Y
                                 WHERE uploaddate is null and Agency = 'CDC'";
+        
         
         
         config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
