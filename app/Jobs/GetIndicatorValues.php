@@ -148,7 +148,7 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->liveSyncIndicator->save();
             } else {
                 Log::error(
-                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    'PostLiveSyncIndicator: failed to post indicator ' 
                     // $this->liveSyncIndicator->name . ': ' .
                     // $this->liveSyncIndicator->facility->name
                 );
@@ -233,7 +233,7 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->liveSyncIndicator->save();
             } else {
                 Log::error(
-                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    'PostLiveSyncIndicator: failed to post indicator ' 
                     // $this->liveSyncIndicator->name . ': ' .
                     // $this->liveSyncIndicator->facility->name
                 );
@@ -318,7 +318,7 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->liveSyncIndicator->save();
             } else {
                 Log::error(
-                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    'PostLiveSyncIndicator: failed to post indicator ' 
                     // $this->liveSyncIndicator->name . ': ' .
                     // $this->liveSyncIndicator->facility->name
                 );
@@ -403,7 +403,7 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->liveSyncIndicator->save();
             } else {
                 Log::error(
-                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    'PostLiveSyncIndicator: failed to post indicator ' 
                     // $this->liveSyncIndicator->name . ': ' .
                     // $this->liveSyncIndicator->facility->name
                 );
@@ -488,7 +488,7 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->liveSyncIndicator->save();
             } else {
                 Log::error(
-                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    'PostLiveSyncIndicator: failed to post indicator ' 
                     // $this->liveSyncIndicator->name . ': ' .
                     // $this->liveSyncIndicator->facility->name
                 );
@@ -573,7 +573,7 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->liveSyncIndicator->save();
             } else {
                 Log::error(
-                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    'PostLiveSyncIndicator: failed to post indicator ' 
                     // $this->liveSyncIndicator->name . ': ' .
                     // $this->liveSyncIndicator->facility->name
                 );
@@ -656,7 +656,7 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->liveSyncIndicator->save();
             } else {
                 Log::error(
-                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    'PostLiveSyncIndicator: failed to post indicator ' 
                     // $this->liveSyncIndicator->name . ': ' .
                     // $this->liveSyncIndicator->facility->name
                 );
@@ -839,7 +839,7 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->liveSyncIndicator->save();
             } else {
                 Log::error(
-                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    'PostLiveSyncIndicator: failed to post indicator ' 
                     // $this->liveSyncIndicator->name . ': ' .
                     // $this->liveSyncIndicator->facility->name
                 );
@@ -924,7 +924,7 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->liveSyncIndicator->save();
             } else {
                 Log::error(
-                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    'PostLiveSyncIndicator: failed to post indicator ' 
                     // $this->liveSyncIndicator->name . ': ' .
                     // $this->liveSyncIndicator->facility->name
                 );
