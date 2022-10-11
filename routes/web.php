@@ -612,7 +612,7 @@ Route::get('/livesync', function(){
             $facilities->each(function ($facility) use (&$f) {
                 $f[$facility->code] = $facility->id;
             });
-            // GetIndicatorValues::dispatchNow(null, null, $f);
+            GetIndicatorValues::dispatchNow(null, null, $f);
             PostLiveSyncIndicators::dispatchNow(array_values($f));
     });
 });
