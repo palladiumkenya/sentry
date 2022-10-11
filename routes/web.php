@@ -611,7 +611,7 @@ Route::get('/livesync', function(){
     $etlJob = new EtlJob;
     $etlJob->save();
     GetSpotFacilities::dispatchNow();
-    Facility::where('etl', true)->chunk(100, function ($facilities) {
+    Facility::where('etl', true)->chunk(100, function ($facilities) use ($etlJob)  {
             $f = [];
             $facilities->each(function ($facility) use (&$f) {
                 $f[$facility->code] = $facility->id;
