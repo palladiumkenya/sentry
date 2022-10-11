@@ -48,13 +48,12 @@ class GetSpotFacilities implements ShouldQueue
                         'posted' => false,
                     ]);
                 } else {
-                    if (!$facility->uid) {
                         $facility->update([
                             'uid' => isset($transfer['facility']['_id']) ? $transfer['facility']['_id'] : '',
                             'processed' => false,
                             'posted' => false,
                         ]);
-                    }
+                    
                 }
             }
         } else {

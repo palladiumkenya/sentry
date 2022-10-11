@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 use App\Jobs\EtlJob as Etl;
 use App\Jobs\GetIndicatorValues;
 use App\Jobs\PostLiveSyncIndicators;
+use App\Jobs\GetSpotFacilityUploads;
+use App\Jobs\GetSpotFacilityMetrics;
 use App\Jobs\GetSpotFacilities;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
