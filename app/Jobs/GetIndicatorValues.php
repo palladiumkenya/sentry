@@ -208,8 +208,6 @@ class GetIndicatorValues implements ShouldQueue
                         'posted' => false
                     ]
                 );
-            });
-            
                 Log::info($facilities[$row->facility_code]);
                 
         try {
@@ -248,6 +246,8 @@ class GetIndicatorValues implements ShouldQueue
                 $e->getMessage()
             );
         }
+            });
+            
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -293,8 +293,6 @@ class GetIndicatorValues implements ShouldQueue
                     ]
                 );
                 $fetched[] = $row->facility_code;
-            });
-                
                 Log::info($facilities[$row->facility_code]);
                 
         try {
@@ -333,6 +331,8 @@ class GetIndicatorValues implements ShouldQueue
                 $e->getMessage()
             );
         }
+            });
+                
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -378,7 +378,6 @@ class GetIndicatorValues implements ShouldQueue
                     ]
                 );
                 $fetched[] = $row->facility_code;
-            });
             
                 Log::info($facilities[$row->facility_code]);
                 
@@ -418,6 +417,7 @@ class GetIndicatorValues implements ShouldQueue
                 $e->getMessage()
             );
         }
+            });
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -463,7 +463,6 @@ class GetIndicatorValues implements ShouldQueue
                     ]
                 );
                 $fetched[] = $row->facility_code;
-            });
             
                 Log::info($facilities[$row->facility_code]);
                 
@@ -503,6 +502,7 @@ class GetIndicatorValues implements ShouldQueue
                 $e->getMessage()
             );
         }
+            });
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -548,7 +548,6 @@ class GetIndicatorValues implements ShouldQueue
                     ]
                 );
                 $fetched[] = $row->facility_code;
-            });
             
                 Log::info($facilities[$row->facility_code]);
                 
@@ -588,6 +587,7 @@ class GetIndicatorValues implements ShouldQueue
                 $e->getMessage()
             );
         }
+            });
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -631,7 +631,6 @@ class GetIndicatorValues implements ShouldQueue
                     ]
                 );
                 $fetched[] = $row->facility_code;
-            });
             
                 Log::info($facilities[$row->facility_code]);
                 
@@ -671,6 +670,7 @@ class GetIndicatorValues implements ShouldQueue
                 $e->getMessage()
             );
         }
+            });
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -814,7 +814,6 @@ class GetIndicatorValues implements ShouldQueue
                     ]
                 );
                 $fetched[] = $row->facility_code;
-            });
             
                 Log::info($facilities[$row->facility_code]);
                 
@@ -854,6 +853,7 @@ class GetIndicatorValues implements ShouldQueue
                 $e->getMessage()
             );
         }
+            });
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -899,7 +899,6 @@ class GetIndicatorValues implements ShouldQueue
                     ]
                 );
                 $fetched[] = $row->facility_code;
-            });
             
                 Log::info($facilities[$row->facility_code]);
                 
@@ -939,6 +938,7 @@ class GetIndicatorValues implements ShouldQueue
                 $e->getMessage()
             );
         }
+            });
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
