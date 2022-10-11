@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 use App\Jobs\EtlJob as Etl;
 use App\Jobs\GetIndicatorValues;
 use App\Jobs\PostLiveSyncIndicators;
+use App\Jobs\GetSpotFacilities;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
 
@@ -607,6 +608,9 @@ Route::get('/email/comparison_txcurr', function () {
 
 Route::get('/livesync', function(){
     ini_set('max_execution_time', -1);
+    $etlJob = new EtlJob;
+    $etlJob->save();
+    GetSpotFacilities::dispatchNow();
     Facility::where('etl', true)->chunk(100, function ($facilities) {
             $f = [];
             $facilities->each(function ($facility) use (&$f) {
@@ -614,6 +618,10 @@ Route::get('/livesync', function(){
             });
             GetIndicatorValues::dispatchNow(null, null, $f);
             PostLiveSyncIndicators::dispatchNow(array_values($f));
+            $facilities->each(function ($facility) use ($etlJob) {
+                GetSpotFacilityMetrics::dispatchNow($etlJob, $facility);
+                GetSpotFacilityUploads::dispatchNow($etlJob, $facility);
+            });
     });
 });
 
