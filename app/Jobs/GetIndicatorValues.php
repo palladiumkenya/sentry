@@ -123,6 +123,44 @@ class GetIndicatorValues implements ShouldQueue
                     ]
                 );
                 $fetched[] = $row->facility_code;
+                Log::info($facilities[$row->facility_code]);
+                
+        try {
+            $client = new Client();
+            $response = $client->request('POST', 'stages/indicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+                'verify' => false,
+                'timeout'  => 300,
+                'http_errors' => false,
+                'json' => [[
+                    'id' => strtoupper(Str::uuid()),
+                    'facilityCode' => $row->facility_code,
+                    'facilityName' => '',
+                    'name' => 'HTS_TESTED',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'indicatorDate' => $period->format('Y-m-d H:i:s'),
+                    'stage' => 'DWH',
+                    'facilityManifestId' => null,
+                ]]
+            ]);
+            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
+                // $this->liveSyncIndicator->posted = true;
+                // $this->liveSyncIndicator->save();
+            } else {
+                Log::error(
+                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    // $this->liveSyncIndicator->name . ': ' .
+                    // $this->liveSyncIndicator->facility->name
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error(
+                'PostLiveSyncIndicator: failed to post indicator ' .
+                // $this->liveSyncIndicator->name . ': ' .
+                // $this->liveSyncIndicator->facility->name . ': ' .
+                $e->getMessage()
+            );
+        }
             });
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
@@ -169,6 +207,45 @@ class GetIndicatorValues implements ShouldQueue
                     ]
                 );
             });
+            
+                Log::info($facilities[$row->facility_code]);
+                
+        try {
+            $client = new Client();
+            $response = $client->request('POST', 'stages/indicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+                'verify' => false,
+                'timeout'  => 300,
+                'http_errors' => false,
+                'json' => [[
+                    'id' => strtoupper(Str::uuid()),
+                    'facilityCode' => $row->facility_code,
+                    'facilityName' => '',
+                    'name' => 'HTS_TESTED_POS',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'indicatorDate' => $period->format('Y-m-d H:i:s'),
+                    'stage' => 'DWH',
+                    'facilityManifestId' => null,
+                ]]
+            ]);
+            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
+                // $this->liveSyncIndicator->posted = true;
+                // $this->liveSyncIndicator->save();
+            } else {
+                Log::error(
+                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    // $this->liveSyncIndicator->name . ': ' .
+                    // $this->liveSyncIndicator->facility->name
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error(
+                'PostLiveSyncIndicator: failed to post indicator ' .
+                // $this->liveSyncIndicator->name . ': ' .
+                // $this->liveSyncIndicator->facility->name . ': ' .
+                $e->getMessage()
+            );
+        }
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -215,6 +292,45 @@ class GetIndicatorValues implements ShouldQueue
                 );
                 $fetched[] = $row->facility_code;
             });
+                
+                Log::info($facilities[$row->facility_code]);
+                
+        try {
+            $client = new Client();
+            $response = $client->request('POST', 'stages/indicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+                'verify' => false,
+                'timeout'  => 300,
+                'http_errors' => false,
+                'json' => [[
+                    'id' => strtoupper(Str::uuid()),
+                    'facilityCode' => $row->facility_code,
+                    'facilityName' => '',
+                    'name' => 'HTS_LINKED',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'indicatorDate' => $period->format('Y-m-d H:i:s'),
+                    'stage' => 'DWH',
+                    'facilityManifestId' => null,
+                ]]
+            ]);
+            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
+                // $this->liveSyncIndicator->posted = true;
+                // $this->liveSyncIndicator->save();
+            } else {
+                Log::error(
+                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    // $this->liveSyncIndicator->name . ': ' .
+                    // $this->liveSyncIndicator->facility->name
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error(
+                'PostLiveSyncIndicator: failed to post indicator ' .
+                // $this->liveSyncIndicator->name . ': ' .
+                // $this->liveSyncIndicator->facility->name . ': ' .
+                $e->getMessage()
+            );
+        }
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -261,6 +377,45 @@ class GetIndicatorValues implements ShouldQueue
                 );
                 $fetched[] = $row->facility_code;
             });
+            
+                Log::info($facilities[$row->facility_code]);
+                
+        try {
+            $client = new Client();
+            $response = $client->request('POST', 'stages/indicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+                'verify' => false,
+                'timeout'  => 300,
+                'http_errors' => false,
+                'json' => [[
+                    'id' => strtoupper(Str::uuid()),
+                    'facilityCode' => $row->facility_code,
+                    'facilityName' => '',
+                    'name' => 'HTS_INDEX',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'indicatorDate' => $period->format('Y-m-d H:i:s'),
+                    'stage' => 'DWH',
+                    'facilityManifestId' => null,
+                ]]
+            ]);
+            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
+                // $this->liveSyncIndicator->posted = true;
+                // $this->liveSyncIndicator->save();
+            } else {
+                Log::error(
+                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    // $this->liveSyncIndicator->name . ': ' .
+                    // $this->liveSyncIndicator->facility->name
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error(
+                'PostLiveSyncIndicator: failed to post indicator ' .
+                // $this->liveSyncIndicator->name . ': ' .
+                // $this->liveSyncIndicator->facility->name . ': ' .
+                $e->getMessage()
+            );
+        }
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -307,6 +462,45 @@ class GetIndicatorValues implements ShouldQueue
                 );
                 $fetched[] = $row->facility_code;
             });
+            
+                Log::info($facilities[$row->facility_code]);
+                
+        try {
+            $client = new Client();
+            $response = $client->request('POST', 'stages/indicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+                'verify' => false,
+                'timeout'  => 300,
+                'http_errors' => false,
+                'json' => [[
+                    'id' => strtoupper(Str::uuid()),
+                    'facilityCode' => $row->facility_code,
+                    'facilityName' => '',
+                    'name' => 'HTS_INDEX_POS',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'indicatorDate' => $period->format('Y-m-d H:i:s'),
+                    'stage' => 'DWH',
+                    'facilityManifestId' => null,
+                ]]
+            ]);
+            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
+                // $this->liveSyncIndicator->posted = true;
+                // $this->liveSyncIndicator->save();
+            } else {
+                Log::error(
+                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    // $this->liveSyncIndicator->name . ': ' .
+                    // $this->liveSyncIndicator->facility->name
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error(
+                'PostLiveSyncIndicator: failed to post indicator ' .
+                // $this->liveSyncIndicator->name . ': ' .
+                // $this->liveSyncIndicator->facility->name . ': ' .
+                $e->getMessage()
+            );
+        }
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -353,6 +547,45 @@ class GetIndicatorValues implements ShouldQueue
                 );
                 $fetched[] = $row->facility_code;
             });
+            
+                Log::info($facilities[$row->facility_code]);
+                
+        try {
+            $client = new Client();
+            $response = $client->request('POST', 'stages/indicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+                'verify' => false,
+                'timeout'  => 300,
+                'http_errors' => false,
+                'json' => [[
+                    'id' => strtoupper(Str::uuid()),
+                    'facilityCode' => $row->facility_code,
+                    'facilityName' => '',
+                    'name' => 'TX_NEW',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'indicatorDate' => $period->format('Y-m-d H:i:s'),
+                    'stage' => 'DWH',
+                    'facilityManifestId' => null,
+                ]]
+            ]);
+            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
+                // $this->liveSyncIndicator->posted = true;
+                // $this->liveSyncIndicator->save();
+            } else {
+                Log::error(
+                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    // $this->liveSyncIndicator->name . ': ' .
+                    // $this->liveSyncIndicator->facility->name
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error(
+                'PostLiveSyncIndicator: failed to post indicator ' .
+                // $this->liveSyncIndicator->name . ': ' .
+                // $this->liveSyncIndicator->facility->name . ': ' .
+                $e->getMessage()
+            );
+        }
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -397,6 +630,45 @@ class GetIndicatorValues implements ShouldQueue
                 );
                 $fetched[] = $row->facility_code;
             });
+            
+                Log::info($facilities[$row->facility_code]);
+                
+        try {
+            $client = new Client();
+            $response = $client->request('POST', 'stages/indicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+                'verify' => false,
+                'timeout'  => 300,
+                'http_errors' => false,
+                'json' => [[
+                    'id' => strtoupper(Str::uuid()),
+                    'facilityCode' => $row->facility_code,
+                    'facilityName' => '',
+                    'name' => 'TX_CURR',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'indicatorDate' => $period->format('Y-m-d H:i:s'),
+                    'stage' => 'DWH',
+                    'facilityManifestId' => null,
+                ]]
+            ]);
+            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
+                // $this->liveSyncIndicator->posted = true;
+                // $this->liveSyncIndicator->save();
+            } else {
+                Log::error(
+                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    // $this->liveSyncIndicator->name . ': ' .
+                    // $this->liveSyncIndicator->facility->name
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error(
+                'PostLiveSyncIndicator: failed to post indicator ' .
+                // $this->liveSyncIndicator->name . ': ' .
+                // $this->liveSyncIndicator->facility->name . ': ' .
+                $e->getMessage()
+            );
+        }
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -541,6 +813,45 @@ class GetIndicatorValues implements ShouldQueue
                 );
                 $fetched[] = $row->facility_code;
             });
+            
+                Log::info($facilities[$row->facility_code]);
+                
+        try {
+            $client = new Client();
+            $response = $client->request('POST', 'stages/indicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+                'verify' => false,
+                'timeout'  => 300,
+                'http_errors' => false,
+                'json' => [[
+                    'id' => strtoupper(Str::uuid()),
+                    'facilityCode' => $row->facility_code,
+                    'facilityName' => '',
+                    'name' => 'RETENTION_ON_ART_12_MONTHS',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'indicatorDate' => $period->format('Y-m-d H:i:s'),
+                    'stage' => 'DWH',
+                    'facilityManifestId' => null,
+                ]]
+            ]);
+            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
+                // $this->liveSyncIndicator->posted = true;
+                // $this->liveSyncIndicator->save();
+            } else {
+                Log::error(
+                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    // $this->liveSyncIndicator->name . ': ' .
+                    // $this->liveSyncIndicator->facility->name
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error(
+                'PostLiveSyncIndicator: failed to post indicator ' .
+                // $this->liveSyncIndicator->name . ': ' .
+                // $this->liveSyncIndicator->facility->name . ': ' .
+                $e->getMessage()
+            );
+        }
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
@@ -587,6 +898,45 @@ class GetIndicatorValues implements ShouldQueue
                 );
                 $fetched[] = $row->facility_code;
             });
+            
+                Log::info($facilities[$row->facility_code]);
+                
+        try {
+            $client = new Client();
+            $response = $client->request('POST', 'stages/indicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+                'verify' => false,
+                'timeout'  => 300,
+                'http_errors' => false,
+                'json' => [[
+                    'id' => strtoupper(Str::uuid()),
+                    'facilityCode' => $row->facility_code,
+                    'facilityName' => '',
+                    'name' => 'RETENTION_ON_ART_VL_1000_12_MONTHS',
+                    'value' => is_null($row->value) ? 0 : $row->value,
+                    'indicatorDate' => $period->format('Y-m-d H:i:s'),
+                    'stage' => 'DWH',
+                    'facilityManifestId' => null,
+                ]]
+            ]);
+            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
+                // $this->liveSyncIndicator->posted = true;
+                // $this->liveSyncIndicator->save();
+            } else {
+                Log::error(
+                    'PostLiveSyncIndicator: failed to post indicator ' .
+                    // $this->liveSyncIndicator->name . ': ' .
+                    // $this->liveSyncIndicator->facility->name
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error(
+                'PostLiveSyncIndicator: failed to post indicator ' .
+                // $this->liveSyncIndicator->name . ': ' .
+                // $this->liveSyncIndicator->facility->name . ': ' .
+                $e->getMessage()
+            );
+        }
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(
                 [
