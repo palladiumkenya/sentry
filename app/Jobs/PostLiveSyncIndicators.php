@@ -35,8 +35,8 @@ class PostLiveSyncIndicators implements ShouldQueue
         LiveSyncIndicator::whereIn('facility_id', $facilityIds)
             ->where('posted', false)
             ->where(function (Builder $query) {
-                $query->orWhere('created_at', '<=', now()->subtract('hour', 1))
-                    ->orWhere('updated_at', '<=', now()->subtract('hour', 1));
+                $query->orWhere('created_at', '<=', now()->subtract('month', 1))
+                    ->orWhere('updated_at', '<=', now()->subtract('month', 1));
             })->cursor()->each(function ($liveSyncIndicator) {
                 PostLiveSyncIndicator::dispatch($liveSyncIndicator)->onQueue('PostLiveSyncIndicator');
             });
