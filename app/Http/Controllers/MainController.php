@@ -1077,7 +1077,7 @@ class MainController extends Controller
                     SUM([StartedART]) txNew 
             from PortalDev.dbo.FACT_Trans_Newly_Started 
             where [StartedART] > 0 
-            and Start_Year = ".Carbon::now()->subMonth()->format('Y')." and StartART_Month =".Carbon::now()->subMonth()->format('m')."
+            and Start_Year = ".Carbon::now()->subMonth(2)->format('Y')." and StartART_Month =".Carbon::now()->subMonth(2)->format('m')."
             GROUP BY MFLCode, FacilityName, CTPartner, County
             ),
             EMR As (SELECT
@@ -1088,7 +1088,7 @@ class MainController extends Controller
                 ,statusDate
                 ,indicatorDate
             FROM livesync.dbo.indicator
-            where stage like '%EMR' and name like '%TX_NEW' and indicatorDate= EOMONTH(DATEADD(mm,-1,GETDATE()))
+            where stage like '%EMR' and name like '%TX_NEW' and indicatorDate=  EOMONTH(DATEADD(mm,-2,GETDATE()))
             ),
             DHIS2_TxNew AS (
                 SELECT
@@ -1098,7 +1098,7 @@ class MainController extends Controller
                     [StartedART_Total],
                     ReportMonth_Year
                 FROM [All_Staging_2016_2].[dbo].[FACT_CT_DHIS2]
-                WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')."
+                WHERE ReportMonth_Year = ".Carbon::now()->subMonth(2)->format('Ym')."
             ),
             LatestEMR AS (Select
                     Emr.facilityCode 
@@ -1136,7 +1136,7 @@ class MainController extends Controller
                 ,statusDate
                 ,indicatorDate
             FROM livesync.dbo.indicator
-            where stage like '%DWH' and name like '%HTS_TESTED' and indicatorDate= EOMONTH(DATEADD(mm,-1,GETDATE()))
+            where stage like '%DWH' and name like '%HTS_TESTED' and statusDate>= '2022-10-06'
             ),
             EMR As (SELECT
             Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
@@ -1146,7 +1146,7 @@ class MainController extends Controller
                 ,statusDate
                 ,indicatorDate
             FROM livesync.dbo.indicator
-            where stage like '%EMR' and name like '%HTS_TESTED' and indicatorDate>= DATEADD(m, DATEDIFF(m, 0, GETDATE()), 0) 
+            where stage like '%EMR' and name like '%HTS_TESTED' and indicatorDate>=  EOMONTH(DATEADD(mm,-2,GETDATE()))
             ),
             DHIS2_TxNew AS (
                 SELECT
@@ -1156,7 +1156,7 @@ class MainController extends Controller
                     Tested_Total,
                     ReportMonth_Year
                 FROM [All_Staging_2016_2].[dbo].[FACT_HTS_DHIS2]
-                WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')."
+                WHERE ReportMonth_Year = ".Carbon::now()->subMonth(2)->format('Ym')."
             ),
             LatestDWH AS (Select
                     NDW.facilityCode 
@@ -1203,7 +1203,7 @@ class MainController extends Controller
                 ,statusDate
                 ,indicatorDate
             FROM livesync.dbo.indicator
-            where stage like '%DWH' and name like '%HTS_TESTED_POS' and indicatorDate>= DATEADD(m, DATEDIFF(m, 0, GETDATE()), 0) 
+            where stage like '%DWH' and name like '%HTS_TESTED_POS' and statusDate>= '2022-10-06' 
             ),
             EMR As (SELECT
             Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
@@ -1213,7 +1213,7 @@ class MainController extends Controller
                 ,statusDate
                 ,indicatorDate
             FROM livesync.dbo.indicator
-            where stage like '%EMR' and name like '%HTS_TESTED_POS' and indicatorDate= EOMONTH(DATEADD(mm,-1,GETDATE()))
+            where stage like '%EMR' and name like '%HTS_TESTED_POS' and indicatorDate= EOMONTH(DATEADD(mm,-2,GETDATE()))
             ),
             DHIS2_TxNew AS (
                 SELECT
@@ -1223,7 +1223,7 @@ class MainController extends Controller
                     [Positive_Total],
                     ReportMonth_Year
                 FROM [All_Staging_2016_2].[dbo].[FACT_HTS_DHIS2]
-                WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')."
+                WHERE ReportMonth_Year = ".Carbon::now()->subMonth(2)->format('Ym')."
             ),
             LatestDWH AS (Select
                     NDW.facilityCode 
@@ -1398,7 +1398,7 @@ class MainController extends Controller
                         // email configurations
                         $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                         // email address of the recipients
-                        $message->to([$test])->subject('Data Triangulation Report');
+                        $message->to(['charles.bett@thepalladiumgroup.com'])->subject('Data Triangulation Report');
                         // attach the csv file
                         $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxCurr'.$reportingMonth.'.csv');
                         $message->attach(__DIR__ .'/../../../storage/fileout_Triangulation_TxNew'.$reportingMonth.'.csv');
