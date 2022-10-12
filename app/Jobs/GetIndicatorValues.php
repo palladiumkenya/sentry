@@ -208,7 +208,6 @@ class GetIndicatorValues implements ShouldQueue
                         'posted' => false
                     ]
                 );
-                Log::info($row);
                 
         try {
             $client = new Client();

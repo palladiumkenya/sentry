@@ -612,7 +612,7 @@ Route::get('/livesync', function(){
     ini_set('max_execution_time', -1);
     $etlJob = new EtlJob;
     $etlJob->save();
-    // GetSpotFacilities::dispatchNow();
+    GetSpotFacilities::dispatchNow();
     Facility::where('etl', true)->chunk(100, function ($facilities) use ($etlJob)  {
             $f = [];
             $facilities->each(function ($facility) use (&$f) {
@@ -625,6 +625,9 @@ Route::get('/livesync', function(){
                 GetSpotFacilityUploads::dispatchNow($etlJob, $facility);
             });
     });
+
+    $etlJob->completed_at = now();
+    $etlJob->save();
 });
 
 Route::get('/email/start', function () {
