@@ -107,7 +107,7 @@ class GetIndicatorValues implements ShouldQueue
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
             ->where('year', $period->format('Y'))
-            ->where('month', $period->format('n'))
+            ->where('month', $period->format('m'))
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -191,7 +191,7 @@ class GetIndicatorValues implements ShouldQueue
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
             ->where('year', $period->format('Y'))
-            ->where('month', $period->format('n'))
+            ->where('month', $period->format('m'))
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -275,7 +275,7 @@ class GetIndicatorValues implements ShouldQueue
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
             ->where('year', $period->format('Y'))
-            ->where('month', $period->format('n'))
+            ->where('month', $period->format('m'))
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -360,7 +360,7 @@ class GetIndicatorValues implements ShouldQueue
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
             ->where('year', $period->format('Y'))
-            ->where('month', $period->format('n'))
+            ->where('month', $period->format('m'))
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -445,7 +445,7 @@ class GetIndicatorValues implements ShouldQueue
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
             ->where('year', $period->format('Y'))
-            ->where('month', $period->format('n'))
+            ->where('month', $period->format('m'))
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -528,7 +528,7 @@ class GetIndicatorValues implements ShouldQueue
         DB::connection('sqlsrv')->table('FACT_Trans_Newly_Started')
             ->selectRaw('MFLCode as facility_code, SUM(StartedART) as value')
             ->where('Start_Year', $period->format('Y'))
-            ->where('StartART_Month', $period->format('n'))
+            ->where('StartART_Month', $period->format('m'))
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
             ->groupBy('MFLCode')
@@ -794,7 +794,7 @@ class GetIndicatorValues implements ShouldQueue
         DB::connection('sqlsrv')->table('FACT_ART_Retention731')
             ->selectRaw('MFLCode as facility_code, SUM(Active12M) as value')
             ->where('StartYear', $period->format('Y'))
-            ->where('StartMonth', $period->format('n'))
+            ->where('StartMonth', $period->format('m'))
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
             ->groupBy('MFLCode')
@@ -881,7 +881,7 @@ class GetIndicatorValues implements ShouldQueue
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
             ->where('StartYear', $period->format('Y'))
-            ->where('StartMonth', $period->format('n'))
+            ->where('StartMonth', $period->format('m'))
             ->groupBy('MFLCode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
