@@ -208,7 +208,7 @@ class GetIndicatorValues implements ShouldQueue
                         'posted' => false
                     ]
                 );
-                Log::info($facilities[$row->facility_code]);
+                Log::info($facilities[$row]);
                 
         try {
             $client = new Client();
@@ -793,8 +793,8 @@ class GetIndicatorValues implements ShouldQueue
         $fetched = [];
         DB::connection('sqlsrv')->table('FACT_ART_Retention731')
             ->selectRaw('MFLCode as facility_code, SUM(Active12M) as value')
-            ->where('StartYear', $period->format('Y'))
-            ->where('StartMonth', $period->format('m'))
+            ->where('StartART_Month', $period->format('Y'))
+            ->where('StartART_Year', $period->format('m'))
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
             ->groupBy('MFLCode')
