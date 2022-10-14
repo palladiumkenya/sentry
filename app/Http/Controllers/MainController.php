@@ -616,7 +616,6 @@ class MainController extends Controller
                 count(*) as no_otz_10_19_yrs
             from PortalDev.dbo.FACT_Trans_OTZEnrollments
             where TXCurr = 1
-                and CTAgency = 'CDC'
                 and DATIM_AgeGroup in ('10 to 14', '15 to 19')
                 and OTZEnrollmentDate  is not null
             group by MFLCode, FacilityName, CTPartner, County
@@ -629,7 +628,6 @@ class MainController extends Controller
                     count(*) as no_ovc_0_17_yrs
                 from PortalDev.dbo.Fact_Trans_New_Cohort
                 where TXCurr=1
-                    and CTAgency = 'CDC'
                     and ageLV between 0 and 17
                     and OVCEnrollmentDate is not null
                 group by MFLCode, FacilityName, CTPartner, County
@@ -656,7 +654,6 @@ class MainController extends Controller
                     and documented_viral_loads_last_12.SiteCode = cohort.MFLCode
                 where ageLV between 0 and 19
                     and TXCurr = 1
-                    and CTAgency = 'CDC'
                 group by MFLCode, FacilityName, CTPartner, County
             ), documented_regimen_0_19_yrs as (
                 select
@@ -668,7 +665,6 @@ class MainController extends Controller
                 from PortalDev.dbo.Fact_Trans_New_Cohort as cohort
                 where ageLV between 0 and 19
                     and TXCurr=1
-                    and CTAgency = 'CDC'
                     and CurrentRegimen is not null
                 group by MFLCode, FacilityName, CTPartner, County
             ),
@@ -721,7 +717,6 @@ class MainController extends Controller
                     CTPartner,
                     County
                 from PortalDev.dbo.Fact_Trans_New_Cohort
-                where CTAgency = 'CDC'
             ),
             documented_weight_last_2_visits as (
                 select
@@ -744,7 +739,7 @@ class MainController extends Controller
                 CTAgency,
                 Count (*)PaedsTXCurr
             from PortalDev.dbo.Fact_Trans_New_Cohort
-            where ageLV between 0 and 19  and CTAgency ='CDC' and TXCurr=1
+            where ageLV between 0 and 19   and TXCurr=1
             group by
                 MFLCode,
                 FacilityName,
@@ -761,7 +756,7 @@ class MainController extends Controller
                 CTAgency,
                 Count (*)Females15TXCurr
             from PortalDev.dbo.Fact_Trans_New_Cohort
-            where ageLV >=15 and CTAgency ='CDC' and TXCurr=1 and Gender='Female'
+            where ageLV >=15 and TXCurr=1 and Gender='Female'
             group by
                 MFLCode,
                 FacilityName,
@@ -835,7 +830,6 @@ class MainController extends Controller
                     ELSE NULL END AS MMDStatus
                 from PortalDev.dbo.Fact_Trans_New_Cohort as cohort
                 where ageLV between 0 and 19
-                    and CTAgency = 'CDC'
                     and ARTOutcome='V'
             ),
             PaedsOnMMD AS (
@@ -887,8 +881,8 @@ class MainController extends Controller
                             FacilityId,docketId,fm.timeId, dt.year,dt.month FROM  portaldevtest.fact_manifest fm
                             inner join portaldevtest.dim_time dt on dt.timeId=fm.timeId
                             where dt.year = ".Carbon::now()->subMonth(2)->format('Y')." and dt.month = ".Carbon::now()->subMonth(2)->format('m')."
-                )u where RowId=1) f on f.facilityId=df.facilityId and df.docket=f.docketId) Y
-                                WHERE uploaddate is null and Agency = 'CDC'";
+                                )u where RowId=1) f on f.facilityId=df.facilityId and df.docket=f.docketId) Y
+                                WHERE uploaddate is null ";
         
         
         
