@@ -448,7 +448,7 @@ Route::get('/email/comparison_txcurr', function () {
 
     // Send the email
     Mail::send('reports.partner.reports',
-        [],
+        ['unsubscribe_url' => ''],
         function ($message) use (&$fh, &$reportingMonth) {
             // email configurations
             $message->from('dwh@mg.kenyahmis.org', 'NDWH');
