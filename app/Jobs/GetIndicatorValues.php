@@ -792,8 +792,8 @@ class GetIndicatorValues implements ShouldQueue
         $fetched = [];
         DB::connection('sqlsrv')->table('FACT_ART_Retention731')
             ->selectRaw('MFLCode as facility_code, SUM(Active12M) as value')
-            ->where('StartART_Month', $period->format('Y'))
-            ->where('StartART_Year', $period->format('m'))
+            ->where('StartMonth', $period->format('m'))
+            ->where('StartYear', $period->format('Y'))
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
             ->groupBy('MFLCode')
