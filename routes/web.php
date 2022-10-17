@@ -415,8 +415,6 @@ Route::get('/email/comparison_txcurr', function () {
                 ORDER BY Percent_variance_EMR_DWH DESC";
     
 
-    
-    fclose($fh);
     config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
     $table = DB::connection('sqlsrv')->select(DB::raw($comparison_query));
     // Get previous Month and Year
