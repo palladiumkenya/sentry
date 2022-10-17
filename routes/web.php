@@ -608,6 +608,11 @@ Route::get('/email/comparison_txcurr', function () {
 
 });
 
+
+
+Route::get('/reportingMonth', function(){
+    Log::info(now()->startOf('month')->sub(2, 'month')->addDays(16)->endOf('month')->startOf('day'));
+});
 Route::get('/livesync', function(){
     ini_set('max_execution_time', -1);
     $etlJob = new EtlJob;
