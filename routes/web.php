@@ -445,18 +445,22 @@ Route::get('/email/comparison_txcurr', function () {
         }
     }
     fclose($fh);
-
-    // Send the email
-    Mail::send('reports.partner.reports',
-        ['unsubscribe_url' => ''],
-        function ($message) use (&$fh, &$reportingMonth) {
-            // email configurations
-            $message->from('dwh@mg.kenyahmis.org', 'NDWH');
-            // email address of the recipients
-            $message->to(["charles.bett@thepalladiumgroup.com"])->subject('Comparison Report');
-            // attach the csv file
-            $message->attach('fileout_Comparison_'.$reportingMonth.'.csv');
-        });
+    $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'DQA')->pluck('email')->toArray(); 
+    
+    
+    foreach ($emails as $e){
+        // Send the email
+        Mail::send('reports.partner.reports',
+            ['unsubscribe_url' => ''],
+            function ($message) use (&$fh, &$reportingMonth) {
+                // email configurations
+                $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                // email address of the recipients
+                $message->to([$e])->subject('Comparison Report');
+                // attach the csv file
+                $message->attach('fileout_Comparison_'.$reportingMonth.'.csv');
+            });
+    }
     return;
 
 });
