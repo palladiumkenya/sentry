@@ -608,17 +608,17 @@ class MainController extends Controller
     public function PeadAlert($email)
     {
         $query = "WITH otz_10_19_yrs as (
-            select
-                MFLCode,
-                FacilityName,
-                CTPartner,
-                County,
-                count(*) as no_otz_10_19_yrs
-            from PortalDev.dbo.FACT_Trans_OTZEnrollments
-            where TXCurr = 1
-                and DATIM_AgeGroup in ('10 to 14', '15 to 19')
-                and OTZEnrollmentDate  is not null
-            group by MFLCode, FacilityName, CTPartner, County
+                select
+                    MFLCode,
+                    FacilityName,
+                    CTPartner,
+                    County,
+                    count(*) as no_otz_10_19_yrs
+                from PortalDev.dbo.FACT_Trans_OTZEnrollments
+                where TXCurr = 1
+                    and DATIM_AgeGroup in ('10 to 14', '15 to 19')
+                    and OTZEnrollmentDate  is not null
+                group by MFLCode, FacilityName, CTPartner, County
             ), ovc_0_17_yrs as (
                 select
                     MFLCode,
@@ -638,22 +638,22 @@ class MainController extends Controller
                 SiteCode,
                 PatientPK
                 from All_Staging_2016_2.dbo.vw_GetViralLoads
-                where OrderedbyDate between dateadd(m, -13, dateadd(day, 1, eomonth(getdate(), -2))) -- subtract 12 months from last day of previous completed month
-                    and eomonth(dateadd(mm, -2, getdate())) --get last day of previous completed month
+                where OrderedbyDate between dateadd(m, -12, dateadd(day, 1, eomonth(getdate(), -1))) -- subtract 12 months from last day of previous completed month
+                    and eomonth(dateadd(mm, -1, getdate())) --get last day of previous completed month
                     and TestResult is not null
-            ), txcurr_0_19_yrs_valid_vl_12_months as (
+            ), txcurr_0_17_yrs_valid_vl_12_months as (
                 select
                         MFLCode,
                         FacilityName,
                         County,
                         CTPartner,
-                        count(*) as no_txcurr_0_19_yrs_valid_vl_12_months
+                        count(*) as no_txcurr_0_17_yrs_valid_vl_12_months
                 from PortalDev.dbo.Fact_Trans_New_Cohort as cohort
                 inner join documented_viral_loads_last_12 on documented_viral_loads_last_12.PatientId = cohort.PatientId
                     and documented_viral_loads_last_12.PatientPK = cohort.PatientPK
                     and documented_viral_loads_last_12.SiteCode = cohort.MFLCode
-                where ageLV between 0 and 19
-                    and TXCurr = 1
+                where ageLV between 0 and 17
+                    and TXCurr=1
                 group by MFLCode, FacilityName, CTPartner, County
             ), documented_regimen_0_19_yrs as (
                 select
@@ -665,7 +665,6 @@ class MainController extends Controller
                 from PortalDev.dbo.Fact_Trans_New_Cohort as cohort
                 where ageLV between 0 and 19
                     and TXCurr=1
-                    and CurrentRegimen is not null
                 group by MFLCode, FacilityName, CTPartner, County
             ),
             visit_weight_and_height_ordering as (
@@ -677,8 +676,8 @@ class MainController extends Controller
                     VisitDate,
                     Weight,
                     Height,
-                    row_number() over (partition by PatientPK, PatientID, SiteCode order by VisitDate desc) as rank
-                from All_Staging_2016_2.dbo.stg_PatientVisits
+                    row_number() over (partition by  PatientID,PatientPK, SiteCode order by VisitDate desc) as Num
+                from All_Staging_2016_2.dbo.vw_LastWeightHeight
             ),
             latest_visit as (
                 select
@@ -689,13 +688,13 @@ class MainController extends Controller
                 Left join PortalDev.dbo.Fact_Trans_New_Cohort on visit_weight_and_height_ordering.PatientID=Fact_Trans_New_Cohort.PatientID
                 and visit_weight_and_height_ordering.PatientPK=Fact_Trans_New_Cohort.PatientPK
                 and visit_weight_and_height_ordering.SiteCode=Fact_Trans_New_Cohort.MFLCode
-                where rank = 1
+                where Num = 1
             ),
             second_latest_visit as (
                 select
                     *
                 from visit_weight_and_height_ordering
-                where rank = 2
+                where Num = 2
             ),
             combined_weight_last_2_visits as (
             select
@@ -739,7 +738,7 @@ class MainController extends Controller
                 CTAgency,
                 Count (*)PaedsTXCurr
             from PortalDev.dbo.Fact_Trans_New_Cohort
-            where ageLV between 0 and 19   and TXCurr=1
+            where ageLV between 0 and 19  and TXCurr=1
             group by
                 MFLCode,
                 FacilityName,
@@ -756,7 +755,7 @@ class MainController extends Controller
                 CTAgency,
                 Count (*)Females15TXCurr
             from PortalDev.dbo.Fact_Trans_New_Cohort
-            where ageLV >=15 and TXCurr=1 and Gender='Female'
+            where ageLV >=15  and TXCurr=1 and Gender='Female'
             group by
                 MFLCode,
                 FacilityName,
@@ -832,16 +831,15 @@ class MainController extends Controller
                 where ageLV between 0 and 19
                     and ARTOutcome='V'
             ),
-            PaedsOnMMD AS (
-                    select
+            PaedsOnMMD AS (Select
                         MFLCode,
                         FacilityName,
                         County,
                         CTPartner,
-                        Count (*) as PaedsOnMMD
-                    from MMDCalc
-                    where MMDStatus=1
-                    group by
+                        Count (*) PaedsOnMMD
+                        from MMDCalc
+                        where MMDStatus=1
+                        group by
                         MFLCode,
                         FacilityName,
                         County,
@@ -852,27 +850,28 @@ class MainController extends Controller
                 facility_partner_combinations.FacilityName,
                 facility_partner_combinations.CTPartner,
                 facility_partner_combinations.County,
-                coalesce (Females15TXCurr,0) As Females15TXCurr,
-                coalesce (PaedsTXCurr,0) As PaedsTXCurr,
+                Coalesce (Females15TXCurr,0) As Females15TXCurr,
+                Coalesce (PaedsTXCurr,0) As PaedsTXCurr,
                 coalesce (PaedsListed,0) As PaedsListed,
                 coalesce (PaedsTested,0) As PaedsTested,
-                coalesce(txcurr_0_19_yrs_valid_vl_12_months.no_txcurr_0_19_yrs_valid_vl_12_months, 0) as no_txcurr_0_19_yrs_valid_vl_12_months,
+                coalesce(txcurr_0_17_yrs_valid_vl_12_months.no_txcurr_0_17_yrs_valid_vl_12_months, 0) as no_txcurr_0_17_yrs_valid_vl_12_months,
                 coalesce(documented_regimen_0_19_yrs.no_txcurr_0_19_yrs_documented_regimen, 0) as no_txcurr_0_19_yrs_documented_regimen,
                 coalesce(documented_weight_last_2_visits.no_documented_weight, 0) as no_documented_weight,
-                coalesce (PaedsOnMMD,0) As PaedsOnMMD,
+                Coalesce (PaedsOnMMD,0) As PaedsOnMMD,
                 coalesce(otz_10_19_yrs.no_otz_10_19_yrs, 0) as no_otz_10_19_yrs,
                 coalesce(ovc_0_17_yrs.no_ovc_0_17_yrs, 0) as no_ovc_0_17_yrs
             from facility_partner_combinations
             left join otz_10_19_yrs on otz_10_19_yrs.MFLCode = facility_partner_combinations.MFLCode
             left join ovc_0_17_yrs on ovc_0_17_yrs.MFLCode = facility_partner_combinations.MFLCode
-            left join txcurr_0_19_yrs_valid_vl_12_months on txcurr_0_19_yrs_valid_vl_12_months.MFLCode = facility_partner_combinations.MFLCode
+            left join txcurr_0_17_yrs_valid_vl_12_months on txcurr_0_17_yrs_valid_vl_12_months.MFLCode = facility_partner_combinations.MFLCode
             left join documented_regimen_0_19_yrs on documented_regimen_0_19_yrs.MFLCode = facility_partner_combinations.MFLCode
             left join documented_weight_last_2_visits on documented_weight_last_2_visits.MFLCode = facility_partner_combinations.MFLCode
-            left join Paeds on facility_partner_combinations.MFLCode=Paeds.MFLCode
-            left join FemaleAdults on facility_partner_combinations.MFLCode=FemaleAdults.MFLCode 
-            left join PaedsListed on facility_partner_combinations.MFLCode=PaedsListed.MFLCode
-            left join PaedsTested on facility_partner_combinations.MFLCode=PaedsTested.MFLCode
-            left join PaedsOnMMD on facility_partner_combinations.MFLCode=PaedsOnMMD.MFLCode";
+            Left join Paeds on facility_partner_combinations.MFLCode=Paeds.MFLCode
+            Left join FemaleAdults on facility_partner_combinations.MFLCode=FemaleAdults.MFLCode 
+            Left join PaedsListed on facility_partner_combinations.MFLCode=PaedsListed.MFLCode
+            Left join PaedsTested on facility_partner_combinations.MFLCode=PaedsTested.MFLCode
+            Left join PaedsOnMMD on facility_partner_combinations.MFLCode=PaedsOnMMD.MFLCode";
+        
         
         $query2 = "SELECT * from (Select Distinct df.FacilityId,Name as FacilityName,County,subCounty,Agency,Partner, f.year,f.month, f.docketId ,f.timeId as uploaddate
                 from (select name,facilityId,county,subcounty,agency,partner, \"CT\" AS docket from portaldevtest.dim_facility where isCt = 1) df
@@ -880,7 +879,7 @@ class MainController extends Controller
                             SELECT DISTINCT ROW_NUMBER ( ) OVER (PARTITION BY FacilityId,docketId,Concat(Month(fm.timeId),'-', Year(fm.timeId)) ORDER BY (cast(fm.timeId as date)) desc) AS RowID,
                             FacilityId,docketId,fm.timeId, dt.year,dt.month FROM  portaldevtest.fact_manifest fm
                             inner join portaldevtest.dim_time dt on dt.timeId=fm.timeId
-                            where dt.year = ".Carbon::now()->subMonth(2)->format('Y')." and dt.month = ".Carbon::now()->subMonth(2)->format('m')."
+                            where dt.year = ".Carbon::now()->subMonth(1)->format('Y')." and dt.month = ".Carbon::now()->subMonth(1)->format('m')."
                                 )u where RowId=1) f on f.facilityId=df.facilityId and df.docket=f.docketId) Y
                                 WHERE uploaddate is null ";
         
