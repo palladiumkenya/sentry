@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\NUPI;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ImportController extends Controller
 {
@@ -34,7 +36,6 @@ class ImportController extends Controller
             }
             $csv_data = array_slice($data[0], 0, 2);
 
-            $csv_data_file = "1";
             //CsvData::create([
             //     'csv_filename' => $request->file('csv_file')->getClientOriginalName(),
             //     'csv_header' => $request->has('header'),
@@ -65,30 +66,28 @@ class ImportController extends Controller
                 $csv_header_fields = $data[0][0];
             }
             $csv_data = array_shift($data[0]);
-            foreach ($csv_data as $row) {
-                $contact = new Contact();
-                foreach (config('app.db_fields') as $index => $field) {
-                    $contact->$field = $row[$request->fields[$index]];
-                }
-                $contact->save();
+        
+            $archive_db = "SELECT * INTO PortalDev.dbo.FACT_NUPI_" .Carbon::now()->format('dMY'). " FROM PortalDev.dbo.FACT_NUPI; DELETE FROM PortalDev.dbo.FACT_NUPI;" ;
+            $import_data = "";
+
+            config(['database.connections.sqlsrv.database' => 'PortalDev']);
+            DB::connection('sqlsrv')->raw($archive_db);
+
+            foreach ($data[0] as $d) {
+                config(['database.connections.sqlsrv.database' => 'PortalDev']);
+                DB::connection('sqlsrv')->table('PortalDev.dbo.FACT_NUPI')->insert([
+                    'MFLCode'=>$d[5],
+                    'FacilityName'=>$d[0],
+                    'County'=>$d[2],
+                    'Subcounty'=>$d[3],
+                    'CTPartner'=>$d[1],
+                    'CTAgency'=>$d[4],
+                    'NumNUPI'=>$d[6],
+                    ]);
             }
 
-            //CsvData::create([
-            //     'csv_filename' => $request->file('csv_file')->getClientOriginalName(),
-            //     'csv_header' => $request->has('header'),
-            //     'csv_data' => json_encode($data)
-            // ]);
         } else {
             return redirect()->back();
-        }
-        // $data = NUPI::find($request->csv_data_file_id);
-        $csv_data = json_decode($data->csv_data, true);
-        foreach ($csv_data as $row) {
-            $contact = new Contact();
-            foreach (config('app.db_fields') as $index => $field) {
-                $contact->$field = $row[$request->fields[$index]];
-            }
-            $contact->save();
         }
 
         return view('import_success');
