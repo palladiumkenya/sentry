@@ -512,3 +512,11 @@ Route::get('/data_triangulation/{email}', [MainController::class, 'DataTriangula
 Route::get('/nupi/{email}', [MainController::class, 'NUPIAlert']);
 Route::get('/unsubscribe/{email}', [EmailController::class, 'Unsubscribe'])->name('Unsubscribe');
 Route::get('/resubscribe/{email}', [EmailController::class, 'Resubscribe'])->name('resubscribe');
+
+Route::get('/nupi', [ImportController::class, 'getImport'])->name('import');
+Route::post('/import_parse', [ImportController::class, 'parseImport'])->name('import_parse');
+Route::post('/import_process', [ImportController::class, 'processImport'])->name('import_process');
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
