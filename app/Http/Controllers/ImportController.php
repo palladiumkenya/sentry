@@ -13,6 +13,8 @@ class ImportController extends Controller
 {
     public function getImport()
     {
+        ini_set('upload_max_filesize', -1);
+        ini_set('post_max_size', -1);
         return view('importnupi');
     }
 
@@ -52,6 +54,8 @@ class ImportController extends Controller
 
     public function processImport(Request $request)
     {
+        ini_set('upload_max_filesize', -1);
+        ini_set('post_max_size', -1);
         $path = $request->file('csv_file')->getRealPath();
 
         if ($request->has('header')) {
@@ -67,22 +71,34 @@ class ImportController extends Controller
             }
             $csv_data = array_shift($data[0]);
         
-            $archive_db = "SELECT * INTO PortalDev.dbo.FACT_NUPI_" .Carbon::now()->format('dMY'). " FROM PortalDev.dbo.FACT_NUPI; DELETE FROM PortalDev.dbo.FACT_NUPI;" ;
+            $archive_db = "SELECT * INTO tmp_and_adhoc.dbo.nupi_dataset_" .Carbon::now()->format('dMY'). " FROM tmp_and_adhoc.dbo.nupi_dataset; DELETE FROM tmp_and_adhoc.dbo.nupi_dataset;" ;
             $import_data = "";
 
-            config(['database.connections.sqlsrv.database' => 'PortalDev']);
+            config(['database.connections.sqlsrv.database' => 'tmp_and_adhoc']);
             DB::connection('sqlsrv')->raw($archive_db);
 
             foreach ($data[0] as $d) {
-                config(['database.connections.sqlsrv.database' => 'PortalDev']);
-                DB::connection('sqlsrv')->table('PortalDev.dbo.FACT_NUPI')->insert([
-                    'MFLCode'=>$d[5],
-                    'FacilityName'=>$d[0],
-                    'County'=>$d[2],
-                    'Subcounty'=>$d[3],
-                    'CTPartner'=>$d[1],
-                    'CTAgency'=>$d[4],
-                    'NumNUPI'=>$d[6],
+                config(['database.connections.sqlsrv.database' => 'nupi_dataset']);
+                DB::connection('sqlsrv')->table('tmp_and_adhoc.dbo.nupi_dataset')->insert([
+                    'ccc_no'=>$d[0], 
+                    'county'=>$d[1], 
+                    'sub_county'=>$d[2], 
+                    'origin_facility_kmfl_code'=>$d[3], 
+                    'facility'=>$d[4], 
+                    'gender'=>$d[5], 
+                    'client_number'=>$d[6], 
+                    'created_by'=>$d[7], 
+                    'date_created'=>$d[8], 
+                    'date_of_initiation'=>$d[9], 
+                    'treatment_outcome'=>$d[10], 
+                    'date_of_last_encounter'=>$d[11], 
+                    'date_of_last_viral_load'=>$d[12], 
+                    'date_of_next_appointment'=>$d[13], 
+                    'last_regimen'=>$d[14], 
+                    'last_regimen_line'=>$d[15], 
+                    'current_on_art'=>$d[16], 
+                    'date_of_hiv_diagnosis'=>$d[17], 
+                    'last_viral_load_result'=>$d[18]
                     ]);
             }
 

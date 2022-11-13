@@ -23,6 +23,7 @@
                                     </span>
                                     @endif
                                 </div>
+                                <small>Columns should be in the following order: ccc_no, county, sub_county, origin_facility_kmfl_code, facility, gender, client_number, created_by, date_created, date_of_initiation, treatment_outcome, date_of_last_encounter, date_of_last_viral_load, date_of_next_appointment, last_regimen, last_regimen_line, current_on_art, date_of_hiv_diagnosis, last_viral_load_result</small>
                             </div>
 
                             <div class="form-group">
