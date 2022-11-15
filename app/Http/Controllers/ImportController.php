@@ -66,13 +66,11 @@ class ImportController extends Controller
         $i = 0;
 
         $archive_db = "SELECT * INTO tmp_and_adhoc.dbo.nupi_dataset_" .Carbon::now()->format('dmY_His'). " FROM tmp_and_adhoc.dbo.nupi_dataset" ;
-
-        try{
-            config(['database.connections.sqlsrv.database' => 'tmp_and_adhoc']);
-            DB::connection('sqlsrv')->select(DB::raw($archive_db));
-        } catch (\Exception $e) {
-            //throw $th;
-        }
+        
+        config(['database.connections.sqlsrv.database' => 'tmp_and_adhoc']);
+        $archived = DB::connection('sqlsrv')->statement($archive_db); 
+        if (!$archived)
+            return "Unable to archive nupi_dataset DB; try again later";
         config(['database.connections.sqlsrv.database' => 'tmp_and_adhoc']);
         DB::connection('sqlsrv')->table("tmp_and_adhoc.dbo.nupi_dataset")->truncate();
         
