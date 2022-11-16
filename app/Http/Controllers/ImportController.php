@@ -74,6 +74,8 @@ class ImportController extends Controller
         config(['database.connections.sqlsrv.database' => 'tmp_and_adhoc']);
         DB::connection('sqlsrv')->table("tmp_and_adhoc.dbo.nupi_dataset")->truncate();
         
+        $insert_data = collect();
+        
         //Read the contents of the uploaded file 
         while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
             $num = count($filedata);
@@ -84,32 +86,41 @@ class ImportController extends Controller
             }
             
             config(['database.connections.sqlsrv.database' => 'nupi_dataset']);
-            DB::connection('sqlsrv')->table('tmp_and_adhoc.dbo.nupi_dataset')->insert([
+            $insert_data->push([
                 'ccc_no'=>$filedata[0], 
                 'origin_facility_kmfl_code'=>$filedata[1], 
                 'client_number'=>$filedata[2],
-                'date_created'=>$filedata[3], 
+                'date_created'=>$filedata[3],
+            ]);
+            // DB::connection('sqlsrv')->table('tmp_and_adhoc.dbo.nupi_dataset')->insert([
+            //     'ccc_no'=>$filedata[0], 
+            //     'origin_facility_kmfl_code'=>$filedata[1], 
+            //     'client_number'=>$filedata[2],
+            //     'date_created'=>$filedata[3], 
 
-                // 'county'=>$d[0], 
-                // 'sub_county'=>$d[], 
-                // 'facility'=>$d[4], 
-                // 'gender'=>$d[5],  
-                // 'created_by'=>$d[7], 
-                // 'date_of_initiation'=>$d[9], 
-                // 'treatment_outcome'=>$d[10], 
-                // 'date_of_last_encounter'=>$d[11], 
-                // 'date_of_last_viral_load'=>$d[12], 
-                // 'date_of_next_appointment'=>$d[13], 
-                // 'last_regimen'=>$d[14], 
-                // 'last_regimen_line'=>$d[15], 
-                // 'current_on_art'=>$d[16], 
-                // 'date_of_hiv_diagnosis'=>$d[17], 
-                // 'last_viral_load_result'=>$d[18]
-                ]);
+            //     // 'county'=>$d[0], 
+            //     // 'sub_county'=>$d[], 
+            //     // 'facility'=>$d[4], 
+            //     // 'gender'=>$d[5],  
+            //     // 'created_by'=>$d[7], 
+            //     // 'date_of_initiation'=>$d[9], 
+            //     // 'treatment_outcome'=>$d[10], 
+            //     // 'date_of_last_encounter'=>$d[11], 
+            //     // 'date_of_last_viral_load'=>$d[12], 
+            //     // 'date_of_next_appointment'=>$d[13], 
+            //     // 'last_regimen'=>$d[14], 
+            //     // 'last_regimen_line'=>$d[15], 
+            //     // 'current_on_art'=>$d[16], 
+            //     // 'date_of_hiv_diagnosis'=>$d[17], 
+            //     // 'last_viral_load_result'=>$d[18]
+            //     ]);
             $i++;
         }
+        foreach ($insert_data->chunk(520) as $chunk)
+        {
+            DB::connection('sqlsrv')->table('tmp_and_adhoc.dbo.nupi_dataset')->insert($chunk->toArray());
+        }
         fclose($file); //Close after reading
-        $j = 0;
         
         return view('import_success');
     }
