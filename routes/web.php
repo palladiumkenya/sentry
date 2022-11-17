@@ -516,8 +516,9 @@ Route::get('/resubscribe/{email}', [EmailController::class, 'Resubscribe'])->nam
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/nupi', [ImportController::class, 'getImport'])->name('import');
-    Route::post('/import_parse', [ImportController::class, 'parseImport'])->name('import_parse');
+    Route::get('/import_parse', [ImportController::class, 'parseImport'])->name('import_parse');
     Route::post('/import_process', [ImportController::class, 'processImport'])->name('import_process');
+    Route::post('file-upload/upload-large-files', [ImportController::class, 'uploadLargeFiles'])->name('files.upload.large');
 });
 
 Auth::routes();
