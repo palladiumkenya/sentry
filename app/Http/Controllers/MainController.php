@@ -844,7 +844,34 @@ class MainController extends Controller
                         FacilityName,
                         County,
                         CTPartner
-            )
+            ),
+            IITPaeds As (
+            Select
+                        PatientID,
+                        PatientPK,
+                        MFLCode,
+                        FacilityName,
+                        County,
+                        CTPartner,
+                        ARTOutcome,
+                        NextAppointmentDate
+            from PortalDev.dbo.Fact_Trans_New_Cohort
+            where ageLV between 0 and 19 and datediff (mm,NextAppointmentDate, EOMONTH(DATEADD(mm,-1,GETDATE())))<=6 and ARTOutcome not in ('V','D','T','NP','S')
+            ),
+            PaedsIIT AS (
+            Select
+                        MFLCode,
+                        FacilityName,
+                        County,
+                        CTPartner,
+                        count(*)IITPaeds
+                        from IITPaeds
+                        group by
+                        MFLCode,
+                        FacilityName,
+                        County,
+                        CTPartner
+                        )
             select
                 facility_partner_combinations.MFLCode,
                 facility_partner_combinations.FacilityName,
@@ -859,7 +886,8 @@ class MainController extends Controller
                 coalesce(documented_weight_last_2_visits.no_documented_weight, 0) as no_documented_weight,
                 Coalesce (PaedsOnMMD,0) As PaedsOnMMD,
                 coalesce(otz_10_19_yrs.no_otz_10_19_yrs, 0) as no_otz_10_19_yrs,
-                coalesce(ovc_0_17_yrs.no_ovc_0_17_yrs, 0) as no_ovc_0_17_yrs
+                coalesce(ovc_0_17_yrs.no_ovc_0_17_yrs, 0) as no_ovc_0_17_yrs,
+                coalesce (IITPaeds,0) as IITPaeds
             from facility_partner_combinations
             left join otz_10_19_yrs on otz_10_19_yrs.MFLCode = facility_partner_combinations.MFLCode
             left join ovc_0_17_yrs on ovc_0_17_yrs.MFLCode = facility_partner_combinations.MFLCode
@@ -870,15 +898,16 @@ class MainController extends Controller
             Left join FemaleAdults on facility_partner_combinations.MFLCode=FemaleAdults.MFLCode 
             Left join PaedsListed on facility_partner_combinations.MFLCode=PaedsListed.MFLCode
             Left join PaedsTested on facility_partner_combinations.MFLCode=PaedsTested.MFLCode
-            Left join PaedsOnMMD on facility_partner_combinations.MFLCode=PaedsOnMMD.MFLCode";
+            Left join PaedsOnMMD on facility_partner_combinations.MFLCode=PaedsOnMMD.MFLCode
+            left join PaedsIIT on PaedsIIT.MFLCode=facility_partner_combinations.MFLCode";
         
         
         $query2 = "SELECT * from (Select Distinct df.FacilityId,Name as FacilityName,County,subCounty,Agency,Partner, f.year,f.month, f.docketId ,f.timeId as uploaddate
-                from (select name,facilityId,county,subcounty,agency,partner, \"CT\" AS docket from portaldevtest.dim_facility where isCt = 1) df
+                from (select name,facilityId,county,subcounty,agency,partner, \"CT\" AS docket from portaldev.dim_facility where isCt = 1) df
                 LEFT JOIN (SELECT * FROM (
                             SELECT DISTINCT ROW_NUMBER ( ) OVER (PARTITION BY FacilityId,docketId,Concat(Month(fm.timeId),'-', Year(fm.timeId)) ORDER BY (cast(fm.timeId as date)) desc) AS RowID,
-                            FacilityId,docketId,fm.timeId, dt.year,dt.month FROM  portaldevtest.fact_manifest fm
-                            inner join portaldevtest.dim_time dt on dt.timeId=fm.timeId
+                            FacilityId,docketId,fm.timeId, dt.year,dt.month FROM  portaldev.fact_manifest fm
+                            inner join portaldev.dim_time dt on dt.timeId=fm.timeId
                             where dt.year = ".Carbon::now()->subMonth(1)->format('Y')." and dt.month = ".Carbon::now()->subMonth(1)->format('m')."
                                 )u where RowId=1) f on f.facilityId=df.facilityId and df.docket=f.docketId) Y
                                 WHERE uploaddate is null ";
