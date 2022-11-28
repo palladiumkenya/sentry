@@ -129,8 +129,8 @@ class GetIndicatorValues implements ShouldQueue
                 
         try {
             $client = new Client();
-            $response = $client->request('POST', 'stages/indicator', [
-                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+            $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
@@ -211,8 +211,8 @@ class GetIndicatorValues implements ShouldQueue
                 
         try {
             $client = new Client();
-            $response = $client->request('POST', 'stages/indicator', [
-                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+            $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
@@ -296,8 +296,8 @@ class GetIndicatorValues implements ShouldQueue
                 
         try {
             $client = new Client();
-            $response = $client->request('POST', 'stages/indicator', [
-                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+            $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
@@ -382,8 +382,8 @@ class GetIndicatorValues implements ShouldQueue
                 
         try {
             $client = new Client();
-            $response = $client->request('POST', 'stages/indicator', [
-                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+            $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
@@ -467,8 +467,8 @@ class GetIndicatorValues implements ShouldQueue
                 
         try {
             $client = new Client();
-            $response = $client->request('POST', 'stages/indicator', [
-                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+            $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
@@ -552,8 +552,8 @@ class GetIndicatorValues implements ShouldQueue
                 
         try {
             $client = new Client();
-            $response = $client->request('POST', 'stages/indicator', [
-                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+            $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
@@ -635,8 +635,8 @@ class GetIndicatorValues implements ShouldQueue
                 
         try {
             $client = new Client();
-            $response = $client->request('POST', 'stages/indicator', [
-                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+            $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
@@ -818,8 +818,8 @@ class GetIndicatorValues implements ShouldQueue
                 
         try {
             $client = new Client();
-            $response = $client->request('POST', 'stages/indicator', [
-                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+            $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
@@ -903,8 +903,8 @@ class GetIndicatorValues implements ShouldQueue
                 
         try {
             $client = new Client();
-            $response = $client->request('POST', 'stages/indicator', [
-                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'live_sync_api_url' : 'live_sync_api_url_staging'),
+            $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
+                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
