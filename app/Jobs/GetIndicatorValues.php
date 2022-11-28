@@ -134,7 +134,7 @@ class GetIndicatorValues implements ShouldQueue
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
-                'json' => [[
+                'json' => [
                     'id' => strtoupper(Str::uuid()),
                     'facilityCode' => $row->facility_code,
                     'facilityName' => '',
@@ -143,7 +143,7 @@ class GetIndicatorValues implements ShouldQueue
                     'indicatorDate' => $period->format('Y-m-d H:i:s'),
                     'stage' => 'DWH',
                     'facilityManifestId' => null,
-                ]]
+                ]
             ]);
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
                 // $this->liveSyncIndicator->posted = true;
@@ -216,7 +216,7 @@ class GetIndicatorValues implements ShouldQueue
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
-                'json' => [[
+                'json' => [
                     'id' => strtoupper(Str::uuid()),
                     'facilityCode' => $row->facility_code,
                     'facilityName' => '',
@@ -225,7 +225,7 @@ class GetIndicatorValues implements ShouldQueue
                     'indicatorDate' => $period->format('Y-m-d H:i:s'),
                     'stage' => 'DWH',
                     'facilityManifestId' => null,
-                ]]
+                ]
             ]);
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
                 // $this->liveSyncIndicator->posted = true;
@@ -301,7 +301,7 @@ class GetIndicatorValues implements ShouldQueue
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
-                'json' => [[
+                'json' => [
                     'id' => strtoupper(Str::uuid()),
                     'facilityCode' => $row->facility_code,
                     'facilityName' => '',
@@ -310,7 +310,7 @@ class GetIndicatorValues implements ShouldQueue
                     'indicatorDate' => $period->format('Y-m-d H:i:s'),
                     'stage' => 'DWH',
                     'facilityManifestId' => null,
-                ]]
+                ]
             ]);
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
                 // $this->liveSyncIndicator->posted = true;
@@ -387,7 +387,7 @@ class GetIndicatorValues implements ShouldQueue
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
-                'json' => [[
+                'json' => [
                     'id' => strtoupper(Str::uuid()),
                     'facilityCode' => $row->facility_code,
                     'facilityName' => '',
@@ -396,7 +396,7 @@ class GetIndicatorValues implements ShouldQueue
                     'indicatorDate' => $period->format('Y-m-d H:i:s'),
                     'stage' => 'DWH',
                     'facilityManifestId' => null,
-                ]]
+                ]
             ]);
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
                 // $this->liveSyncIndicator->posted = true;
@@ -472,7 +472,7 @@ class GetIndicatorValues implements ShouldQueue
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
-                'json' => [[
+                'json' => [
                     'id' => strtoupper(Str::uuid()),
                     'facilityCode' => $row->facility_code,
                     'facilityName' => '',
@@ -481,7 +481,7 @@ class GetIndicatorValues implements ShouldQueue
                     'indicatorDate' => $period->format('Y-m-d H:i:s'),
                     'stage' => 'DWH',
                     'facilityManifestId' => null,
-                ]]
+                ]
             ]);
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
                 // $this->liveSyncIndicator->posted = true;
@@ -557,7 +557,7 @@ class GetIndicatorValues implements ShouldQueue
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
-                'json' => [[
+                'json' => [
                     'id' => strtoupper(Str::uuid()),
                     'facilityCode' => $row->facility_code,
                     'facilityName' => '',
@@ -566,7 +566,7 @@ class GetIndicatorValues implements ShouldQueue
                     'indicatorDate' => $period->format('Y-m-d H:i:s'),
                     'stage' => 'DWH',
                     'facilityManifestId' => null,
-                ]]
+                ]
             ]);
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
                 // $this->liveSyncIndicator->posted = true;
@@ -640,7 +640,7 @@ class GetIndicatorValues implements ShouldQueue
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
-                'json' => [[
+                'json' => [
                     'id' => strtoupper(Str::uuid()),
                     'facilityCode' => $row->facility_code,
                     'facilityName' => '',
@@ -649,7 +649,7 @@ class GetIndicatorValues implements ShouldQueue
                     'indicatorDate' => $period->format('Y-m-d H:i:s'),
                     'stage' => 'DWH',
                     'facilityManifestId' => null,
-                ]]
+                ]
             ]);
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
                 // $this->liveSyncIndicator->posted = true;
@@ -823,7 +823,7 @@ class GetIndicatorValues implements ShouldQueue
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
-                'json' => [[
+                'json' => [
                     'id' => strtoupper(Str::uuid()),
                     'facilityCode' => $row->facility_code,
                     'facilityName' => '',
@@ -832,7 +832,7 @@ class GetIndicatorValues implements ShouldQueue
                     'indicatorDate' => $period->format('Y-m-d H:i:s'),
                     'stage' => 'DWH',
                     'facilityManifestId' => null,
-                ]]
+                ]
             ]);
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
                 // $this->liveSyncIndicator->posted = true;
@@ -908,7 +908,7 @@ class GetIndicatorValues implements ShouldQueue
                 'verify' => false,
                 'timeout'  => 300,
                 'http_errors' => false,
-                'json' => [[
+                'json' => [
                     'id' => strtoupper(Str::uuid()),
                     'facilityCode' => $row->facility_code,
                     'facilityName' => '',
@@ -917,7 +917,7 @@ class GetIndicatorValues implements ShouldQueue
                     'indicatorDate' => $period->format('Y-m-d H:i:s'),
                     'stage' => 'DWH',
                     'facilityManifestId' => null,
-                ]]
+                ]
             ]);
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
                 // $this->liveSyncIndicator->posted = true;
