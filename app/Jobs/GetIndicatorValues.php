@@ -94,7 +94,7 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->getTxPvls($this->period, $this->facilities);
                 // $this->getMmd($this->period, $this->facilities);
                 $this->getRetentionOnArt12Months($this->period, $this->facilities);
-                // $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
+                $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
         }
     }
 
@@ -876,11 +876,11 @@ class GetIndicatorValues implements ShouldQueue
         config(['database.connections.sqlsrv.database' => 'PortalDev']);
         $fetched = [];
         DB::connection('sqlsrv')->table('FACT_Trans_Retention')
-            ->selectRaw('MFLCode as facility_code, sum (12Mstatus) as value')
+            ->selectRaw('MFLCode as facility_code, sum ([12Mstatus]) as value')
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
-            ->where('StartYear', $period->format('Y'))
-            ->where('StartMonth', $period->format('m'))
+            ->where('StartART_Year', $period->format('Y'))
+            ->where('StartART_Month', $period->format('m'))
             ->groupBy('MFLCode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
