@@ -127,42 +127,42 @@ class GetIndicatorValues implements ShouldQueue
                 $fetched[] = $row->facility_code;
                 Log::info($facilities[$row->facility_code]);
                 
-        try {
-            $client = new Client();
-            $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
-                'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
-                'verify' => false,
-                'timeout'  => 300,
-                'http_errors' => false,
-                'json' => [
-                    'id' => strtoupper(Str::uuid()),
-                    'facilityCode' => $row->facility_code,
-                    'facilityName' => '',
-                    'name' => 'HTS_TESTED',
-                    'value' => is_null($row->value) ? 0 : $row->value,
-                    'indicatorDate' => $period->format('Y-m-d H:i:s'),
-                    'stage' => 'DWH',
-                    'facilityManifestId' => null,
-                ]
-            ]);
-            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
-                // $this->liveSyncIndicator->posted = true;
-                // $this->liveSyncIndicator->save();
-            } else {
-                Log::error(
-                    'PostLiveSyncIndicator: failed to post indicator ' 
-                    // $this->liveSyncIndicator->name . ': ' .
-                    // $this->liveSyncIndicator->facility->name
-                );
-            }
-        } catch (\Exception $e) {
-            Log::error(
-                'PostLiveSyncIndicator: failed to post indicator ' .
-                // $this->liveSyncIndicator->name . ': ' .
-                // $this->liveSyncIndicator->facility->name . ': ' .
-                $e->getMessage()
-            );
-        }
+                try {
+                    $client = new Client();
+                    $response = $client->request('POST', 'api/v1/metrics/facmetrics/dwhIndicator', [
+                        'base_uri' => nova_get_setting(nova_get_setting('production') ? 'spot_api_url' : 'spot_api_url_staging'),
+                        'verify' => false,
+                        'timeout'  => 300,
+                        'http_errors' => false,
+                        'json' => [
+                            'id' => strtoupper(Str::uuid()),
+                            'facilityCode' => $row->facility_code,
+                            'facilityName' => '',
+                            'name' => 'HTS_TESTED',
+                            'value' => is_null($row->value) ? 0 : $row->value,
+                            'indicatorDate' => $period->format('Y-m-d H:i:s'),
+                            'stage' => 'DWH',
+                            'facilityManifestId' => null,
+                        ]
+                    ]);
+                    if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) {
+                        // $this->liveSyncIndicator->posted = true;
+                        // $this->liveSyncIndicator->save();
+                    } else {
+                        Log::error(
+                            'PostLiveSyncIndicator: failed to post indicator ' 
+                            // $this->liveSyncIndicator->name . ': ' .
+                            // $this->liveSyncIndicator->facility->name
+                        );
+                    }
+                } catch (\Exception $e) {
+                    Log::error(
+                        'PostLiveSyncIndicator: failed to post indicator ' .
+                        // $this->liveSyncIndicator->name . ': ' .
+                        // $this->liveSyncIndicator->facility->name . ': ' .
+                        $e->getMessage()
+                    );
+                }
             });
         collect(array_diff(array_keys($facilities), $fetched))->each(function($facility_code) use ($facilities, $period) {
             LiveSyncIndicator::updateOrCreate(

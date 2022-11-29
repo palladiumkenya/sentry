@@ -312,7 +312,7 @@ Route::get('/email/comparison_txcurr', function () {
                     [CurrentOnART_Total],
                     ReportMonth_Year
                 FROM [All_Staging_2016_2].[dbo].[FACT_CT_DHIS2]
-                WHERE ReportMonth_Year =". Carbon::now()->subMonth()->format('Ym')."
+                WHERE ReportMonth_Year =". Carbon::now()->subMonth()->format('Ym') ."
             ),
             LatestEMR AS (Select
                     Emr.facilityCode 
@@ -415,14 +415,96 @@ Route::get('/email/comparison_txcurr', function () {
                 left join Uploaddata on NDW_CurTx.MFLCode=Uploaddata.MFLCode
                 ORDER BY Percent_variance_EMR_DWH DESC";
     
-
+    $comparison_hts = "WITH NDW_HTSPos AS (
+                SELECT
+                    SiteCode,
+                    FacilityName,
+                    sites.SDP,
+                    sites.County,
+                    COUNT(DISTINCT CONCAT( PatientPK,'-',SiteCode)) AS HTSPos_total
+                FROM All_Staging_2016_2.dbo.stg_hts_ClientTests tests
+                left join HIS_Implementation.dbo.All_EMRSites sites on tests.SiteCode=sites.MFL_Code
+                where TestDate  between  DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE())-1, 0) and DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1) and FinalTestResult='Positive' and SiteCode is not null and TestType='Initial'
+                GROUP BY SiteCode, FacilityName, SDP, County
+            ),
+        Upload As (
+            SELECT distinct
+                MFLCode,
+                FacName As FacilityName,
+                [CT Partner],
+                DateUploaded
+                from All_Staging_2016_2.dbo.Cohort2015_2016
+            ),
+        EMR As (SELECT
+            Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
+                facilityCode
+                ,facilityName
+                ,[value]
+                ,statusDate
+                ,indicatorDate
+            FROM livesync.dbo.indicator
+            where stage like '%EMR' and name like '%HTS_TESTED_POS' and indicatorDate=EOMONTH(DATEADD(mm,-1,GETDATE())) and facilityCode is not null
+            ),
+        Facilityinfo AS (
+            Select
+            MFL_Code,
+            County,
+            SDP
+            from HIS_Implementation.dbo.All_EMRSites
+            ),
+        DHIS2_HTSPos AS (
+                SELECT
+                    [SiteCode],
+                    [FacilityName],
+                    [County],
+                    Positive_Total,
+                    ReportMonth_Year
+                FROM [All_Staging_2016_2].[dbo].FACT_HTS_DHIS2
+                WHERE ReportMonth_Year = ". Carbon::now()->subMonth()->format('Ym') ." and SiteCode <>'NULL'
+            ),
+        LatestEMR AS (Select
+                    Emr.facilityCode 
+                ,Emr.facilityName
+                ,CONVERT (varchar,Emr.[value] ) As EMRValue
+                ,Emr.statusDate
+                ,Emr.indicatorDate
+                from EMR
+                where Num=1 and Emr.facilityCode is not null
+                )
+        Select
+                coalesce (DHIS2_HTSPos.Sitecode, NDW_HTSPos.sitecode,LatestEMR.facilityCode ) As MFLCode,
+                Coalesce (DHIS2_HTSPos.FacilityName, NDW_HTSPos.FacilityName,LatestEMR.facilityName) As FacilityName,
+                coalesce (fac.SDP,sites.SDIP) As SDP,
+                coalesce (NDW_HTSPos.County,sites.County) As County,
+                DHIS2_HTSPos.Positive_Total As KHIS_HTSPos,
+                NDW_HTSPos.HTSPos_total AS DWH_HTSPos,
+                LatestEMR.EMRValue As EMR_HTSPos,
+                LatestEMR.EMRValue-HTSPos_total As Diff_EMR_DWH,
+                DHIS2_HTSPos.Positive_Total-HTSPos_total As DiffKHISDWH,
+                DHIS2_HTSPos.Positive_Total-LatestEMR.EMRValue As DiffKHISEMR,
+            CAST(ROUND((CAST(LatestEMR.EMRValue AS DECIMAL(7,2)) - CAST(NDW_HTSPos.HTSPos_total AS DECIMAL(7,2)))
+                /NULLIF(CAST(LatestEMR.EMRValue  AS DECIMAL(7,2)),0)* 100, 2) AS float) AS Percent_variance_EMR_DWH,
+            CAST(ROUND((CAST(DHIS2_HTSPos.Positive_Total AS DECIMAL(7,2)) - CAST(NDW_HTSPos.HTSPos_total AS DECIMAL(7,2)))
+                /CAST(DHIS2_HTSPos.Positive_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_DWH,
+                CAST(ROUND((CAST(DHIS2_HTSPos.Positive_Total AS DECIMAL(7,2)) - CAST(LatestEMR.EMRValue AS DECIMAL(7,2)))
+                /CAST(DHIS2_HTSPos.Positive_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_EMR,
+                cast (Upload.DateUploaded as date)As DateUploaded
+            from DHIS2_HTSPos
+            left join LatestEMR on DHIS2_HTSPos.sitecode=LatestEMR.facilityCode
+            left join NDW_HTSPos on NDW_HTSPos.sitecode=DHIS2_HTSPos.SiteCode COLLATE Latin1_General_CI_AS
+            left join Upload on NDW_HTSPos.sitecode=Upload.MFLCode
+            left join Facilityinfo fac on DHIS2_HTSPos.SiteCode=fac.MFL_Code
+            left join HIS_Implementation.dbo.EMRandNonEMRSites sites on sites.MFLCode=DHIS2_HTSPos.SiteCode COLLATE Latin1_General_CI_AS
+            where DHIS2_HTSPos.Positive_Total is not null
+            ORDER BY Percent_variance_EMR_DWH DESC";
+    
     config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
     $table = DB::connection('sqlsrv')->select(DB::raw($comparison_query));
     // Get previous Month and Year
     $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
 
     $jsonDecoded = json_decode(json_encode($table), true); 
-    $fh = fopen('fileout_Comparison_'.$reportingMonth.'.csv', 'w');
+    $fh = fopen('fileout_Comparison_TXCURR_'.$reportingMonth.'.csv', 'w');
     if (is_array($jsonDecoded)) {
         $counter = 0;
         foreach ($jsonDecoded as $line) {
@@ -446,8 +528,38 @@ Route::get('/email/comparison_txcurr', function () {
         }
     }
     fclose($fh);
+
+    config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
+    $table2 = DB::connection('sqlsrv')->select(DB::raw($comparison_hts));
+
+    $jsonDecoded = json_decode(json_encode($table2), true); 
+    $fh = fopen('fileout_Comparison_HTS_'.$reportingMonth.'.csv', 'w');
+    if (is_array($jsonDecoded)) {
+        $counter = 0;
+        foreach ($jsonDecoded as $line) {
+            // sets the header row
+            if($counter == 0){
+                $header = array_keys($line);
+                fputcsv($fh, $header);
+            }
+            $counter++;
+
+            // sets the data row
+            foreach ($line as $key => $value) {
+                if ($value) {
+                    $line[$key] = $value;
+                }
+            }
+            // add each row to the csv file
+            if (is_array($line)) {
+                fputcsv($fh,$line);
+            }
+        }
+    }
+    fclose($fh);
+
+
     $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'DQA')->pluck('email')->toArray(); 
-    
     
     foreach ($emails as $e){
         // Send the email
@@ -459,7 +571,8 @@ Route::get('/email/comparison_txcurr', function () {
                 // email address of the recipients
                 $message->to([$e])->subject('Comparison Report');
                 // attach the csv file
-                $message->attach('fileout_Comparison_'.$reportingMonth.'.csv');
+                $message->attach('fileout_Comparison_TXCURR_'.$reportingMonth.'.csv');
+                $message->attach('fileout_Comparison_HTS_'.$reportingMonth.'.csv');
             });
     }
     return;
