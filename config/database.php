@@ -111,6 +111,19 @@ return [
             'prefix_indexes' => true,
         ],
 
+        'sqlsrv60' => [
+            'driver' => 'sqlsrv',
+            'url' => env('MSSQL_DATABASE_URL_60'),
+            'host' => env('MSSQL_DB_HOST_60', 'localhost'),
+            'port' => env('MSSQL_DB_PORT_60', '1433'),
+            'database' => env('', 'forge'),
+            'username' => env('MSSQL_DB_USERNAME_60', 'forge'),
+            'password' => env('MSSQL_DB_PASSWORD_60', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+        ],
+
     ],
 
     /*

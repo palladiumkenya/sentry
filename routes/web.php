@@ -3,6 +3,7 @@
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\HTSRecencyController;
 use App\Models\EtlJob;
 use App\Models\EmailContacts;
 use App\Models\FacilityMetric;
@@ -621,6 +622,7 @@ Route::get('/email/start', function () {
 Route::get('/dqa/{email}', [MainController::class, 'DQAReport']);
 
 Route::get('/peads/{email}', [MainController::class, 'PeadAlert']);
+Route::get('/htsrecency/pull', [HTSRecencyController::class, 'PullHtsRecency']);
 
 Route::get('/data_triangulation/{email}', [MainController::class, 'DataTriangulation']);
 Route::get('/nupi/{email}', [MainController::class, 'NUPIAlert']);
