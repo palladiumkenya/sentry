@@ -400,13 +400,13 @@ Route::get('/email/comparison_txcurr', function () {
                     JSON_VALUE ( Items, '$.Version' ) AS DwapiVersion,
                     JSON_VALUE ( Items, '$.Name' ) AS Docket 
                 FROM
-                    ( SELECT DISTINCT code FROM PatientExtract p INNER JOIN Facility f ON f.Id= p.FacilityId AND f.Voided= 0 AND code > 1 ) p
-                    LEFT JOIN FacilityManifest fm ON p.Code= fm.SiteCode
-                    JOIN FacilityManifestCargo fc ON fc.FacilityManifestId= fm.Id 
+                    ( SELECT DISTINCT code FROM DWAPICentral.dbo.PatientExtract p INNER JOIN DWAPICentral.dbo.Facility f ON f.Id= p.FacilityId AND f.Voided= 0 AND code > 1 ) p
+                    LEFT JOIN DWAPICentral.dbo.FacilityManifest fm ON p.Code= fm.SiteCode
+                    JOIN DWAPICentral.dbo.FacilityManifestCargo fc ON fc.FacilityManifestId= fm.Id 
                     AND CargoType = 2
                     ) Y 
             WHERE
-                Num = 1 
+                Num = 1
         ) 
         Select
                 coalesce (NDW_CurTx.MFLCode,LatestEMR.facilityCode ) As MFLCode,
@@ -504,13 +504,13 @@ Route::get('/email/comparison_txcurr', function () {
                     JSON_VALUE ( Items, '$.Version' ) AS DwapiVersion,
                     JSON_VALUE ( Items, '$.Name' ) AS Docket 
                 FROM
-                    ( SELECT DISTINCT code FROM PatientExtract p INNER JOIN Facility f ON f.Id= p.FacilityId AND f.Voided= 0 AND code > 1 ) p
-                    LEFT JOIN FacilityManifest fm ON p.Code= fm.SiteCode
-                    JOIN FacilityManifestCargo fc ON fc.FacilityManifestId= fm.Id 
+                    ( SELECT DISTINCT code FROM DWAPICentral.dbo.PatientExtract p INNER JOIN DWAPICentral.dbo.Facility f ON f.Id= p.FacilityId AND f.Voided= 0 AND code > 1 ) p
+                    LEFT JOIN DWAPICentral.dbo.FacilityManifest fm ON p.Code= fm.SiteCode
+                    JOIN DWAPICentral.dbo.FacilityManifestCargo fc ON fc.FacilityManifestId= fm.Id 
                     AND CargoType = 2
                     ) Y 
             WHERE
-                Num = 1 
+                Num = 1
         ) 
         Select
                 coalesce (DHIS2_HTSPos.Sitecode, NDW_HTSPos.sitecode,LatestEMR.facilityCode ) As MFLCode,
