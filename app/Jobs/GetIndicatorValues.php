@@ -30,7 +30,7 @@ class GetIndicatorValues implements ShouldQueue
     {
         $this->indicator = $indicator;
         $this->period = is_null($period) ?
-            now()->startOf('month')->sub(1, 'month')->endOf('month')->startOf('day') :
+            now()->sub(1, 'month')->endOf('month')->startOf('day') :
             Carbon::parse($period)->endOf('month');
         $this->facilities = $facilities;
     }
