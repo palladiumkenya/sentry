@@ -86,7 +86,7 @@ class GetIndicatorValues implements ShouldQueue
                 $this->getHtsTestedPos($this->period, $this->facilities);
                 // $this->getHtsLinked($this->period, $this->facilities);
                 // $this->getHtsIndex($this->period, $this->facilities);
-                $this->getHtsIndexPos($this->period, $this->facilities);
+                // todo:: look into this $this->getHtsIndexPos($this->period, $this->facilities);
                 $this->getTxNew($this->period, $this->facilities);
                 $this->getTxCurr($this->period, $this->facilities);
                 // $this->getTxRtt($this->period, $this->facilities);
@@ -107,8 +107,8 @@ class GetIndicatorValues implements ShouldQueue
             ->leftJoin('DimFacility', 'FactHTSClientTests.FacilityKey', '=', 'DimFacility.FacilityKey')
             ->whereNotNull('MFLCode')
             ->whereIn('Mflcode', array_keys($facilities))
-            ->where('year(DateTestedKey)', $period->format('Y'))
-            ->where('month(DateTestedKey)', $period->format('m'))
+            ->whereRaw('year(DateTestedKey)', $period->format('Y'))
+            ->whereRaw('month(DateTestedKey)', $period->format('m'))
             ->groupBy('MFLCode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -191,8 +191,8 @@ class GetIndicatorValues implements ShouldQueue
             ->selectRaw('Mflcode as facility_code, SUM(Positive) as value')
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
-            ->where('year(DateTestedKey)', $period->format('Y'))
-            ->where('month(DateTestedKey)', $period->format('m'))
+            ->whereRaw('year(DateTestedKey)', $period->format('Y'))
+            ->whereRaw('month(DateTestedKey)', $period->format('m'))
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -353,14 +353,15 @@ class GetIndicatorValues implements ShouldQueue
 
     public function getHtsIndex($period, $facilities)
     {
+        //TODO:: we need to get the query
         config(['database.connections.sqlsrv.database' => 'NDWH']);
         $fetched = [];
         DB::connection('sqlsrv')->table('FactHTSClientTests')
             ->selectRaw('Mflcode as facility_code, SUM(Positive) as value')
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
-            ->where('year(DateTestedKey)', $period->format('Y'))
-            ->where('month(DateTestedKey)', $period->format('m'))
+            ->whereRaw('year(DateTestedKey)', $period->format('Y'))
+            ->whereRaw('month(DateTestedKey)', $period->format('m'))
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -438,9 +439,9 @@ class GetIndicatorValues implements ShouldQueue
 
     public function getHtsIndexPos($period, $facilities)
     {
-        config(['database.connections.mysql2.database' => 'portaldev']);
+        config(['database.connections.sqlsrv.database' => 'NDWH']);
         $fetched = [];
-        DB::connection('mysql2')->table('fact_pns_knowledgehivstatus')
+        DB::connection('sqlsrv')->table('fact_pns_knowledgehivstatus')
             ->selectRaw('Mflcode as facility_code, SUM(Positive) as value')
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
@@ -527,8 +528,8 @@ class GetIndicatorValues implements ShouldQueue
         $fetched = [];
         DB::connection('sqlsrv')->table('AggregateCohortRetention')
             ->selectRaw('MFLCode as facility_code, SUM(patients_startedART) as value')
-            ->where("YEAR(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))", $period->format('Y'))
-            ->where("MONTH(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))", $period->format('m'))
+            ->whereRaw("YEAR(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))", $period->format('Y'))
+            ->whereRaw("MONTH(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))", $period->format('m'))
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
             ->groupBy('MFLCode')
