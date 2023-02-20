@@ -76,10 +76,10 @@ class GetIndicatorValues implements ShouldQueue
                 $this->getMmd($this->period, $this->facilities);
                 break;
             case 'RETENTION_ON_ART_12_MONTHS':
-                $this->getRetentionOnArt12Months($this->period, $this->facilities);
+                // $this->getRetentionOnArt12Months($this->period, $this->facilities);
                 break;
             case 'RETENTION_ON_ART_VL_1000_12_MONTHS':
-                $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
+                // $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
                 break;
             default:
                 $this->getHtsTested($this->period, $this->facilities);
@@ -93,8 +93,9 @@ class GetIndicatorValues implements ShouldQueue
                 // $this->getTxMl($this->period, $this->facilities);
                 // $this->getTxPvls($this->period, $this->facilities);
                 // $this->getMmd($this->period, $this->facilities);
-                $this->getRetentionOnArt12Months($this->period, $this->facilities);
-                $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
+                // todo:: look into this
+                // $this->getRetentionOnArt12Months($this->period, $this->facilities);
+                // $this->getRetentionOnArtVl100012Months($this->period, $this->facilities);
         }
     }
 
