@@ -528,7 +528,7 @@ class GetIndicatorValues implements ShouldQueue
     {
         config(['database.connections.sqlsrv.database' => 'REPORTING']);
         $fetched = [];
-        DB::connection('sqlsrv')->table('AggregateCohortRetention')
+        DB::connection('sqlsrv')->table('REPORTING.dbo.AggregateCohortRetention')
             ->selectRaw('MFLCode as facility_code, SUM(patients_startedART) as value')
             ->whereRaw("YEAR(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))  = ?", [$period->format('Y')])
             ->whereRaw("MONTH(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))  = ?", [$period->format('m')])
