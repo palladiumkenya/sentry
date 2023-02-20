@@ -100,15 +100,16 @@ class GetIndicatorValues implements ShouldQueue
 
     public function getHtsTested($period, $facilities)
     {
-        config(['database.connections.mysql2.database' => 'portaldev']);
+        config(['database.connections.sqlsrv.database' => 'NDWH']);
         $fetched = [];
-        DB::connection('mysql2')->table('fact_htsuptake')
-            ->selectRaw('Mflcode as facility_code, SUM(Tested) as value')
-            ->whereNotNull('Mflcode')
+        DB::connection('sqlsrv')->table('FactHTSClientTests')
+            ->selectRaw('MFLCode as facility_code, SUM(Tested) as value')
+            ->leftJoin('DimFacility', 'FactHTSClientTests.FacilityKey', '=', 'DimFacility.FacilityKey')
+            ->whereNotNull('MFLCode')
             ->whereIn('Mflcode', array_keys($facilities))
-            ->where('year', $period->format('Y'))
-            ->where('month', $period->format('m'))
-            ->groupBy('Mflcode')
+            ->where('year(DateTestedKey)', $period->format('Y'))
+            ->where('month(DateTestedKey)', $period->format('m'))
+            ->groupBy('MFLCode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
                     [
@@ -184,14 +185,14 @@ class GetIndicatorValues implements ShouldQueue
 
     public function getHtsTestedPos($period, $facilities)
     {
-        config(['database.connections.mysql2.database' => 'portaldev']);
+        config(['database.connections.sqlsrv.database' => 'NDWH']);
         $fetched = [];
-        DB::connection('mysql2')->table('fact_htsuptake')
+        DB::connection('sqlsrv')->table('FactHTSClientTests')
             ->selectRaw('Mflcode as facility_code, SUM(Positive) as value')
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
-            ->where('year', $period->format('Y'))
-            ->where('month', $period->format('m'))
+            ->where('year(DateTestedKey)', $period->format('Y'))
+            ->where('month(DateTestedKey)', $period->format('m'))
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -352,14 +353,14 @@ class GetIndicatorValues implements ShouldQueue
 
     public function getHtsIndex($period, $facilities)
     {
-        config(['database.connections.mysql2.database' => 'portaldev']);
+        config(['database.connections.sqlsrv.database' => 'NDWH']);
         $fetched = [];
-        DB::connection('mysql2')->table('fact_htsuptake')
+        DB::connection('sqlsrv')->table('FactHTSClientTests')
             ->selectRaw('Mflcode as facility_code, SUM(Positive) as value')
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
-            ->where('year', $period->format('Y'))
-            ->where('month', $period->format('m'))
+            ->where('year(DateTestedKey)', $period->format('Y'))
+            ->where('month(DateTestedKey)', $period->format('m'))
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -522,12 +523,12 @@ class GetIndicatorValues implements ShouldQueue
 
     public function getTxNew($period, $facilities)
     {
-        config(['database.connections.sqlsrv.database' => 'PortalDev']);
+        config(['database.connections.sqlsrv.database' => 'REPORTING']);
         $fetched = [];
-        DB::connection('sqlsrv')->table('FACT_Trans_Newly_Started')
-            ->selectRaw('MFLCode as facility_code, SUM(StartedART) as value')
-            ->where('Start_Year', $period->format('Y'))
-            ->where('StartART_Month', $period->format('m'))
+        DB::connection('sqlsrv')->table('AggregateCohortRetention')
+            ->selectRaw('MFLCode as facility_code, SUM(patients_startedART) as value')
+            ->where("YEAR(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))", $period->format('Y'))
+            ->where("MONTH(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))", $period->format('m'))
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
             ->groupBy('MFLCode')
@@ -607,10 +608,10 @@ class GetIndicatorValues implements ShouldQueue
 
     public function getTxCurr($period, $facilities)
     {
-        config(['database.connections.sqlsrv.database' => 'PortalDev']);
+        config(['database.connections.sqlsrv.database' => 'REPORTING']);
         $fetched = [];
-        DB::connection('sqlsrv')->table('Fact_Trans_HMIS_STATS_TXCURR')
-            ->selectRaw('MFLCode as facility_code, SUM(TXCURR_Total) as value')
+        DB::connection('sqlsrv')->table('AggregateTXCurr')
+            ->selectRaw('MFLCode as facility_code, SUM(CountClientsTXCur) as value')
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
             ->groupBy('MFLCode')
