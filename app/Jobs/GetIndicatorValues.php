@@ -107,8 +107,8 @@ class GetIndicatorValues implements ShouldQueue
             ->leftJoin('DimFacility', 'FactHTSClientTests.FacilityKey', '=', 'DimFacility.FacilityKey')
             ->whereNotNull('MFLCode')
             ->whereIn('Mflcode', array_keys($facilities))
-            ->whereRaw('year(DateTestedKey)', $period->format('Y'))
-            ->whereRaw('month(DateTestedKey)', $period->format('m'))
+            ->whereRaw('year(DateTestedKey) = ?', [$period->format('Y')])
+            ->whereRaw('month(DateTestedKey) = ?', [$period->format('m')])
             ->groupBy('MFLCode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -191,8 +191,8 @@ class GetIndicatorValues implements ShouldQueue
             ->selectRaw('Mflcode as facility_code, SUM(Positive) as value')
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
-            ->whereRaw('year(DateTestedKey)', $period->format('Y'))
-            ->whereRaw('month(DateTestedKey)', $period->format('m'))
+            ->whereRaw('year(DateTestedKey) = ?', [$period->format('Y')])
+            ->whereRaw('month(DateTestedKey) = ?', [$period->format('m')])
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -360,8 +360,8 @@ class GetIndicatorValues implements ShouldQueue
             ->selectRaw('Mflcode as facility_code, SUM(Positive) as value')
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
-            ->whereRaw('year(DateTestedKey)', $period->format('Y'))
-            ->whereRaw('month(DateTestedKey)', $period->format('m'))
+            ->whereRaw('year(DateTestedKey) = ?', [$period->format('Y')])
+            ->whereRaw('month(DateTestedKey) = ?', [$period->format('m')])
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -528,8 +528,8 @@ class GetIndicatorValues implements ShouldQueue
         $fetched = [];
         DB::connection('sqlsrv')->table('AggregateCohortRetention')
             ->selectRaw('MFLCode as facility_code, SUM(patients_startedART) as value')
-            ->whereRaw("YEAR(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))", $period->format('Y'))
-            ->whereRaw("MONTH(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))", $period->format('m'))
+            ->whereRaw("YEAR(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))  = ?", [$period->format('Y')])
+            ->whereRaw("MONTH(CAST(REPLACE(StartARTYearMonth , '-', '') + '01' AS DATE))  = ?", [$period->format('m')])
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
             ->groupBy('MFLCode')
