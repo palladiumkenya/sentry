@@ -613,7 +613,7 @@ class GetIndicatorValues implements ShouldQueue
     {
         config(['database.connections.sqlsrv.database' => 'REPORTING']);
         $fetched = [];
-        DB::connection('sqlsrv')->table('AggregateTXCurr')
+        DB::connection('sqlsrv')->table('REPORTING.dbo.AggregateTXCurr')
             ->selectRaw('MFLCode as facility_code, SUM(CountClientsTXCur) as value')
             ->whereNotNull('MFLCode')
             ->whereIn('MFLCode', array_keys($facilities))
