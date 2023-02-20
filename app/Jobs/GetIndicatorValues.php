@@ -189,6 +189,7 @@ class GetIndicatorValues implements ShouldQueue
         $fetched = [];
         DB::connection('sqlsrv')->table('FactHTSClientTests')
             ->selectRaw('Mflcode as facility_code, SUM(Positive) as value')
+            ->leftJoin('DimFacility', 'FactHTSClientTests.FacilityKey', '=', 'DimFacility.FacilityKey')
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
             ->whereRaw('year(DateTestedKey) = ?', [$period->format('Y')])
@@ -358,6 +359,7 @@ class GetIndicatorValues implements ShouldQueue
         $fetched = [];
         DB::connection('sqlsrv')->table('FactHTSClientTests')
             ->selectRaw('Mflcode as facility_code, SUM(Positive) as value')
+            ->leftJoin('DimFacility', 'FactHTSClientTests.FacilityKey', '=', 'DimFacility.FacilityKey')
             ->whereNotNull('Mflcode')
             ->whereIn('Mflcode', array_keys($facilities))
             ->whereRaw('year(DateTestedKey) = ?', [$period->format('Y')])
