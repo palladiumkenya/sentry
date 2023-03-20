@@ -671,6 +671,7 @@ Route::get('/email/start', function () {
 Route::get('/dqa/{email}', [MainController::class, 'DQAReport']);
 
 Route::get('/peads/{email}', [MainController::class, 'PeadAlert']);
+Route::get('/peadstesting/{email}', [MainController::class, 'PeadTestingAlert']);
 Route::get('/htsrecency/pull', [HTSRecencyController::class, 'PullHtsRecency']);
 
 Route::get('/data_triangulation/{email}', [MainController::class, 'DataTriangulation']);
