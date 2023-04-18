@@ -824,7 +824,7 @@ class MainController extends Controller
                 coalesce (PaedsTested,0) As PaedsTested,
                 coalesce(txcurr_0_17_yrs_valid_vl_12_months.no_txcurr_0_17_yrs_valid_vl_12_months, 0) as no_txcurr_0_17_yrs_valid_vl_12_months,
                 coalesce(documented_regimen_0_19_yrs.no_txcurr_0_19_yrs_documented_regimen, 0) as no_txcurr_0_19_yrs_documented_regimen,
-                coalesce(documented_weight_last_2_visits.no_documented_weight, 0) as no_documented_weight,                
+                coalesce(documented_weight_last_2_visits.no_documented_weight, 0) as no_documented_weight,
                 Coalesce (PaedsOnMMD,0) As PaedsOnMMD,
                 coalesce(otz_10_19_yrs.no_otz_10_19_yrs, 0) as no_otz_10_19_yrs,
                 coalesce(ovc_0_17_yrs.no_ovc_0_17_yrs, 0) as no_ovc_0_17_yrs,
