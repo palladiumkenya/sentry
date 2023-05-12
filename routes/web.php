@@ -232,11 +232,10 @@ Route::get('/email/covid', function () {
         County,
         SubCounty,
         COUNT(*) Adults,
-        SUM(CASE WHEN VaccinationStatus in ('Fully Vaccinated','Not Vaccinated','Partially Vaccinated') THEN 1 ELSE 0 END) Screened,
-        SUM(CASE WHEN VaccinationStatus in ('Partially Vaccinated') THEN 1 ELSE 0 END) Partially_Vacinated,
-        SUM(CASE WHEN VaccinationStatus in ('Fully Vaccinated') THEN 1 ELSE 0 END) Fully_Vaccinated
+        SUM(CASE WHEN VaccinationStatus in (\'Fully Vaccinated\',\'Not Vaccinated\',\'Partially Vaccinated\') THEN 1 ELSE 0 END) Screened,
+        SUM(CASE WHEN VaccinationStatus in (\'Partially Vaccinated\') THEN 1 ELSE 0 END) Partially_Vacinated,
+        SUM(CASE WHEN VaccinationStatus in (\'Fully Vaccinated\') THEN 1 ELSE 0 END) Fully_Vaccinated
     FROM REPORTING.[dbo].[LineListCovid]
-
     GROUP BY MFLCode, 
         PartnerName,
         FacilityName,
