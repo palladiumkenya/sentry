@@ -225,13 +225,30 @@ Route::get('/test/{email}', function ($email) {
 });
 
 Route::get('/email/covid', function () {
+    $query = 'SELECT 
+        MFLCode, 
+        PartnerName,
+        FacilityName,
+        County,
+        SubCounty,
+        COUNT(*) Adults,
+        SUM(CASE WHEN VaccinationStatus in ('Fully Vaccinated','Not Vaccinated','Partially Vaccinated') THEN 1 ELSE 0 END) Screened,
+        SUM(CASE WHEN VaccinationStatus in ('Partially Vaccinated') THEN 1 ELSE 0 END) Partially_Vacinated,
+        SUM(CASE WHEN VaccinationStatus in ('Fully Vaccinated') THEN 1 ELSE 0 END) Fully_Vaccinated
+    FROM REPORTING.[dbo].[LineListCovid]
+
+    GROUP BY MFLCode, 
+        PartnerName,
+        FacilityName,
+        County,
+        SubCounty
+    ';
     config(['database.connections.sqlsrv.database' => 'PortalDev']);
-    $table = DB::connection('sqlsrv')->table('PortalDev.dbo.FACT_COVID_STATS')
-    ->selectRaw('*')->get();
+    $table = DB::connection('sqlsrv')->select(DB::raw($query));
     // Get previous Month and Year
     $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
 
-    $jsonDecoded = json_decode($table, true); 
+    $jsonDecoded = json_decode(json_encode($table), true); 
     $fh = fopen('fileout_Covid_'.$reportingMonth.'.csv', 'w');
     if (is_array($jsonDecoded)) {
         $counter = 0;
@@ -452,7 +469,7 @@ Route::get('/email/comparison_txcurr', function () {
                 INNER JOIN NDWH.dbo.DimPartner AS part ON link.PartnerKey = part.PartnerKey
                 INNER JOIN NDWH.dbo.DimFacility AS fac ON link.FacilityKey = fac.FacilityKey
                 INNER JOIN NDWH.dbo.DimAgency AS agency ON link.AgencyKey = agency.AgencyKey
-                where link.DateTestedKey  between  DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE())-1, 0) and DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1) and FinalTestResult='Positive' and MFLCode is not null and TestType='Initial'
+                where link.DateTestedKey  between  DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE())-1, 0) and DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1) and FinalTestResult='Positive' and MFLCode is not null and TestType='Initial Test'
                 GROUP BY MFLCode, FacilityName, PartnerName, County
             ),
 --         Upload As (
