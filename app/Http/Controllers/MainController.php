@@ -969,134 +969,75 @@ class MainController extends Controller
     public function PeadTestingAlert($email)
     {
         $query = "WITH FemaleAdults AS (
-            SELECT 
-                    PartnerName,
-                    Count (*)FemalesTXCurr
-            from REPORTING.dbo.Linelist_FACTART as ART
-            where ARTOutcome='V' and  Gender='Female' and age between 20 and 49
-            group by 
-                PartnerName
-            ),
-
-            PaedsListed AS (
-            SELECT 
-                    PartnerName,
-                    Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsListed
-                FROM [ODS].dbo.CT_ContactListing listing 
-                inner join REPORTING.dbo.Linelist_FACTART as ART on 
-                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and 
-                listing.SiteCode=ART.SiteCode
-            where ContactAge<=19
-                    and Gender = 'Female' 
-                    and age between 20 and 49
-                    and ARTOutcome ='V'
-            Group by 
-                PartnerName	
-            ),
-            PaedsEligible AS (
-            SELECT 
-                    PartnerName,
-                    Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsEligible
-                FROM [ODS].dbo.CT_ContactListing listing 
-                inner join REPORTING.dbo.Linelist_FACTART as ART on 
-                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and 
-                listing.SiteCode=ART.SiteCode
-            where ContactAge<=19
-                    and Gender = 'Female' 
-                    and age between 20 and 49
-                    and ARTOutcome ='V' and KnowledgeOfHivStatus <> 'Yes'
-            Group by 
-                PartnerName	
-            ),
-
-            PaedsTested AS (
-            SELECT 
-                    PartnerName,
-                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsTested
-                FROM [ODS].[dbo].[CT_ContactListing] listing 
-                inner join REPORTING.dbo.Linelist_FACTART as ART on 
-                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and 
-                listing.SiteCode=ART.SiteCode
-                inner join ODS.dbo.HTS_ClientTests tests on
-                listing.ContactPatientPK=tests.PatientPk and 
-                listing.SiteCode=tests.SiteCode
-            where ContactAge<=19
-                    and Gender = 'Female' 
-                    and age between 20 and 49
-                    and ARTOutcome='V'
-            Group by 
-                PartnerName
-            ),
-            PaedsHIVPos AS (
-            SELECT 
-                    PartnerName,
-                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsHIVPos
-                FROM [ODS].[dbo].[CT_ContactListing] listing 
-                inner join REPORTING.dbo.Linelist_FACTART as ART on 
-                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and 
-                listing.SiteCode=ART.SiteCode
-                inner join ODS.dbo.HTS_ClientTests tests on
-                listing.ContactPatientPK=tests.PatientPk and 
-                listing.SiteCode=tests.SiteCode
-            where ContactAge<=19
-                    and Gender = 'Female' 
-                    and age between 20 and 49
-                    and ARTOutcome='V'
-                    and FinalTestResult='Positive'
-            Group by 
-                PartnerName
-
-            ),
-
-            PaedsLinked AS (
-            SELECT 
-                    PartnerName,
-                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsLinked
-                FROM [ODS].[dbo].[CT_ContactListing] listing 
-                inner join REPORTING.dbo.Linelist_FACTART as ART on 
-                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and 
-                listing.SiteCode=ART.SiteCode
-                inner join ODS.dbo.HTS_ClientTests tests on
-                listing.ContactPatientPK=tests.PatientPk and 
-                listing.SiteCode=tests.SiteCode
-                inner join ODS.dbo.HTS_ClientLinkages linkage  on  
-                tests.PatientPk=linkage.PatientPK and 
-                tests.SiteCode=linkage.SiteCode
-            where ContactAge<=19
-                    and Gender = 'Female' 
-                    and age between 20 and 49
-                    and ARTOutcome='V'
-                    and FinalTestResult='Positive'
-            Group by 
-                PartnerName
-            )
             Select 
-                    FemaleAdults.PartnerName,
-                    FemalesTXCurr,
-                    coalesce (PaedsListed,0) as PaedsListed,
-                    coalesce (PaedsEligible,0) as PaedsEligible,
-                    coalesce (PaedsTested,0) as PaedsTested,
-                    coalesce (round(cast(sum(PaedsTested) as float) / nullif(cast(sum(PaedsEligible) as float), 0),2), 0) as '% PaedsTested',
-                    coalesce (PaedsHIVPos,0) as PaedsHIVPos,
-                    coalesce (round(cast(sum(PaedsHIVPos) as float) / nullif(cast(sum(PaedsTested) as float), 0),2), 0) as '% PaedsHIVPos',
-                    coalesce (PaedsLinked,0) as PaedsLinked,
-                    coalesce (round(cast(sum(PaedsLinked) as float) / nullif(cast(sum(PaedsHIVPos) as float), 0),2), 0) as '% PaedsLinked'
-            from 
-                FemaleAdults
-                left join PaedsListed on PaedsListed.PartnerName=FemaleAdults.PartnerName
-                left join PaedsEligible on PaedsEligible.PartnerName=FemaleAdults.PartnerName
-                left join PaedsTested on PaedsTested.PartnerName=FemaleAdults.PartnerName
-                left join PaedsHIVPos on PaedsHIVPos.PartnerName=FemaleAdults.PartnerName
-                left join PaedsLinked on PaedsLinked.PartnerName=FemaleAdults.PartnerName
-                Group by 
-                FemaleAdults.PartnerName,
-                FemalesTXCurr,
-                PaedsListed,
-                PaedsEligible,
-                PaedsTested,
-                PaedsHIVPos,
-                PaedsLinked
-                ";
+                PartnerName, 
+                Count (*)FemalesTXCurr 
+            from REPORTING.dbo.Linelist_FACTART as ART 
+            where ARTOutcome='V' and Gender='Female' and age between 20 and 49group by PartnerName 
+        ),
+        PaedsListed AS (
+            SELECT 
+                PartnerName, 
+                Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsListed 
+            FROM [ODS].dbo.CT_ContactListing listing 
+            inner join REPORTING.dbo.Linelist_FACTART as ART on convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and listing.SiteCode=ART.SiteCode 
+            where ContactAge<=19 and Gender = 'Female' and age between 20 and 49 and ARTOutcome ='V' Group by PartnerName 
+        ),
+        PaedsEligible AS (
+            SELECT 
+                PartnerName, 
+                Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsEligible 
+            FROM [ODS].dbo.CT_ContactListing listing 
+            inner join REPORTING.dbo.Linelist_FACTART as ART on convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and listing.SiteCode=ART.SiteCode 
+            where ContactAge<=19 and Gender = 'Female' and age between 20 and 49 and ARTOutcome ='V' and KnowledgeOfHivStatus <> 'Yes' Group by PartnerName 
+        ),
+        PaedsTested AS (
+            SELECT 
+                PartnerName, 
+                Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsTested 
+            FROM [ODS].[dbo].[CT_ContactListing] listing 
+            inner join REPORTING.dbo.Linelist_FACTART as ART on convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and listing.SiteCode=ART.SiteCode 
+            inner join ODS.dbo.HTS_ClientTests tests on listing.ContactPatientPK=tests.PatientPk and listing.SiteCode=tests.SiteCode 
+            where ContactAge<=19 and Gender = 'Female' and age between 20 and 49 and ARTOutcome='V' Group by PartnerName 
+        ),
+        PaedsHIVPos AS (
+            SELECT 
+                PartnerName, 
+                Count (Distinct concat(ContactPatientPK,listing.SiteCode)) As PaedsHIVPos 
+            FROM [ODS].[dbo].[CT_ContactListing] listing 
+            inner join REPORTING.dbo.Linelist_FACTART as ART on convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and listing.SiteCode=ART.SiteCode 
+            inner join ODS.dbo.HTS_ClientTests tests on listing.ContactPatientPK=tests.PatientPk and listing.SiteCode=tests.SiteCode 
+            where ContactAge<=19 and Gender = 'Female' and age between 20 and 49 and ARTOutcome='V' and FinalTestResult='Positive' Group by PartnerName 
+        ),
+        PaedsLinked AS (
+            SELECT 
+                PartnerName, 
+                Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsLinked 
+            FROM [ODS].[dbo].[CT_ContactListing] listing 
+            inner join REPORTING.dbo.Linelist_FACTART as ART on convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and listing.SiteCode=ART.SiteCode 
+            inner join ODS.dbo.HTS_ClientTests tests on listing.ContactPatientPK=tests.PatientPk and listing.SiteCode=tests.SiteCode 
+            inner join ODS.dbo.HTS_ClientLinkages linkage on tests.PatientPk=linkage.PatientPK and tests.SiteCode=linkage.SiteCode 
+            where ContactAge<=19 and Gender = 'Female' and age between 20 and 49 and ARTOutcome='V' and FinalTestResult='Positive' 
+            Group by PartnerName 
+        )
+        Select 
+            FemaleAdults.PartnerName, 
+            FemalesTXCurr, 
+            coalesce (PaedsListed,0) as PaedsListed, 
+            coalesce (PaedsEligible,0) as PaedsEligible, 
+            coalesce (PaedsTested,0) as PaedsTested, 
+            coalesce (round(cast(sum(PaedsTested) as float) / nullif(cast(sum(PaedsEligible) as float), 0),2), 0) as '% PaedsTested', 
+            coalesce (PaedsHIVPos,0) as PaedsHIVPos, 
+            coalesce (round(cast(sum(PaedsHIVPos) as float) / nullif(cast(sum(PaedsTested) as float), 0),2), 0) as '% PaedsHIVPos', 
+            coalesce (PaedsLinked,0) as PaedsLinked, 
+            coalesce (round(cast(sum(PaedsLinked) as float) / nullif(cast(sum(PaedsHIVPos) as float), 0),2), 0) as '% PaedsLinked'
+        from FemaleAdults 
+        left join PaedsListed on PaedsListed.PartnerName=FemaleAdults.PartnerName 
+        left join PaedsEligible on PaedsEligible.PartnerName=FemaleAdults.PartnerName 
+        left join PaedsTested on PaedsTested.PartnerName=FemaleAdults.PartnerName 
+        left join PaedsHIVPos on PaedsHIVPos.PartnerName=FemaleAdults.PartnerName 
+        left join PaedsLinked on PaedsLinked.PartnerName=FemaleAdults.PartnerName 
+        Group by FemaleAdults.PartnerName, FemalesTXCurr, PaedsListed, PaedsEligible, PaedsTested, PaedsHIVPos, PaedsLinked";
         
         config(['database.connections.sqlsrv.database' => 'REPORTING']);
 
