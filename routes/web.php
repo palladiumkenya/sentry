@@ -538,8 +538,8 @@ Route::get('/email/comparison_txcurr', function () {
             Select
                 coalesce (DHIS2_HTSPos.SiteCode, NDW_HTSPos.sitecode,LatestEMR.facilityCode ) As MFLCode,
                 Coalesce (NDW_HTSPos.FacilityName, DHIS2_HTSPos.FacilityName) As FacilityName,
-                coalesce (fac.SDP,sites.SDIP) As SDP,
-                coalesce (NDW_HTSPos.County,sites.County) As County,
+                fac.SDP As SDP,
+                Coalesce (NDW_HTSPos.County, DHIS2_HTSPos.County) As County,
                 DHIS2_HTSPos.Positive_Total As KHIS_HTSPos,
                 coalesce (NDW_HTSPos.HTSPos_total, 0 )AS DWH_HTSPos,
                 LatestEMR.EMRValue As EMR_HTSPos,
@@ -560,7 +560,6 @@ Route::get('/email/comparison_txcurr', function () {
             left join NDW_HTSPos on NDW_HTSPos.sitecode=DHIS2_HTSPos.SiteCode
 --             left join Upload on NDW_HTSPos.sitecode=Upload.MFLCode
             left join Facilityinfo fac on DHIS2_HTSPos.SiteCode=fac.MFL_Code
-            left join HIS_Implementation.dbo.EMRandNonEMRSites sites on sites.MFLCode=DHIS2_HTSPos.SiteCode
             where DHIS2_HTSPos.Positive_Total is not null
             ORDER BY Percent_variance_EMR_DWH DESC";
     

@@ -619,18 +619,18 @@ class MainController extends Controller
                 group by MFLCode, FacilityName, PartnerName, County
             ), ovc_0_17_yrs as (
                 select                    
-                    MFLCode,                    
-                    FacilityName,                    
+                    MFLCode,
+                    FacilityName,
                     County,
                     PartnerName CTPartner,
                     count(*) as no_ovc_0_17_yrs
                 from REPORTING.dbo.LineListOVCEnrollments
-                where TXCurr=1                
+                where TXCurr=1
                 group by MFLCode, FacilityName, PartnerName, County
             ), documented_viral_loads_last_12 as (
-                select                
-                    distinct PatientIDHash,                
-                    SiteCode,                
+                select
+                    distinct PatientIDHash,
+                    SiteCode,
                     PatientPKHash
                 from ODS.dbo.[Intermediate_OrderedViralLoads] 
                 where OrderedbyDate between dateadd(m, -12, dateadd(day, 1, eomonth(getdate(), -1))) 
@@ -665,13 +665,13 @@ class MainController extends Controller
                 group by SiteCode, FacilityName, PartnerName, County
             ), visit_weight_and_height_ordering as (                
             /* order pharmacy dispensations as of date by the VisitDate */                                
-                select                                    
-                    DISTINCT row_number() over (partition by PatientIDHash ,SiteCode,PatientPKHash order by VisitDate desc) as num,                                    
-                    VisitDate,                                    
-                    PatientIDHash ,                                    
-                    PatientPKHash,                                    
-                    SiteCode,                                    
-                    Weight,                                    
+                select
+                    DISTINCT row_number() over (partition by PatientIDHash ,SiteCode,PatientPKHash order by VisitDate desc) as num,
+                    VisitDate,
+                    PatientIDHash ,
+                    PatientPKHash,
+                    SiteCode,
+                    Weight,
                     Height
                 from ODS.dbo.CT_PatientVisits
             ), latest_visit as (                
