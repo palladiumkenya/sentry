@@ -110,7 +110,7 @@ class GetIndicatorValues implements ShouldQueue
             ->whereIn('Mflcode', array_keys($facilities))
             ->whereRaw('year(DateTestedKey) = ?', [$period->format('Y')])
             ->whereRaw('month(DateTestedKey) = ?', [$period->format('m')])
-            ->whereRaw('TestType = ?', ['Initial'])
+            ->whereRaw('TestType like ?', ['Initial%'])
             ->groupBy('MFLCode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
@@ -196,7 +196,7 @@ class GetIndicatorValues implements ShouldQueue
             ->whereIn('Mflcode', array_keys($facilities))
             ->whereRaw('year(DateTestedKey) = ?', [$period->format('Y')])
             ->whereRaw('month(DateTestedKey) = ?', [$period->format('m')])
-            ->whereRaw('TestType = ?', ['Initial'])
+            ->whereRaw('TestType like ?', ['Initial%'])
             ->groupBy('Mflcode')
             ->cursor()->each(function ($row) use ($facilities, $period, &$fetched) {
                 LiveSyncIndicator::updateOrCreate(
