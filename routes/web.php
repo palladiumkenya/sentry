@@ -336,7 +336,7 @@ Route::get('/email/comparison_txcurr', function () {
                 Select
                     Emr.facilityCode 
                     ,Emr.facilityName
-                    ,CONVERT (varchar,Emr.[value] ) As EMRValue
+                    ,CAST(CONVERT (varchar,Emr.[value] ) AS DECIMAL(10, 4)) As EMRValue
                     ,Emr.statusDate
                     ,Emr.indicatorDate
                 from EMR
@@ -493,7 +493,8 @@ Route::get('/email/comparison_txcurr', function () {
                 Select
                     MFL_Code,
                     County,
-                    SDP
+                    SDP,
+                    EMR
                 from HIS_Implementation.dbo.All_EMRSites
             ),
             DHIS2_HTSPos AS (
@@ -539,6 +540,7 @@ Route::get('/email/comparison_txcurr', function () {
                 coalesce (DHIS2_HTSPos.SiteCode, NDW_HTSPos.sitecode,LatestEMR.facilityCode ) As MFLCode,
                 Coalesce (NDW_HTSPos.FacilityName, DHIS2_HTSPos.FacilityName) As FacilityName,
                 fac.SDP As SDP,
+                fac.emr as EMR,
                 Coalesce (NDW_HTSPos.County, DHIS2_HTSPos.County) As County,
                 DHIS2_HTSPos.Positive_Total As KHIS_HTSPos,
                 coalesce (NDW_HTSPos.HTSPos_total, 0 )AS DWH_HTSPos,
@@ -546,7 +548,7 @@ Route::get('/email/comparison_txcurr', function () {
                 LatestEMR.EMRValue-HTSPos_total As Diff_EMR_DWH,
                 DHIS2_HTSPos.Positive_Total-HTSPos_total As DiffKHISDWH,
                 DHIS2_HTSPos.Positive_Total-LatestEMR.EMRValue As DiffKHISEMR,
-								CAST(ROUND((CAST(LatestEMR.EMRValue AS DECIMAL(7,2)) - CAST(coalesce(NDW_HTSPos.HTSPos_total, null) AS DECIMAL(7,2)))
+				CAST(ROUND((CAST(LatestEMR.EMRValue AS DECIMAL(7,2)) - CAST(coalesce(NDW_HTSPos.HTSPos_total, null) AS DECIMAL(7,2)))
                 /NULLIF(CAST(LatestEMR.EMRValue  AS DECIMAL(7,2)),0)* 100, 2) AS float) AS Percent_variance_EMR_DWH,
                 CAST(ROUND((CAST(DHIS2_HTSPos.Positive_Total AS DECIMAL(7,2)) - CAST(NDW_HTSPos.HTSPos_total AS DECIMAL(7,2)))
                 /CAST(DHIS2_HTSPos.Positive_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_DWH,
