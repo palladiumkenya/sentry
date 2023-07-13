@@ -302,15 +302,23 @@ Route::get('/email/comparison_txcurr', function () {
                 WHERE ARTOutcome = 'V'
                 GROUP BY SiteCode, FacilityName, PartnerName, County
             ),
-            -- Upload As (
-            -- SELECT distinct
-            --     MFLCode,
-            --     FacName As FacilityName,
-            --     [CT Partner],
-            --     SiteAbstractionDate,
-            --     DateUploaded
-            --     from All_Staging_2016_2.dbo.Cohort2015_2016
-            -- ),
+			AllUpload as (
+				SELECT
+					dat.Date DateUploaded, 
+					[MFLCode],
+					ROW_NUMBER()OVER(Partition by MFLCode Order by [UploadsDateKey] Desc) as Num
+				FROM [NDWH].[dbo].[FactManifiest] m
+				LEFT JOIN NDWH.dbo.DimFacility fac ON fac.FacilityKey = m.FacilityKey
+				LEFT JOIN NDWH.dbo.DimDate dat ON dat.DateKey = m.UploadsDateKey
+			),
+            Upload As (
+				SELECT distinct
+					MFLCode,
+					-- SiteAbstractionDate,
+					DateUploaded
+                from AllUpload
+				WHERE Num = 1
+            ),
             EMR As (
                 SELECT
                     Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
@@ -444,7 +452,7 @@ Route::get('/email/comparison_txcurr', function () {
                 /CAST(DHIS2_CurTx.CurrentOnART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_DWH,
                 CAST(ROUND((CAST(DHIS2_CurTx.CurrentOnART_Total AS DECIMAL(7,2)) - CAST(LatestEMR.EMRValue AS DECIMAL(7,2)))
                 /CAST(DHIS2_CurTx.CurrentOnART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_EMR,
-                -- cast (Upload.DateUploaded as date)As DateUploaded,
+                cast (Upload.DateUploaded as date)As DateUploaded,
                 -- cast (Upload.SiteAbstractionDate as date) As SiteAbstractionDate,
                 case when CompletenessStatus is null then 'Complete' else 'Incomplete' End As Completeness,
 				DWAPI.DwapiVersion
@@ -452,7 +460,7 @@ Route::get('/email/comparison_txcurr', function () {
             left join LatestEMR on NDW_CurTx.MFLCode=LatestEMR.facilityCode
 			LEFT JOIN DWAPI ON DWAPI.SiteCode= LatestEMR.facilityCode
             left join DHIS2_CurTx on NDW_CurTx.MFLCode=DHIS2_CurTx.SiteCode COLLATE Latin1_General_CI_AS
-            -- left join Upload on NDW_CurTx.MFLCode=Upload.MFLCode
+            left join Upload on NDW_CurTx.MFLCode=Upload.MFLCode
             left join Uploaddata on NDW_CurTx.MFLCode=Uploaddata.MFLCode COLLATE Latin1_General_CI_AS
             ORDER BY Percent_variance_EMR_DWH DESC";
     

@@ -110,7 +110,7 @@ class GenerateFacilityMetricsReport implements ShouldQueue
         $spoturl = nova_get_setting(nova_get_setting('production') ? 'spot_url' : 'spot_url_staging') . '/#/';
         $dwhurl = nova_get_setting('production') ? 'https://dwh.nascop.org/#/' : 'https://data.kenyahmis.org:9000/#/';
 
-//        config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
+        // config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
         $facility_partner = DB::connection('sqlsrv')->table('All_Staging_2016_2.dbo.lkp_usgPartnerMenchanism')
             ->selectRaw('MFL_Code as code, FacilityName as name, County as county, Agency as agency, MechanismID as mechanism_id, Mechanism as partner, Implementing_Mechanism_Name as mechanism')
             ->whereNotNull('MFL_Code')
