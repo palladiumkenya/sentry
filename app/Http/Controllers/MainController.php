@@ -607,240 +607,147 @@ class MainController extends Controller
 
     public function PeadAlert($email)
     {
-        $query = "WITH otz_10_19_yrs as (
-                select                    
-                        MFLCode,                    
-                        FacilityName,                    
-                        PartnerName CTPartner,                    
-                        County,                    
-                        count(*) as no_otz_10_19_yrs
-                from REPORTING.dbo.LineListOTZ
-                where AgeGroup in ('10 to 14', '15 to 19')
-                group by MFLCode, FacilityName, PartnerName, County
-            ), ovc_0_17_yrs as (
-                select                    
-                    MFLCode,
-                    FacilityName,
-                    County,
-                    PartnerName CTPartner,
-                    count(*) as no_ovc_0_17_yrs
-                from REPORTING.dbo.LineListOVCEnrollments
-                where TXCurr=1
-                group by MFLCode, FacilityName, PartnerName, County
-            ), documented_viral_loads_last_12 as (
-                select
-                    distinct PatientIDHash,
-                    SiteCode,
-                    PatientPKHash
-                from ODS.dbo.[Intermediate_OrderedViralLoads] 
-                where OrderedbyDate between dateadd(m, -12, dateadd(day, 1, eomonth(getdate(), -1))) 
-                -- subtract 12 months from last day of previous completed month                    
-                and eomonth(dateadd(mm, -1, getdate())) 
-                --get last day of previous completed month                    
-                and TestResult is not null            
-            ), txcurr_0_17_yrs_valid_vl_12_months as (                
-                select                        
-                    Cohort.SiteCode MFLCode,                        
-                    FacilityName,                        
-                    County,                        
-                    PartnerName CTPartner,                        
-                    count(*) as no_txcurr_0_17_yrs_valid_vl_12_months
-                from REPORTING.dbo.Linelist_FACTART as cohort
-                inner join documented_viral_loads_last_12 on documented_viral_loads_last_12.PatientIDHash Collate Latin1_General_CI_AS = cohort.PatientIDHash
-                        and documented_viral_loads_last_12.PatientPKHash Collate Latin1_General_CI_AS = cohort.PatientPKHash
-                        and documented_viral_loads_last_12.SiteCode = cohort.SiteCode
-                where age between 0 and 17                    
-                    and isTXCurr=1                
-                group by Cohort.SiteCode, FacilityName, PartnerName, County
-            ), documented_regimen_0_19_yrs as (                
-                select                        
-                    SiteCode MFLCode,                        
-                    FacilityName,                        
-                    County,                        
-                    PartnerName CTPartner,                        
-                    count(*) as no_txcurr_0_19_yrs_documented_regimen
-                from REPORTING.dbo.Linelist_FACTART as cohort
-                where age between 0 and 19                    
-                    and isTXCurr=1                
-                group by SiteCode, FacilityName, PartnerName, County
-            ), visit_weight_and_height_ordering as (                
-            /* order pharmacy dispensations as of date by the VisitDate */                                
-                select
-                    DISTINCT row_number() over (partition by PatientIDHash ,SiteCode,PatientPKHash order by VisitDate desc) as num,
-                    VisitDate,
-                    PatientIDHash ,
-                    PatientPKHash,
-                    SiteCode,
-                    Weight,
-                    Height
-                from ODS.dbo.CT_PatientVisits
-            ), latest_visit as (                
-                select                
-                    visit_weight_and_height_ordering.*,                
-                    age ageLV,                
-                    ARTOutcome
-                from visit_weight_and_height_ordering
-                Left join REPORTING.dbo.Linelist_FACTART art on visit_weight_and_height_ordering.PatientIDHash=art.PatientIDHash Collate Latin1_General_CI_AS
-                and visit_weight_and_height_ordering.PatientPKHash=art.PatientPKHash Collate Latin1_General_CI_AS
-                and visit_weight_and_height_ordering.SiteCode=art.SiteCode
-                where Num = 1            
-            ), second_latest_visit as (                
-                select                    
-                    *                
-                from visit_weight_and_height_ordering
-                where Num = 2            
-            ), combined_weight_last_2_visits as (            
-                select                
-                    coalesce(latest_visit.PatientIDHash, second_latest_visit.PatientIDHash) as PatientID,                
-                    coalesce(latest_visit.PatientPKHash, second_latest_visit.PatientPKHash) as PatientPK,                
-                    coalesce(latest_visit.SiteCode, second_latest_visit.SiteCode) as SiteCode,                
-                    coalesce(latest_visit.Weight, second_latest_visit.Weight) as Weight,                
-                    latest_visit.ageLV,                
-                    latest_visit.ARTOutcome
-                from latest_visit
-                full join second_latest_visit on latest_visit.PatientIDHash = second_latest_visit.PatientIDHash
-                and latest_visit.PatientPKHash = second_latest_visit.PatientPKHash
-                and latest_visit.SiteCode = second_latest_visit.SiteCode
-            ), facility_partner_combinations as (                
-                select                    
-                    distinct MFLCode,                    
-                    FacilityName,                    
-                    PartnerName CTPartner,                    
-                    County
-                from REPORTING.dbo.all_EMRSites
-            ), documented_weight_last_2_visits as (                
-                select                    
-                    MFLCode,                    
-                    FacilityName,                    
-                    CTPartner,                    
-                    County ,                    
-                    count(*) as no_documented_weight
-                from combined_weight_last_2_visits
-                left join facility_partner_combinations on facility_partner_combinations.MFLCode = combined_weight_last_2_visits.SiteCode  Collate Latin1_General_CI_AS
-                where combined_weight_last_2_visits.Weight is not null and ageLV between 0 and 19 and ARTOutcome='V'                
-                group by MFLCode, FacilityName, CTPartner, County  
-            ), Paeds as (            
-                Select                
-                    SiteCode MFLCode,                
-                    FacilityName,                
-                    County,                
-                    PartnerName CTPartner,                
-                    AgencyName CTAgency,                
-                    Count (*)PaedsTXCurr
-                from REPORTING.dbo.Linelist_FACTART
-                where age between 0 and 19  and isTXCurr=1            
-                group by SiteCode, FacilityName,  County, PartnerName, AgencyName
-            ),  FemaleAdults AS (            
-                Select                
-                    SiteCode MFLCode,                
-                    FacilityName,                
-                    County,                
-                    PartnerName CTPartner,                
-                    AgencyName CTAgency,                
-                    Count (*)Females15TXCurr
-                from REPORTING.dbo.Linelist_FACTART
-                where age >=15  and isTXCurr=1 and Gender='Female'            
-                group by SiteCode, FacilityName, County, PartnerName, AgencyName
-            ), PaedsListed AS (
-                SELECT
-                    Cohort.SiteCode MFLCode,
-                    Coalesce (listing.FacilityName,Cohort.FacilityName Collate Latin1_General_CI_AS)As FacilityName,
-                    Cohort.County,
-                    Cohort.PartnerName CTPartner,
-                    Cohort.AgencyName CTAgency,
-                    Count (Distinct concat(ContactPatientPK,listing.Sitecode))PaedsListed
-                FROM [ODS].[dbo].CT_ContactListing listing 
-                inner join REPORTING.dbo.Linelist_FACTART Cohort on listing.PatientIDHash=Cohort.PatientIDHash Collate Latin1_General_CI_AS and listing.PatientPKHash=Cohort.PatientPKHash Collate Latin1_General_CI_AS and listing.SiteCode=Cohort.SiteCode
-                where ContactAge<15 and cohort.Gender = 'Female' and cohort.age >= 15 and cohort.isTXCurr =1
-                Group by Cohort.SiteCode, Coalesce (listing.FacilityName,Cohort.FacilityName Collate Latin1_General_CI_AS), Cohort.County, Cohort.PartnerName, Cohort.AgencyName
-            ), PaedsTested AS (            
-                SELECT                
-                    Cohort.SiteCode MFLCode,                
-                    Coalesce (listing.FacilityName,Cohort.FacilityName Collate Latin1_General_CI_AS)As FacilityName,                
-                    Cohort.County,                
-                    Cohort.PartnerName CTPartner,                
-                    Cohort.AgencyName CTAgency,                
-                    Count (Distinct concat(ContactPatientPK,listing.SiteCode)) As PaedsTested
-                FROM [ODS].[dbo].CT_ContactListing listing
-                inner join REPORTING.dbo.Linelist_FACTART Cohort on listing.PatientIDHash=Cohort.PatientIDHash Collate Latin1_General_CI_AS and listing.PatientPKHash=Cohort.PatientPKHash Collate Latin1_General_CI_AS and listing.SiteCode=Cohort.SiteCode
-                inner join ODS.dbo.HTS_ClientTests tests on listing.ContactPatientPK=tests.PatientPk and listing.SiteCode=tests.SiteCode
-                where ContactAge<15 and cohort.Gender = 'Female' and cohort.age >= 15 and cohort.isTXCurr = 1
-                Group by Cohort.SiteCode, Coalesce (listing.FacilityName,Cohort.FacilityName Collate Latin1_General_CI_AS), Cohort.County, Cohort.PartnerName, Cohort.AgencyName
-            ), MMDCalc as (
-                select                        
-                    PatientIDHash,                        
-                    PatientPKHash,                        
-                    SiteCode MFLCode,                        
-                    FacilityName,                        
-                    County,                        
-                    PartnerName CTPartner,                        
-                    lastVisitDate dtlastvisit,                        
-                    NextAppointmentDate,                        
-                    CASE WHEN ABS(DATEDIFF(DAY,lastVisitDate ,NextAppointmentDate) ) <=83 THEN 0              
-                                WHEN ABS(DATEDIFF(DAY,lastVisitDate ,NextAppointmentDate) )   >= 84 THEN  1
-                    ELSE NULL END AS MMDStatus
-                from REPORTING.dbo.Linelist_FACTART as cohort
-                where Age between 0 and 19 and ARTOutcome='V' 
-            ), PaedsOnMMD AS (
-                Select
-                    MFLCode,                        
-                    FacilityName,                        
-                    County,                        
-                    CTPartner,                        
-                    Count (*) PaedsOnMMD
-                from MMDCalc
-                where MMDStatus=1                        
-                group by MFLCode, FacilityName, County, CTPartner
-            ), IITPaeds As (            
-                Select                        
-                    PatientIDHash,                        
-                    PatientPKHash,                        
-                    SiteCode MFLCode,                        
-                    FacilityName,                        
-                    County,                        
-                    PartnerName CTPartner,
-                    ARTOutcome,                        
-                    NextAppointmentDate
-                from REPORTING.dbo.Linelist_FACTART
-                where age between 0 and 19 and datediff (mm,NextAppointmentDate, EOMONTH(DATEADD(mm,-1,GETDATE())))<=6 and ARTOutcome not in ('V','D','T','NP','S')            
-            ), PaedsIIT AS (            
-                Select                        
-                    MFLCode,                        
-                    FacilityName,                        
-                    County,                        
-                    CTPartner,                        
-                    count(*)IITPaeds
-                from IITPaeds
-                group by MFLCode, FacilityName, County, CTPartner
-            ) 
-            select
-                facility_partner_combinations.MFLCode,
-                facility_partner_combinations.FacilityName,
-                facility_partner_combinations.CTPartner,
-                facility_partner_combinations.County,
-                Coalesce (Females15TXCurr,0) As Females15TXCurr,
-                Coalesce (PaedsTXCurr,0) As PaedsTXCurr,
-                coalesce (PaedsListed,0) As PaedsListed,
-                coalesce (PaedsTested,0) As PaedsTested,
-                coalesce(txcurr_0_17_yrs_valid_vl_12_months.no_txcurr_0_17_yrs_valid_vl_12_months, 0) as no_txcurr_0_17_yrs_valid_vl_12_months,
-                coalesce(documented_regimen_0_19_yrs.no_txcurr_0_19_yrs_documented_regimen, 0) as no_txcurr_0_19_yrs_documented_regimen,
-                coalesce(documented_weight_last_2_visits.no_documented_weight, 0) as no_documented_weight,
-                Coalesce (PaedsOnMMD,0) As PaedsOnMMD,
-                coalesce(otz_10_19_yrs.no_otz_10_19_yrs, 0) as no_otz_10_19_yrs,
-                coalesce(ovc_0_17_yrs.no_ovc_0_17_yrs, 0) as no_ovc_0_17_yrs,
-                coalesce (IITPaeds,0) as IITPaeds
-            from facility_partner_combinations
-            left join otz_10_19_yrs on otz_10_19_yrs.MFLCode = facility_partner_combinations.MFLCode
-            left join ovc_0_17_yrs on ovc_0_17_yrs.MFLCode = facility_partner_combinations.MFLCode
-            left join txcurr_0_17_yrs_valid_vl_12_months on txcurr_0_17_yrs_valid_vl_12_months.MFLCode = facility_partner_combinations.MFLCode
-            left join documented_regimen_0_19_yrs on documented_regimen_0_19_yrs.MFLCode = facility_partner_combinations.MFLCode
-            left join documented_weight_last_2_visits on documented_weight_last_2_visits.MFLCode = facility_partner_combinations.MFLCode
-            Left join Paeds on facility_partner_combinations.MFLCode=Paeds.MFLCode
-            Left join FemaleAdults on facility_partner_combinations.MFLCode=FemaleAdults.MFLCode 
-            Left join PaedsListed on facility_partner_combinations.MFLCode=PaedsListed.MFLCode
-            Left join PaedsTested on facility_partner_combinations.MFLCode=PaedsTested.MFLCode
-            Left join PaedsOnMMD on facility_partner_combinations.MFLCode=PaedsOnMMD.MFLCode
-            left join PaedsIIT on PaedsIIT.MFLCode=facility_partner_combinations.MFLCode";
+        $query = "WITH FemaleAdults AS (
+            SELECT
+                    PartnerName,
+                    Count (*)FemalesTXCurr
+            from REPORTING.dbo.Linelist_FACTART as ART
+            where ARTOutcome='V' and  Gender='Female' and age between 20 and 49
+            group by
+                PartnerName
+            ),
+            PaedsListed AS (
+            SELECT
+                    PartnerName,
+                    Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsListed
+                FROM [ODS].dbo.CT_ContactListing listing 
+                inner join REPORTING.dbo.Linelist_FACTART as ART on
+                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.SiteCode=ART.SiteCode
+            where ContactAge<=19
+                    and Gender = 'Female'
+                    and age between 20 and 49
+                    and ARTOutcome ='V'
+            Group by
+                PartnerName    
+            ),
+            PaedsEligible AS (
+            SELECT
+                    PartnerName,
+                    Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsEligible
+                FROM [ODS].dbo.CT_ContactListing listing 
+                inner join REPORTING.dbo.Linelist_FACTART as ART on
+                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.SiteCode=ART.SiteCode
+            where ContactAge<=19
+                    and Gender = 'Female'
+                    and age between 20 and 49
+                    and ARTOutcome ='V' and KnowledgeOfHivStatus <> 'Yes'
+            Group by
+                PartnerName    
+            ),
+            PaedsTested AS (
+            SELECT
+                    PartnerName,
+                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsTested
+                FROM [ODS].[dbo].[CT_ContactListing] listing 
+                inner join REPORTING.dbo.Linelist_FACTART as ART on
+                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.SiteCode=ART.SiteCode
+                inner join ODS.dbo.HTS_ClientTests tests on
+                listing.ContactPatientPK=tests.PatientPk and
+                listing.SiteCode=tests.SiteCode
+            where ContactAge<=19
+                    and Gender = 'Female'
+                    and age between 20 and 49
+                    and ARTOutcome='V'
+            Group by
+                PartnerName
+            ),
+            PaedsHIVPos AS (
+            SELECT
+                    PartnerName,
+                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsHIVPos
+                FROM [ODS].[dbo].[CT_ContactListing] listing 
+                inner join REPORTING.dbo.Linelist_FACTART as ART on
+                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.SiteCode=ART.SiteCode
+                inner join ODS.dbo.HTS_ClientTests tests on
+                listing.ContactPatientPK=tests.PatientPk and
+                listing.SiteCode=tests.SiteCode
+            where ContactAge<=19
+                    and Gender = 'Female'
+                    and age between 20 and 49
+                    and ARTOutcome='V'
+                    and FinalTestResult='Positive'
+            Group by
+                PartnerName
+            ),
+            PaedsLinked AS (
+            SELECT
+                    PartnerName,
+                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsLinked
+                FROM [ODS].[dbo].[CT_ContactListing] listing 
+                inner join REPORTING.dbo.Linelist_FACTART as ART on
+                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.SiteCode=ART.SiteCode
+                inner join ODS.dbo.HTS_ClientTests tests on
+                listing.ContactPatientPK=tests.PatientPk and
+                listing.SiteCode=tests.SiteCode
+                inner join ODS.dbo.HTS_ClientLinkages linkage  on
+                tests.PatientPk=linkage.PatientPK and
+                tests.SiteCode=linkage.SiteCode
+            where ContactAge<=19
+                    and Gender = 'Female'
+                    and age between 20 and 49
+                    and ARTOutcome='V'
+                    and FinalTestResult='Positive'
+            Group by
+                PartnerName
+            ),
+
+            PaedsVLAtIntervals AS (
+            SELECT
+                    VL.PartnerName,
+                    sum (VLat6Months) PaedsVLAt6Months,
+                    sum (VLat12Months)PaedsVLAt12Months
+                FROM REPORTING.dbo.AggregateVLUptakeOutcome VL 
+            where VL.AgeGroup in ('Under 1','1 to 4','5 to 9','10 to 14','15 to 19') --and TXCurr=1   
+            Group by
+            VL.PartnerName
+            )
+            Select
+                    FemaleAdults.PartnerName,
+                    FemalesTXCurr,
+                    coalesce (PaedsListed,0) as PaedsListed,
+                    coalesce (PaedsEligible,0) as PaedsEligible,
+                    coalesce (PaedsTested,0) as PaedsTested,
+                    coalesce (round(cast(sum(PaedsTested) as float) / nullif(cast(sum(PaedsEligible) as float), 0),2), 0) as '% PaedsTested',
+                    coalesce (PaedsHIVPos,0) as PaedsHIVPos,
+                    coalesce (round(cast(sum(PaedsHIVPos) as float) / nullif(cast(sum(PaedsTested) as float), 0),2), 0) as '% PaedsHIVPos',
+                    coalesce (PaedsLinked,0) as PaedsLinked,
+                    coalesce (round(cast(sum(PaedsLinked) as float) / nullif(cast(sum(PaedsHIVPos) as float), 0),2), 0) as '% PaedsLinked',
+                    Coalesce (PaedsVLAt6Months,0) as PaedsVLat6Months,
+                    Coalesce (PaedsVLAt12Months,0) as PaedsVLat12Months
+
+            from
+                FemaleAdults
+                left join PaedsListed on PaedsListed.PartnerName=FemaleAdults.PartnerName
+                left join PaedsEligible on PaedsEligible.PartnerName=FemaleAdults.PartnerName
+                left join PaedsTested on PaedsTested.PartnerName=FemaleAdults.PartnerName
+                left join PaedsHIVPos on PaedsHIVPos.PartnerName=FemaleAdults.PartnerName
+                left join PaedsLinked on PaedsLinked.PartnerName=FemaleAdults.PartnerName
+                left join PaedsVLAtIntervals on PaedsVLAtIntervals.PartnerName=FemaleAdults.PartnerName
+                Group by
+                FemaleAdults.PartnerName,
+                FemalesTXCurr,
+                PaedsListed,
+                PaedsEligible,
+                PaedsTested,
+                PaedsHIVPos,
+                PaedsLinked,
+                PaedsVLAt6Months,
+                PaedsVLAt12Months";
         
         
         $query2 = "SELECT * from (Select Distinct df.FacilityId,Name as FacilityName,County,subCounty,Agency,Partner, f.year,f.month, f.docketId ,f.timeId as uploaddate
