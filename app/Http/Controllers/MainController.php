@@ -70,7 +70,7 @@ class MainController extends Controller
             $hts_per = $hts_recency->totalrecency *100 / $hts_expected->totalexpected;
             
             $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'DQA')->pluck('email')->toArray(); 
-            $stale_query= "with clean_data as (
+            $stale_query= "WITH clean_data as (
                         select 
                             distinct FacilityCode,
                             FacilityName,
@@ -421,7 +421,7 @@ class MainController extends Controller
                 }
                 fclose($fh);
                 
-                $incomplete_up_query = "With Uploads as (
+                $incomplete_up_query = "WITH Uploads as (
                     Select  [DateRecieved],ROW_NUMBER()OVER(Partition by Sitecode Order by [DateRecieved] Desc) as Num ,
                         SiteCode,
                         cast( [DateRecieved]as date) As DateReceived,
@@ -652,7 +652,7 @@ class MainController extends Controller
         }
         fclose($fh);
 
-        if($email = "Prod") {
+        if($email == "Prod") {
 
             $unsubscribe_url = str_replace(
                     '{{email}}', "",
@@ -674,7 +674,7 @@ class MainController extends Controller
                 });
             return "DONE";
 
-        }else if ($email = "Test"){
+        }else if ($email == "Test"){
             $unsubscribe_url = str_replace(
                     '{{email}}', "",
                     nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
@@ -975,7 +975,7 @@ class MainController extends Controller
         
         
         
-        config(['database.connections.sqlsrv.database' => 'All_Staging_2016_2']);
+        config(['database.connections.sqlsrv.database' => 'ODS']);
 
         $table = DB::connection('sqlsrv')->select(DB::raw($query));
         // Get previous Month and Year
@@ -1006,7 +1006,7 @@ class MainController extends Controller
         }
         fclose($fh);
 
-        config(['database.connections.mysql.database' => 'portaldev']);
+        config(['database.connections.mysql.database' => 'ODS']);
         $fac_not_reporting = DB::connection('mysql')->select(DB::raw($query2));
         
         $jsonDecoded = json_decode(json_encode($fac_not_reporting), true); 
@@ -1035,7 +1035,7 @@ class MainController extends Controller
         }
         fclose($fh);
 
-        if($email = "Test") {
+        if($email == "Test") {
             $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'Paeds')->pluck('email')->toArray(); 
             
             foreach ($emails as $test){
@@ -1089,146 +1089,146 @@ class MainController extends Controller
     public function PeadTestingAlert($email)
     {
         $query = "WITH FemaleAdults AS (
-        Select
-                PartnerName,
-                Count (*)FemalesTXCurr
-        from REPORTING.dbo.Linelist_FACTART as ART
-        where ARTOutcome='V' and  Gender='Female' and age between 20 and 49
-        group by
-            PartnerName
-        ),
-        PaedsListed AS (
-        SELECT
-                PartnerName,
-                Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsListed
-            FROM [ODS].dbo.CT_ContactListing listing 
-            inner join REPORTING.dbo.Linelist_FACTART as ART on
-            convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
-            listing.SiteCode=ART.SiteCode
-        where ContactAge<=19
-                and Gender = 'Female'
-                and age between 20 and 49
-                and ARTOutcome ='V'
-        Group by
-            PartnerName    
-        ),
-        PaedsEligible AS (
-        SELECT
-                PartnerName,
-                Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsEligible
-            FROM [ODS].dbo.CT_ContactListing listing 
-            inner join REPORTING.dbo.Linelist_FACTART as ART on
-            convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
-            listing.SiteCode=ART.SiteCode
-        where ContactAge<=19
-                and Gender = 'Female'
-                and age between 20 and 49
-                and ARTOutcome ='V' and KnowledgeOfHivStatus <> 'Yes'
-        Group by
-            PartnerName    
-        ),
-        PaedsTested AS (
-        SELECT
-                PartnerName,
-                Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsTested
-            FROM [ODS].[dbo].[CT_ContactListing] listing 
-            inner join REPORTING.dbo.Linelist_FACTART as ART on
-            convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
-            listing.SiteCode=ART.SiteCode
-            inner join ODS.dbo.HTS_ClientTests tests on
-            listing.ContactPatientPK=tests.PatientPk and
-            listing.SiteCode=tests.SiteCode
-        where ContactAge<=19
-                and Gender = 'Female'
-                and age between 20 and 49
-                and ARTOutcome='V'
-        Group by
-            PartnerName
-        ),
-        PaedsHIVPos AS (
-        SELECT
-                PartnerName,
-                Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsHIVPos
-            FROM [ODS].[dbo].[CT_ContactListing] listing 
-            inner join REPORTING.dbo.Linelist_FACTART as ART on
-            convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
-            listing.SiteCode=ART.SiteCode
-            inner join ODS.dbo.HTS_ClientTests tests on
-            listing.ContactPatientPK=tests.PatientPk and
-            listing.SiteCode=tests.SiteCode
-        where ContactAge<=19
-                and Gender = 'Female'
-                and age between 20 and 49
-                and ARTOutcome='V'
-                and FinalTestResult='Positive'
-        Group by
-            PartnerName
-        ),
-        PaedsLinked AS (
-        SELECT
-                PartnerName,
-                Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsLinked
-            FROM [ODS].[dbo].[CT_ContactListing] listing 
-            inner join REPORTING.dbo.Linelist_FACTART as ART on
-            convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
-            listing.SiteCode=ART.SiteCode
-            inner join ODS.dbo.HTS_ClientTests tests on
-            listing.ContactPatientPK=tests.PatientPk and
-            listing.SiteCode=tests.SiteCode
-            inner join ODS.dbo.HTS_ClientLinkages linkage  on
-            tests.PatientPk=linkage.PatientPK and
-            tests.SiteCode=linkage.SiteCode
-        where ContactAge<=19
-                and Gender = 'Female'
-                and age between 20 and 49
-                and ARTOutcome='V'
-                and FinalTestResult='Positive'
-        Group by
-            PartnerName
-        ),
+            Select
+                    PartnerName,
+                    Count (*)FemalesTXCurr
+            from REPORTING.dbo.Linelist_FACTART as ART
+            where ARTOutcome='V' and  Gender='Female' and age between 20 and 49
+            group by
+                PartnerName
+            ),
+            PaedsListed AS (
+            SELECT
+                    PartnerName,
+                    Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsListed
+                FROM [ODS].dbo.CT_ContactListing listing 
+                inner join REPORTING.dbo.Linelist_FACTART as ART on
+                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.SiteCode=ART.SiteCode
+            where ContactAge<=19
+                    and Gender = 'Female'
+                    and age between 20 and 49
+                    and ARTOutcome ='V'
+            Group by
+                PartnerName    
+            ),
+            PaedsEligible AS (
+            SELECT
+                    PartnerName,
+                    Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsEligible
+                FROM [ODS].dbo.CT_ContactListing listing 
+                inner join REPORTING.dbo.Linelist_FACTART as ART on
+                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.SiteCode=ART.SiteCode
+            where ContactAge<=19
+                    and Gender = 'Female'
+                    and age between 20 and 49
+                    and ARTOutcome ='V' and KnowledgeOfHivStatus <> 'Yes'
+            Group by
+                PartnerName    
+            ),
+            PaedsTested AS (
+            SELECT
+                    PartnerName,
+                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsTested
+                FROM [ODS].[dbo].[CT_ContactListing] listing 
+                inner join REPORTING.dbo.Linelist_FACTART as ART on
+                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.SiteCode=ART.SiteCode
+                inner join ODS.dbo.HTS_ClientTests tests on
+                listing.ContactPatientPK=tests.PatientPk and
+                listing.SiteCode=tests.SiteCode
+            where ContactAge<=19
+                    and Gender = 'Female'
+                    and age between 20 and 49
+                    and ARTOutcome='V'
+            Group by
+                PartnerName
+            ),
+            PaedsHIVPos AS (
+            SELECT
+                    PartnerName,
+                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsHIVPos
+                FROM [ODS].[dbo].[CT_ContactListing] listing 
+                inner join REPORTING.dbo.Linelist_FACTART as ART on
+                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.SiteCode=ART.SiteCode
+                inner join ODS.dbo.HTS_ClientTests tests on
+                listing.ContactPatientPK=tests.PatientPk and
+                listing.SiteCode=tests.SiteCode
+            where ContactAge<=19
+                    and Gender = 'Female'
+                    and age between 20 and 49
+                    and ARTOutcome='V'
+                    and FinalTestResult='Positive'
+            Group by
+                PartnerName
+            ),
+            PaedsLinked AS (
+            SELECT
+                    PartnerName,
+                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsLinked
+                FROM [ODS].[dbo].[CT_ContactListing] listing 
+                inner join REPORTING.dbo.Linelist_FACTART as ART on
+                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.SiteCode=ART.SiteCode
+                inner join ODS.dbo.HTS_ClientTests tests on
+                listing.ContactPatientPK=tests.PatientPk and
+                listing.SiteCode=tests.SiteCode
+                inner join ODS.dbo.HTS_ClientLinkages linkage  on
+                tests.PatientPk=linkage.PatientPK and
+                tests.SiteCode=linkage.SiteCode
+            where ContactAge<=19
+                    and Gender = 'Female'
+                    and age between 20 and 49
+                    and ARTOutcome='V'
+                    and FinalTestResult='Positive'
+            Group by
+                PartnerName
+            ),
 
-        PaedsVLAtIntervals AS (
-        SELECT
-                VL.PartnerName,
-                sum (VLat6Months) PaedsVLAt6Months,
-                sum (VLat12Months)PaedsVLAt12Months
-            FROM REPORTING.dbo.AggregateVLUptakeOutcome VL 
-        where VL.AgeGroup in ('Under 1','1 to 4','5 to 9','10 to 14','15 to 19') --and TXCurr=1   
-        Group by
-        VL.PartnerName
-        )
-        Select
+            PaedsVLAtIntervals AS (
+            SELECT
+                    VL.PartnerName,
+                    sum (VLat6Months) PaedsVLAt6Months,
+                    sum (VLat12Months)PaedsVLAt12Months
+                FROM REPORTING.dbo.AggregateVLUptakeOutcome VL 
+            where VL.AgeGroup in ('Under 1','1 to 4','5 to 9','10 to 14','15 to 19') --and TXCurr=1   
+            Group by
+            VL.PartnerName
+            )
+            Select
+                    FemaleAdults.PartnerName,
+                    FemalesTXCurr,
+                    coalesce (PaedsListed,0) as PaedsListed,
+                    coalesce (PaedsEligible,0) as PaedsEligible,
+                    coalesce (PaedsTested,0) as PaedsTested,
+                    coalesce (round(cast(sum(PaedsTested) as float) / nullif(cast(sum(PaedsEligible) as float), 0),2), 0) as '% PaedsTested',
+                    coalesce (PaedsHIVPos,0) as PaedsHIVPos,
+                    coalesce (round(cast(sum(PaedsHIVPos) as float) / nullif(cast(sum(PaedsTested) as float), 0),2), 0) as '% PaedsHIVPos',
+                    coalesce (PaedsLinked,0) as PaedsLinked,
+                    coalesce (round(cast(sum(PaedsLinked) as float) / nullif(cast(sum(PaedsHIVPos) as float), 0),2), 0) as '% PaedsLinked',
+                    Coalesce (PaedsVLAt6Months,0) as PaedsVLat6Months,
+                    Coalesce (PaedsVLAt12Months,0) as PaedsVLat12Months
+
+            from
+                FemaleAdults
+                left join PaedsListed on PaedsListed.PartnerName=FemaleAdults.PartnerName
+                left join PaedsEligible on PaedsEligible.PartnerName=FemaleAdults.PartnerName
+                left join PaedsTested on PaedsTested.PartnerName=FemaleAdults.PartnerName
+                left join PaedsHIVPos on PaedsHIVPos.PartnerName=FemaleAdults.PartnerName
+                left join PaedsLinked on PaedsLinked.PartnerName=FemaleAdults.PartnerName
+                left join PaedsVLAtIntervals on PaedsVLAtIntervals.PartnerName=FemaleAdults.PartnerName
+                Group by
                 FemaleAdults.PartnerName,
                 FemalesTXCurr,
-                coalesce (PaedsListed,0) as PaedsListed,
-                coalesce (PaedsEligible,0) as PaedsEligible,
-                coalesce (PaedsTested,0) as PaedsTested,
-                coalesce (round(cast(sum(PaedsTested) as float) / nullif(cast(sum(PaedsEligible) as float), 0),2), 0) as '% PaedsTested',
-                coalesce (PaedsHIVPos,0) as PaedsHIVPos,
-                coalesce (round(cast(sum(PaedsHIVPos) as float) / nullif(cast(sum(PaedsTested) as float), 0),2), 0) as '% PaedsHIVPos',
-                coalesce (PaedsLinked,0) as PaedsLinked,
-                coalesce (round(cast(sum(PaedsLinked) as float) / nullif(cast(sum(PaedsHIVPos) as float), 0),2), 0) as '% PaedsLinked',
-                Coalesce (PaedsVLAt6Months,0) as PaedsVLat6Months,
-                Coalesce (PaedsVLAt12Months,0) as PaedsVLat12Months
-
-        from
-            FemaleAdults
-            left join PaedsListed on PaedsListed.PartnerName=FemaleAdults.PartnerName
-            left join PaedsEligible on PaedsEligible.PartnerName=FemaleAdults.PartnerName
-            left join PaedsTested on PaedsTested.PartnerName=FemaleAdults.PartnerName
-            left join PaedsHIVPos on PaedsHIVPos.PartnerName=FemaleAdults.PartnerName
-            left join PaedsLinked on PaedsLinked.PartnerName=FemaleAdults.PartnerName
-            left join PaedsVLAtIntervals on PaedsVLAtIntervals.PartnerName=FemaleAdults.PartnerName
-            Group by
-            FemaleAdults.PartnerName,
-            FemalesTXCurr,
-            PaedsListed,
-            PaedsEligible,
-            PaedsTested,
-            PaedsHIVPos,
-            PaedsLinked,
-            PaedsVLAt6Months,
-            PaedsVLAt12Months";
+                PaedsListed,
+                PaedsEligible,
+                PaedsTested,
+                PaedsHIVPos,
+                PaedsLinked,
+                PaedsVLAt6Months,
+                PaedsVLAt12Months";
         
         config(['database.connections.sqlsrv.database' => 'REPORTING']);
 
@@ -1261,7 +1261,7 @@ class MainController extends Controller
         }
         fclose($fh);
 
-        if($email = "Test") {
+        if($email == "Test") {
             $emails = EmailContacts::where('is_main', 1 )->where('list_subscribed', 'Paeds')->pluck('email')->toArray(); 
             
             foreach ($emails as $test){
