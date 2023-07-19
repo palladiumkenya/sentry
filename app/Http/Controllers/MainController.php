@@ -605,6 +605,97 @@ class MainController extends Controller
         return "DONE";
     }
 
+    public function HTSML($email)
+    {
+        $query = "SELECT 
+            emr.County,
+            emr.SubCounty,
+            emr.MFL_Code,
+            emr.latitude,
+            emr.longitude,
+            cast (TestDate as date) as TestDate,
+            HIVRiskCategory,
+            FinalTestResult as HTSResult
+        from ODS.dbo.Intermediate_EncounterHTSTests tests
+        left join ODS.dbo.ALL_EMRSites emr on tests.SiteCode=emr.MFL_Code
+        left join  ODS.dbo.HTS_EligibilityExtract elig on elig.PatientPk=tests.PatientPK and elig.SiteCode=tests.SiteCode and elig.VisitDate=tests.TestDate
+        where HIVRiskCategory is not Null and TestDate >='2023-04-01'";
+
+        config(['database.connections.sqlsrv.database' => 'ODS']);
+
+        $table = DB::connection('sqlsrv')->select(DB::raw($query));
+        // Get previous Month and Year
+        $reportingMonth = Carbon::now()->subMonth()->format('M_Y_D');
+        $jsonDecoded = json_decode(json_encode($table), true); 
+        $fh = fopen(__DIR__ .'/../../../storage/fileout_HTS_ML_'.$reportingMonth.'.csv', 'w');
+        if (is_array($jsonDecoded)) {
+            $counter = 0;
+            foreach ($jsonDecoded as $line) {
+                // sets the header row
+                if($counter == 0){
+                    $header = array_keys($line);
+                    fputcsv($fh, $header);
+                }
+                $counter++;
+
+                // sets the data row
+                foreach ($line as $key => $value) {
+                    if ($value) {
+                        $line[$key] = $value;
+                    }
+                }
+                // add each row to the csv file
+                if (is_array($line)) {
+                    fputcsv($fh,$line);
+                }
+            }
+        }
+        fclose($fh);
+
+        if($email = "Prod") {
+
+            $unsubscribe_url = str_replace(
+                    '{{email}}', "",
+                    nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+                );
+            // Send the email
+            Mail::send('reports.partner.reports',
+                [
+                    'unsubscribe_url' => $unsubscribe_url
+                ],
+                function ($message) use (&$fh, &$reportingMonth, &$test) {
+                    // email configurations
+                    $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                    // email address of the recipients
+                    $message->to(["benard.ajwang@thepalladiumgroup.com", "fridah.oyucho@thepalladiumgroup.com", "benedette.otieno@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "mary.gikura@thepalladiumgroup.com"])->subject('HTS ML REPORT');
+                    $message->cc(["charles.bett@thepalladiumgroup.com"]);
+                    // attach the csv covid file
+                    $message->attach(__DIR__ .'/../../../storage/fileout_HTS_ML_'.$reportingMonth.'.csv');
+                });
+            return "DONE";
+
+        }else if ($email = "Test"){
+            $unsubscribe_url = str_replace(
+                    '{{email}}', "",
+                    nova_get_setting(nova_get_setting('production') ? 'email_unsubscribe_url' : 'email_unsubscribe_url_staging')
+                );
+            // Send the email
+            Mail::send('reports.partner.reports',
+                [
+                    'unsubscribe_url' => $unsubscribe_url
+                ],
+                function ($message) use (&$fh, &$reportingMonth) {
+                    // email configurations
+                    $message->from('dwh@mg.kenyahmis.org', 'NDWH');
+                    // email address of the recipients
+                    $message->to(["charles.bett@thepalladiumgroup.com"])->subject('HTS ML REPORT');
+                    $message->cc(["mary.gikura@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com"]);
+                    // attach the csv covid file
+                    $message->attach(__DIR__ .'/../../../storage/fileout_HTS_ML_'.$reportingMonth.'.csv');
+                });
+            return "DONE";
+        }
+    }
     public function PeadAlert($email)
     {
         $query = "WITH otz_10_19_yrs as (
