@@ -668,7 +668,7 @@ class MainController extends Controller
                     $message->from('dwh@mg.kenyahmis.org', 'NDWH');
                     // email address of the recipients
                     $message->to(["benard.ajwang@thepalladiumgroup.com", "fridah.oyucho@thepalladiumgroup.com", "benedette.otieno@thepalladiumgroup.com", "nobert.mumo@thepalladiumgroup.com", "mary.gikura@thepalladiumgroup.com"])->subject('HTS ML REPORT');
-                    $message->cc(["charles.bett@thepalladiumgroup.com"]);
+                    $message->cc(["charles.bett@thepalladiumgroup.com", "jacob.odhiambo@thepalladiumgroup.com"]);
                     // attach the csv covid file
                     $message->attach(__DIR__ .'/../../../storage/fileout_HTS_ML_'.$reportingMonth.'.csv');
                 });
