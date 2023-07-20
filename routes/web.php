@@ -299,7 +299,7 @@ Route::get('/email/comparison_txcurr', function () {
                     County,
                     SUM(ISTxCurr) AS CurTx_total
                 FROM REPORTING.dbo.Linelist_FACTART
-                WHERE ARTOutcome = 'V'
+                WHERE ARTOutcomeDescription ='Active'
                 GROUP BY SiteCode, FacilityName, PartnerName, County
             ),
 			AllUpload as (

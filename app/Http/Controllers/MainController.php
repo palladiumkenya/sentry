@@ -796,7 +796,7 @@ class MainController extends Controller
                 select                
                     visit_weight_and_height_ordering.*,                
                     age ageLV,                
-                    ARTOutcome
+                    ARTOutcomeDescription
                 from visit_weight_and_height_ordering
                 Left join REPORTING.dbo.Linelist_FACTART art on visit_weight_and_height_ordering.PatientIDHash=art.PatientIDHash Collate Latin1_General_CI_AS
                 and visit_weight_and_height_ordering.PatientPKHash=art.PatientPKHash Collate Latin1_General_CI_AS
@@ -814,7 +814,7 @@ class MainController extends Controller
                     coalesce(latest_visit.SiteCode, second_latest_visit.SiteCode) as SiteCode,                
                     coalesce(latest_visit.Weight, second_latest_visit.Weight) as Weight,                
                     latest_visit.ageLV,                
-                    latest_visit.ARTOutcome
+                    latest_visit.ARTOutcomeDescription
                 from latest_visit
                 full join second_latest_visit on latest_visit.PatientIDHash = second_latest_visit.PatientIDHash
                 and latest_visit.PatientPKHash = second_latest_visit.PatientPKHash
@@ -835,7 +835,7 @@ class MainController extends Controller
                     count(*) as no_documented_weight
                 from combined_weight_last_2_visits
                 left join facility_partner_combinations on facility_partner_combinations.MFLCode = combined_weight_last_2_visits.SiteCode  Collate Latin1_General_CI_AS
-                where combined_weight_last_2_visits.Weight is not null and ageLV between 0 and 19 and ARTOutcome='V'                
+                where combined_weight_last_2_visits.Weight is not null and ageLV between 0 and 19 and ARTOutcomeDescription='Active'                
                 group by MFLCode, FacilityName, CTPartner, County  
             ), Paeds as (            
                 Select                
@@ -898,7 +898,7 @@ class MainController extends Controller
                                 WHEN ABS(DATEDIFF(DAY,lastVisitDate ,NextAppointmentDate) )   >= 84 THEN  1
                     ELSE NULL END AS MMDStatus
                 from REPORTING.dbo.Linelist_FACTART as cohort
-                where Age between 0 and 19 and ARTOutcome='V' 
+                where Age between 0 and 19 and ARTOutcomeDescription='Active' 
             ), PaedsOnMMD AS (
                 Select
                     MFLCode,                        
@@ -917,10 +917,10 @@ class MainController extends Controller
                     FacilityName,                        
                     County,                        
                     PartnerName CTPartner,
-                    ARTOutcome,                        
+                    ARTOutcomeDescription,                        
                     NextAppointmentDate
                 from REPORTING.dbo.Linelist_FACTART
-                where age between 0 and 19 and datediff (mm,NextAppointmentDate, EOMONTH(DATEADD(mm,-1,GETDATE())))<=6 and ARTOutcome not in ('V','D','T','NP','S')            
+                where age between 0 and 19 and datediff (mm,NextAppointmentDate, EOMONTH(DATEADD(mm,-1,GETDATE())))<=6 and ARTOutcomeDescription not in ('Active','Dead','Transferred Out','New Patient','Stopped')            
             ), PaedsIIT AS (            
                 Select                        
                     MFLCode,                        
@@ -1093,7 +1093,7 @@ class MainController extends Controller
                     PartnerName,
                     Count (*)FemalesTXCurr
             from REPORTING.dbo.Linelist_FACTART as ART
-            where ARTOutcome='V' and  Gender='Female' and age between 20 and 49
+            where ARTOutcomeDescription='Active' and  Gender='Female' and age between 20 and 49
             group by
                 PartnerName
             ),
@@ -1108,7 +1108,7 @@ class MainController extends Controller
             where ContactAge<=19
                     and Gender = 'Female'
                     and age between 20 and 49
-                    and ARTOutcome ='V'
+                    and ARTOutcomeDescription ='Active'
             Group by
                 PartnerName    
             ),
@@ -1123,7 +1123,7 @@ class MainController extends Controller
             where ContactAge<=19
                     and Gender = 'Female'
                     and age between 20 and 49
-                    and ARTOutcome ='V' and KnowledgeOfHivStatus <> 'Yes'
+                    and ARTOutcomeDescription ='Active' and KnowledgeOfHivStatus <> 'Yes'
             Group by
                 PartnerName    
             ),
@@ -1141,7 +1141,7 @@ class MainController extends Controller
             where ContactAge<=19
                     and Gender = 'Female'
                     and age between 20 and 49
-                    and ARTOutcome='V'
+                    and ARTOutcomeDescription ='Active'
             Group by
                 PartnerName
             ),
@@ -1159,7 +1159,7 @@ class MainController extends Controller
             where ContactAge<=19
                     and Gender = 'Female'
                     and age between 20 and 49
-                    and ARTOutcome='V'
+                    and ARTOutcomeDescription ='Active'
                     and FinalTestResult='Positive'
             Group by
                 PartnerName
@@ -1181,7 +1181,7 @@ class MainController extends Controller
             where ContactAge<=19
                     and Gender = 'Female'
                     and age between 20 and 49
-                    and ARTOutcome='V'
+                    and ARTOutcomeDescription ='Active'
                     and FinalTestResult='Positive'
             Group by
                 PartnerName
@@ -1323,7 +1323,7 @@ class MainController extends Controller
                     County,
                     COUNT(DISTINCT CONCAT(PatientID, '-', PatientPK,'-',MFLCode)) AS CurTx_total
                 FROM PortalDev.dbo.Fact_Trans_New_Cohort
-                WHERE ARTOutcome = 'V'
+                WHERE ARTOutcomeDescription ='Active'
                 GROUP BY MFLCode, FacilityName, CTPartner, County
             ),
             EMR As (SELECT
@@ -1747,7 +1747,7 @@ class MainController extends Controller
     {
         // Get previous Month and Year
         $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
-        $query = "with facilities_list as (
+        $query = "WITH facilities_list as (
                 select 
                     distinct 
                     FacilityName,
@@ -1781,7 +1781,7 @@ class MainController extends Controller
                 MFLCode,
                 CTPartner as SDIP,
                 CTAgency as Agency,
-                ARTOutcome as ARTOutcomeJuly2022
+                ARTOutcomeDescription as ARTOutcomeJuly2022
             from tmp_and_adhoc.dbo.nupi_dataset_20220826 
             inner join PortalDev.dbo.Fact_Trans_New_Cohort as cohort on  replace(ccc_no, '-' , '') = cohort.PatientID
                 and nupi_dataset_20220826.origin_facility_kmfl_code = cohort.MFLCode
@@ -1906,7 +1906,7 @@ class MainController extends Controller
         // Get previous Month and Year
         $reportingMonth = Carbon::now()->subMonth()->format('M_Y');
 
-        $query = "With NDW_CurTx AS (
+        $query = "WITH NDW_CurTx AS (
                 SELECT
                     MFLCode,
                     FacilityName,
@@ -1914,7 +1914,7 @@ class MainController extends Controller
                     County,
                     COUNT(DISTINCT CONCAT(PatientID, '-', PatientPK,'-',MFLCode)) AS CurTx_total
                 FROM PortalDev.dbo.Fact_Trans_New_Cohort
-                WHERE ARTOutcome = 'V'
+                WHERE ARTOutcomeDescription ='Active'
                 GROUP BY MFLCode, FacilityName, CTPartner, County
             ),
             EMR As (SELECT
