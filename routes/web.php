@@ -319,6 +319,14 @@ Route::get('/email/comparison_txcurr', function () {
                 from AllUpload
 				WHERE Num = 1
             ),
+            Facilityinfo AS (
+                Select
+                    MFL_Code,
+                    County,
+                    SDP,
+                    EMR
+                from HIS_Implementation.dbo.All_EMRSites
+            ),
             EMR As (
                 SELECT
                     Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
@@ -440,6 +448,7 @@ Route::get('/email/comparison_txcurr', function () {
                 NDW_CurTx.FacilityName As FacilityName,
                 NDW_CurTx.PartnerName,
                 NDW_CurTx.County,
+                fac.emr as EMR,
                 DHIS2_CurTx.CurrentOnART_Total As KHIS_TxCurr,
                 NDW_CurTx.CurTx_total AS DWH_TXCurr,
                 LatestEMR.EMRValue As EMR_TxCurr,
@@ -452,7 +461,7 @@ Route::get('/email/comparison_txcurr', function () {
                 /CAST(DHIS2_CurTx.CurrentOnART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_DWH,
                 CAST(ROUND((CAST(DHIS2_CurTx.CurrentOnART_Total AS DECIMAL(7,2)) - CAST(LatestEMR.EMRValue AS DECIMAL(7,2)))
                 /CAST(DHIS2_CurTx.CurrentOnART_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_EMR,
-                cast (Upload.DateUploaded as date)As DateUploaded,
+                cast (Upload.DateUploaded as date) As DateUploaded,
                 -- cast (Upload.SiteAbstractionDate as date) As SiteAbstractionDate,
                 case when CompletenessStatus is null then 'Complete' else 'Incomplete' End As Completeness,
 				DWAPI.DwapiVersion
@@ -462,6 +471,7 @@ Route::get('/email/comparison_txcurr', function () {
             left join DHIS2_CurTx on NDW_CurTx.MFLCode=DHIS2_CurTx.SiteCode COLLATE Latin1_General_CI_AS
             left join Upload on NDW_CurTx.MFLCode=Upload.MFLCode
             left join Uploaddata on NDW_CurTx.MFLCode=Uploaddata.MFLCode COLLATE Latin1_General_CI_AS
+            left join Facilityinfo fac on NDW_CurTx.MFLCode=fac.MFL_Code
             ORDER BY Percent_variance_EMR_DWH DESC";
     
     $comparison_hts = "WITH NDW_HTSPos AS (
@@ -479,14 +489,23 @@ Route::get('/email/comparison_txcurr', function () {
                 where link.DateTestedKey  between  DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE())-1, 0) and DATEADD(MONTH, DATEDIFF(MONTH, -1, GETDATE())-1, -1) and FinalTestResult='Positive' and MFLCode is not null and TestType in ('Initial Test', 'Initial')
                 GROUP BY MFLCode, FacilityName, PartnerName, County
             ),
-        -- Upload As (
-        --     SELECT distinct
-        --         MFLCode,
-        --         FacName As FacilityName,
-        --         [CT Partner],
-        --         DateUploaded
-        --         from All_Staging_2016_2.dbo.Cohort2015_2016
-        --     ),
+            AllUpload as (
+				SELECT
+					dat.Date DateUploaded, 
+					[MFLCode],
+					ROW_NUMBER()OVER(Partition by MFLCode Order by [UploadsDateKey] Desc) as Num
+				FROM [NDWH].[dbo].[FactManifiest] m
+				LEFT JOIN NDWH.dbo.DimFacility fac ON fac.FacilityKey = m.FacilityKey
+				LEFT JOIN NDWH.dbo.DimDate dat ON dat.DateKey = m.UploadsDateKey
+			),
+            Upload As (
+				SELECT distinct
+					MFLCode,
+					-- SiteAbstractionDate,
+					DateUploaded
+                from AllUpload
+				WHERE Num = 1
+            ),
             EMR As (SELECT
                 Row_Number () over (partition by FacilityCode order by statusDate desc) as Num,
                     facilityCode
@@ -496,7 +515,7 @@ Route::get('/email/comparison_txcurr', function () {
                     ,indicatorDate
                 FROM livesync.dbo.indicator
                 where stage like '%EMR' and name like '%HTS_TESTED_POS' and indicatorDate=EOMONTH(DATEADD(mm,-1,GETDATE())) and facilityCode is not null
-                ),
+            ),
             Facilityinfo AS (
                 Select
                     MFL_Code,
@@ -562,13 +581,13 @@ Route::get('/email/comparison_txcurr', function () {
                 /CAST(DHIS2_HTSPos.Positive_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_DWH,
                 CAST(ROUND((CAST(DHIS2_HTSPos.Positive_Total AS DECIMAL(7,2)) - CAST(LatestEMR.EMRValue AS DECIMAL(7,2)))
                 /CAST(DHIS2_HTSPos.Positive_Total  AS DECIMAL(7,2))* 100, 2) AS float) AS Percent_variance_KHIS_EMR,
-                -- cast (Upload.DateUploaded as date)As DateUploaded,
-				DWAPI.DwapiVersion
+                cast (Upload.DateUploaded as date) As DateUploaded,
+                DWAPI.DwapiVersion
             from DHIS2_HTSPos
             left join LatestEMR on DHIS2_HTSPos.sitecode=LatestEMR.facilityCode
 			LEFT JOIN DWAPI ON DWAPI.SiteCode= LatestEMR.facilityCode
             left join NDW_HTSPos on NDW_HTSPos.sitecode=DHIS2_HTSPos.SiteCode
-            -- left join Upload on NDW_HTSPos.sitecode=Upload.MFLCode
+            left join Upload on NDW_HTSPos.SiteCode=Upload.MFLCode
             left join Facilityinfo fac on DHIS2_HTSPos.SiteCode=fac.MFL_Code
             where DHIS2_HTSPos.Positive_Total is not null
             ORDER BY Percent_variance_EMR_DWH DESC";
