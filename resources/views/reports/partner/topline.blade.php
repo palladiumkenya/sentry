@@ -390,7 +390,7 @@ transparent;border-left: 0px solid transparent;border-right: 0px solid transpare
 
                                                                     <strong>PaedsTested</strong> - these are the no. of tested patients who are less than 15 years and were elicited from female patients - who are TXCurr and have age greater than 15 (inclusive) and above<br/>
 
-                                                                    <strong>PaedsOnMMD</strong> - these are the no. of patients who are TXCurr between age 19 (inclusive) and below whose MMD is more than 84 (inclusive) days<br/>
+                                                                    <strong>PaedsOnMMD</strong> - these are the no. of patients who are TXCurr between age 19 (inclusive) and below whose MMD is more than 90 (inclusive) days<br/>
                                                                 </p>
                                                                 <p style="font-size: 14px; line-height: 140%;"> </p>
                                                                 <p style="font-size: 14px; line-height: 140%;">Kind

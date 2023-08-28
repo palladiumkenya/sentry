@@ -894,8 +894,8 @@ class MainController extends Controller
                     PartnerName CTPartner,                        
                     lastVisitDate dtlastvisit,                        
                     NextAppointmentDate,                        
-                    CASE WHEN ABS(DATEDIFF(DAY,lastVisitDate ,NextAppointmentDate) ) <=83 THEN 0              
-                                WHEN ABS(DATEDIFF(DAY,lastVisitDate ,NextAppointmentDate) )   >= 84 THEN  1
+                    CASE WHEN ABS(DATEDIFF(DAY,lastVisitDate ,NextAppointmentDate) ) <=89 THEN 0              
+                                WHEN ABS(DATEDIFF(DAY,lastVisitDate ,NextAppointmentDate) )   >= 90 THEN  1
                     ELSE NULL END AS MMDStatus
                 from REPORTING.dbo.Linelist_FACTART as cohort
                 where Age between 0 and 19 and ARTOutcomeDescription='Active' 
