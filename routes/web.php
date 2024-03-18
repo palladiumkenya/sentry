@@ -531,7 +531,7 @@ Route::get('/email/comparison_txcurr', function () {
                     [County],
                     Positive_Total,
                     ReportMonth_Year
-                FROM [NDWH].[dbo].FACT_HTS_DHIS2
+                FROM [ODS].[dbo].HTS_DHIS2
                 WHERE ReportMonth_Year = ".Carbon::now()->subMonth()->format('Ym')." and SiteCode <>'NULL' and ISNUMERIC(SiteCode) =1
             ),
             LatestEMR AS (
