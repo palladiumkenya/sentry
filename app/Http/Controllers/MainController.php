@@ -699,17 +699,17 @@ class MainController extends Controller
     public function PeadAlert($email)
     {
         $query = "WITH otz_10_19_yrs as (
-                select                    
-                        MFLCode,                    
-                        FacilityName,                    
-                        PartnerName CTPartner,                    
-                        County,                    
+                select
+                        MFLCode,
+                        FacilityName,
+                        PartnerName CTPartner,
+                        County,
                         count(*) as no_otz_10_19_yrs
                 from REPORTING.dbo.LineListOTZ
                 where AgeGroup in ('10 to 14', '15 to 19')
                 group by MFLCode, FacilityName, PartnerName, County
             ), ovc_0_17_yrs as (
-                select                    
+                select
                     MFLCode,
                     FacilityName,
                     County,
@@ -772,16 +772,16 @@ class MainController extends Controller
 
             ), documented_regimen_0_19_yrs as (                
                 select                        
-                    SiteCode MFLCode,                        
-                    FacilityName,                        
-                    County,                        
-                    PartnerName CTPartner,                        
+                    SiteCode MFLCode,
+                    FacilityName,
+                    County,
+                    PartnerName CTPartner,
                     count(*) as no_txcurr_0_19_yrs_documented_regimen
                 from REPORTING.dbo.Linelist_FACTART as cohort
                 where age between 0 and 19                    
                     and isTXCurr=1                
                 group by SiteCode, FacilityName, PartnerName, County
-            ), visit_weight_and_height_ordering as (                
+            ), visit_weight_and_height_ordering as (
             /* order pharmacy dispensations as of date by the VisitDate */                                
                 select
                     DISTINCT row_number() over (partition by PatientIDHash ,SiteCode,PatientPKHash order by VisitDate desc) as num,
@@ -866,7 +866,7 @@ class MainController extends Controller
                     Cohort.County,
                     Cohort.PartnerName CTPartner,
                     Cohort.AgencyName CTAgency,
-                    Count (Distinct concat(ContactPatientPK,listing.Sitecode))PaedsListed
+                    Count (Distinct concat(ContactPatientPKHash,listing.Sitecode))PaedsListed
                 FROM [ODS].[dbo].CT_ContactListing listing 
                 inner join REPORTING.dbo.Linelist_FACTART Cohort on listing.PatientIDHash=Cohort.PatientIDHash Collate Latin1_General_CI_AS and listing.PatientPKHash=Cohort.PatientPKHash Collate Latin1_General_CI_AS and listing.SiteCode=Cohort.SiteCode
                 where ContactAge<15 and cohort.Gender = 'Female' and cohort.age >= 15 and cohort.isTXCurr =1
@@ -878,10 +878,10 @@ class MainController extends Controller
                     Cohort.County,                
                     Cohort.PartnerName CTPartner,                
                     Cohort.AgencyName CTAgency,                
-                    Count (Distinct concat(ContactPatientPK,listing.SiteCode)) As PaedsTested
+                    Count (Distinct concat(ContactPatientPKHash,listing.SiteCode)) As PaedsTested
                 FROM [ODS].[dbo].CT_ContactListing listing
                 inner join REPORTING.dbo.Linelist_FACTART Cohort on listing.PatientIDHash=Cohort.PatientIDHash Collate Latin1_General_CI_AS and listing.PatientPKHash=Cohort.PatientPKHash Collate Latin1_General_CI_AS and listing.SiteCode=Cohort.SiteCode
-                inner join ODS.dbo.HTS_ClientTests tests on listing.ContactPatientPK=tests.PatientPk and listing.SiteCode=tests.SiteCode
+                inner join ODS.dbo.HTS_ClientTests tests on listing.ContactPatientPKHash=tests.PatientPkHash and listing.SiteCode=tests.SiteCode
                 where ContactAge<15 and cohort.Gender = 'Female' and cohort.age >= 15 and cohort.isTXCurr = 1
                 Group by Cohort.SiteCode, Coalesce (listing.FacilityName,Cohort.FacilityName Collate Latin1_General_CI_AS), Cohort.County, Cohort.PartnerName, Cohort.AgencyName
             ), MMDCalc as (
