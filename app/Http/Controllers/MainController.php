@@ -1100,10 +1100,10 @@ class MainController extends Controller
             PaedsListed AS (
             SELECT
                     PartnerName,
-                    Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsListed
+                    Count (Distinct concat(ContactPatientPKHash,ART.Sitecode))PaedsListed
                 FROM [ODS].dbo.CT_ContactListing listing 
                 inner join REPORTING.dbo.Linelist_FACTART as ART on
-                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.PatientPKHash=ART.PatientPKHash and
                 listing.SiteCode=ART.SiteCode
             where ContactAge<=19
                     and Gender = 'Female'
@@ -1115,10 +1115,10 @@ class MainController extends Controller
             PaedsEligible AS (
             SELECT
                     PartnerName,
-                    Count (Distinct concat(ContactPatientPK,ART.Sitecode))PaedsEligible
+                    Count (Distinct concat(ContactPatientPKHash,ART.Sitecode))PaedsEligible
                 FROM [ODS].dbo.CT_ContactListing listing 
                 inner join REPORTING.dbo.Linelist_FACTART as ART on
-                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.PatientPKHash=ART.PatientPKHash and
                 listing.SiteCode=ART.SiteCode
             where ContactAge<=19
                     and Gender = 'Female'
@@ -1130,13 +1130,13 @@ class MainController extends Controller
             PaedsTested AS (
             SELECT
                     PartnerName,
-                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsTested
+                    Count (Distinct concat(ContactPatientPKHash,listing.SiteCode))As PaedsTested
                 FROM [ODS].[dbo].[CT_ContactListing] listing 
                 inner join REPORTING.dbo.Linelist_FACTART as ART on
-                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.PatientPKHash=ART.PatientPKHash and
                 listing.SiteCode=ART.SiteCode
                 inner join ODS.dbo.HTS_ClientTests tests on
-                listing.ContactPatientPK=tests.PatientPk and
+                listing.ContactPatientPKHash=tests.PatientPkHash and
                 listing.SiteCode=tests.SiteCode
             where ContactAge<=19
                     and Gender = 'Female'
@@ -1148,13 +1148,13 @@ class MainController extends Controller
             PaedsHIVPos AS (
             SELECT
                     PartnerName,
-                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsHIVPos
+                    Count (Distinct concat(ContactPatientPKHash,listing.SiteCode))As PaedsHIVPos
                 FROM [ODS].[dbo].[CT_ContactListing] listing 
                 inner join REPORTING.dbo.Linelist_FACTART as ART on
-                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.PatientPKHash=ART.PatientPKHash and
                 listing.SiteCode=ART.SiteCode
                 inner join ODS.dbo.HTS_ClientTests tests on
-                listing.ContactPatientPK=tests.PatientPk and
+                listing.ContactPatientPKHash=tests.PatientPkHash and
                 listing.SiteCode=tests.SiteCode
             where ContactAge<=19
                     and Gender = 'Female'
@@ -1167,16 +1167,16 @@ class MainController extends Controller
             PaedsLinked AS (
             SELECT
                     PartnerName,
-                    Count (Distinct concat(ContactPatientPK,listing.SiteCode))As PaedsLinked
+                    Count (Distinct concat(ContactPatientPKHash,listing.SiteCode))As PaedsLinked
                 FROM [ODS].[dbo].[CT_ContactListing] listing 
                 inner join REPORTING.dbo.Linelist_FACTART as ART on
-                convert(nvarchar(64), hashbytes('SHA2_256', cast(listing.PatientPK as nvarchar(36))), 2)=ART.PatientPKHash and
+                listing.PatientPKhash=ART.PatientPKHash and
                 listing.SiteCode=ART.SiteCode
                 inner join ODS.dbo.HTS_ClientTests tests on
-                listing.ContactPatientPK=tests.PatientPk and
+                listing.ContactPatientPKHash=tests.PatientPkHash and
                 listing.SiteCode=tests.SiteCode
                 inner join ODS.dbo.HTS_ClientLinkages linkage  on
-                tests.PatientPk=linkage.PatientPK and
+                tests.PatientPkHash=linkage.PatientPKHash and
                 tests.SiteCode=linkage.SiteCode
             where ContactAge<=19
                     and Gender = 'Female'
